@@ -12,7 +12,7 @@ class LandingPageUseCase(
     private val settingsRepository: ISettingsRepository
 ) : ILandingPageUseCase {
     override suspend fun deleteAllGoals(): Boolean = goalRepository.deleteAll()
-    override fun getAllGoals(): Flow<List<Goal>> = goalRepository.getGoals()
+    override suspend fun getAllGoals(): Flow<List<Goal>> = goalRepository.getGoals()
     override suspend fun updateGoalStatus(id: Int, status: Status) =
         goalRepository.updateStatus(id, status)
 

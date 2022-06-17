@@ -4,7 +4,10 @@ import com.example.aimissionlite.models.domain.Goal
 
 sealed class LandingPageUiEvent(val message: String? = null, val goal: Goal? = null) {
     class ShowSnackbar(message: String) : LandingPageUiEvent(message)
-    class NavigateToDetail(goal: Goal? = null) : LandingPageUiEvent(goal = goal)
-    class NavigateToInfo : LandingPageUiEvent()
-    class NavigateToSettings : LandingPageUiEvent()
+    object OnAddGoalClicked : LandingPageUiEvent()
+    class NavigateToDetailGoal(goal: Goal? = null) : LandingPageUiEvent(goal = goal)
+    object NavigateToInfo : LandingPageUiEvent()
+    object NavigateToSettings : LandingPageUiEvent()
+    class OnDeleteGoalClicked(goal:Goal):LandingPageUiEvent()
+    class OnStatusChangedClicked(goal:Goal):LandingPageUiEvent()
 }

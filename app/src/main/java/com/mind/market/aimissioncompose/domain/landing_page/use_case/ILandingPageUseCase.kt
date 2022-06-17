@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface ILandingPageUseCase {
     suspend fun deleteAllGoals(): Boolean
 
-    fun getAllGoals(): Flow<List<Goal>>
+    suspend fun getAllGoals(): Flow<List<Goal>>
 
     suspend fun updateGoalStatus(
         id: Int,

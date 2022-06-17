@@ -17,5 +17,5 @@ interface IGoalRepository {
 
     suspend fun updateGoal(goal: Goal): Boolean
 
-    fun getGoals(): Flow<List<Goal>>
+    suspend fun getGoals(): Flow<List<Goal>>
 }
