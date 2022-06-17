@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- strings -->
+    <string name="goal_item_image_button_status_changed_content_description">Goal Status Changed Button</string>
+
+    <!-- styles -->
+    <style name="GoalImageButtonStatusChange">
+        <item name="android:layout_margin">@dimen/spacing</item>
+    </style>
+
+    <style name="GoalImageButtonDeleteGoal">
+        <item name="android:layout_margin">@dimen/spacing</item>
+    </style>
+
+</resources>

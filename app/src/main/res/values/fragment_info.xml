@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- strings -->
+    <string name="fragment_info_title">About AimissionLite</string>
+    <string name="fragment_info_author_label_text">Create by:</string>
+    <string name="fragment_info_app_version_label_text">Version:</string>
+    <string name="fragment_info_app_version_value_text">0.2</string>
+    <string name="fragment_info_author_value_text">Michael Widlok</string>
+
+    <!-- styles -->
+    <style name="FragmentInfoTitle">
+        <item name="android:text">@string/fragment_info_title</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_double</item>
+        <item name="android:layout_marginRight">@dimen/spacing_triple</item>
+        <item name="android:textSize">@dimen/font_size_medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingBottom">@dimen/spacing_double</item>
+    </style>
+
+    <style name="FragmentInfoAuthorTextLabel">
+        <item name="android:text">@string/fragment_info_author_label_text</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_double</item>
+        <item name="android:layout_marginRight">@dimen/spacing_triple</item>
+        <item name="android:textSize">@dimen/font_size_medium</item>
+    </style>
+
+    <style name="FragmentInfoAuthorTextValue">
+        <item name="android:layout_marginLeft">@dimen/spacing_double</item>
+        <item name="android:layout_marginRight">@dimen/spacing_triple</item>
+        <item name="android:textSize">@dimen/font_size_medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAlignment">textEnd</item>
+    </style>
+
+    <style name="FragmentInfoAppVersionTextLabel">
+        <item name="android:text">@string/fragment_info_app_version_label_text</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_double</item>
+        <item name="android:layout_marginRight">@dimen/spacing_triple</item>
+        <item name="android:textSize">@dimen/font_size_medium</item>
+    </style>
+
+    <style name="FragmentInfoAppVersionTextValue">
+        <item name="android:layout_marginLeft">@dimen/spacing_double</item>
+        <item name="android:layout_marginRight">@dimen/spacing_triple</item>
+        <item name="android:textSize">@dimen/font_size_medium</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAlignment">textEnd</item>
+    </style>
+
+</resources>

@@ -1,0 +1,21 @@
+<resources>
+    <!-- strings -->
+    <string name="app_name">AimissionCompose</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_info">Info</string>
+
+    <string name="landing_page_fragment_label">LandingPage Fragment</string>
+    <string name="detail_fragment_label">Detail Fragment</string>
+    <string name="info_fragment_label">Info Fragment</string>
+    <string name="settings_fragment_label">Settings Fragment</string>
+    <string name="previous">Previous</string>
+    <string name="bundle_argument_goal_title">goal_title</string>
+
+    <string name="channel_name">AimissionLite Channel</string>
+    <string name="channel_description">Aimission Lite Channel Description</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+
+</resources>

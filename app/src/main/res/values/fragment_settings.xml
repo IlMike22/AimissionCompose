@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--strings-->
+    <string name="fragment_settings_header_text">Adjust Aimission`s behaviour as you like.</string>
+    <string name="fragment_settings_checkbox_delete_goals_text">Delete all goals immediately</string>
+    <string name="fragment_settings_checkbox_delete_goals_description">As long as this option is active, all goals will be deleted every time.</string>
+
+    <!-- styles -->
+    <style name="FragmentSettingsHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/spacing_double</item>
+    </style>
+
+    <style name="FragmentSettingsCheckboxDeleteGoals">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/fragment_settings_checkbox_delete_goals_text</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_triple</item>
+        <item name="android:layout_marginTop">@dimen/spacing_triple</item>
+        <item name="android:layout_marginBottom">@dimen/spacing</item>
+    </style>
+
+    <style name="FragmentSettingsDeleteGoalsDescription">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:text">@string/fragment_settings_checkbox_delete_goals_description</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_triple</item>
+    </style>
+</resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--strings -->
+    <string name="text_view_title">Gib ein neues Ziel ein</string>
+    <string name="button_done">Fertig</string>
+    <string name="edit_text_title_hint">Titel</string>
+    <string name="edit_text_description_hint">Beschreibung</string>
+    <string name="text_view_priority">Priorität</string>
+    <string name="picker_genre">Genre</string>
+
+    <string name="low_priority">Low priority</string>
+    <string name="high_priority">High priority</string>
+
+    <string name="choose_priority">Choose a priority</string>
+    <string name="choose_genre">Choose a genre for your goal</string>
+
+    <string name="hello_world">Hello Square World!</string>
+    <string name="fragment_detail_chip_genre_partnership_text">Partnership</string>
+    <string name="fragment_detail_chip_genre_socialising_text">Socialising</string>
+    <string name="fragment_detail_chip_genre_health_text">Health</string>
+    <string name="fragment_detail_chip_genre_money_text">Money</string>
+    <string name="fragment_detail_chip_genre_fitness_text">Fittness</string>
+    <string name="fragment_detail_chip_genre_business_text">Business</string>
+
+    <string name="fragment_detail_add_goal_button_text">Fertig</string>
+
+    <string name="fragment_detail_goal_validation_status_no_title">You have no title set.</string>
+    <string name="fragment_detail_goal_validation_status_no_description">You have no description set.</string>
+    <string name="fragment_detail_goal_validation_status_no_genre">You have no genre set.</string>
+    <string name="fragment_detail_goal_created_validation_status_success">Your goal was successfully created!</string>
+    <string name="fragment_detail_goal_updated_validation_status_success">Your goal was successfully updated!</string>
+
+    <!--styles -->
+    <style name="text_view">
+        <item name="android:padding">8dp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+    </style>
+
+    <style name="edit_text">
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@color/white</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+    </style>
+
+    <style name="text_view_header_genre" parent="text_view">
+        <item name="android:layout_marginTop">@dimen/margin_standard_double</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:layout_margin">@dimen/margin_standard_double</item>
+    </style>
+
+    <style name="text_view_header_priority" parent="text_view">
+        <item name="android:layout_marginTop">@dimen/margin_standard_double</item>
+        <item name="android:textAlignment">textStart</item>
+        <item name="android:layout_margin">@dimen/margin_standard_double</item>
+    </style>
+
+    <style name="common_chip_group_style">
+        <item name="android:layout_margin">@dimen/margin_standard</item>
+    </style>
+
+    <style name="fragment_detail_button_save_goal">
+        <item name="android:layout_marginBottom">@dimen/margin_standard_double</item>
+    </style>
+
+    <!-- chip ids -->
+    <integer name="id_business">1</integer>
+</resources>
