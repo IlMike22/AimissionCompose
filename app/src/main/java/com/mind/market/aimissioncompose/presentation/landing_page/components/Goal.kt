@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.aimissionlite.models.domain.Goal
+import com.mind.market.aimissioncompose.domain.models.Goal
 
 @Composable
 fun Goal(
@@ -27,7 +27,7 @@ fun Goal(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(8.dp)
             .background(Color.LightGray),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {

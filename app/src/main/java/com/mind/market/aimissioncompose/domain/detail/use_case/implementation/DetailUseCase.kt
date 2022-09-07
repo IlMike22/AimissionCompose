@@ -1,7 +1,7 @@
 package com.example.aimissionlite.domain.detail.use_case.implementation
 
 import com.example.aimissionlite.domain.detail.use_case.IDetailUseCase
-import com.example.aimissionlite.models.domain.Goal
+import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 
 class DetailUseCase(

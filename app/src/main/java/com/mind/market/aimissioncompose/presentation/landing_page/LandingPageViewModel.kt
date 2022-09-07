@@ -7,11 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.aimissionlite.domain.landing_page.use_case.ILandingPageUseCase
-import com.example.aimissionlite.models.domain.Genre
-import com.example.aimissionlite.models.domain.Goal
-import com.example.aimissionlite.models.domain.Priority
+import com.mind.market.aimissioncompose.domain.models.Goal
 import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -20,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
-    private val useCase: ILandingPageUseCase
+    private val repository: IGoalRepository
 ) : ViewModel() {
     var state by mutableStateOf(LandingPageState())
 
@@ -32,7 +31,7 @@ class LandingPageViewModel @Inject constructor(
     val uiEvent = MutableSharedFlow<LandingPageUiEvent>()
 
     init {
-        isDeleteAllGoals = useCase.getDeleteGoalsOnStartup().asLiveData()
+//        isDeleteAllGoals = repository.getDeleteGoalsOnStartup().asLiveData()
         getGoals()
     }
 
@@ -49,22 +48,14 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.NavigateToSettings -> {
                 onSettingsClicked()
             }
+            is LandingPageUiEvent.OnDeleteGoalClicked -> TODO()
+            is LandingPageUiEvent.OnStatusChangedClicked -> TODO()
+            is LandingPageUiEvent.ShowSnackbar -> TODO()
         }
     }
 
-    fun onAddGoalClicked() {
+    private fun onAddGoalClicked() {
         viewModelScope.launch {
-            //TODO remove again - just for testing.
-            state = state.copy(
-                goals = listOf(
-                    Goal(0,"first item!","first description","2022-10-31","",false, Genre.BUSINESS,Status.TODO,Priority.LOW),
-                    Goal(1,"second item!","second description","2022-10-22","",false, Genre.FITNESS,Status.TODO,Priority.NORMAL),
-                    Goal(2,"third item!","third description","2022-10-01","",true, Genre.PARTNERSHIP,Status.TODO,Priority.HIGH),
-                    Goal(3,"fourth item!","fourth description","2022-10-31","",false, Genre.MONEY,Status.TODO,Priority.LOW),
-                    Goal(4,"fifth item!","fifth description","2022-10-22","",false, Genre.SOCIALISING,Status.TODO,Priority.NORMAL),
-                    Goal(5,"six item!","six description","2022-10-01","",true, Genre.HEALTH,Status.TODO,Priority.HIGH)
-                )
-            )
             uiEvent.emit(LandingPageUiEvent.NavigateToDetailGoal())
         }
     }
@@ -85,7 +76,7 @@ class LandingPageViewModel @Inject constructor(
     fun onGoalStatusClicked(goal: Goal?) {
         goal?.apply {
             viewModelScope.launch {
-                useCase.updateGoalStatus(
+                repository.updateStatus(
                     id = goal.id,
                     status = getNewGoalStatus(goal.status)
                 )
@@ -105,7 +96,7 @@ class LandingPageViewModel @Inject constructor(
         lastDeletedGoal = goal ?: Goal.EMPTY
         goal?.apply {
             viewModelScope.launch {
-                val isDeleteSucceeded = useCase.deleteGoal(goal)
+                val isDeleteSucceeded = repository.deleteGoal(goal)
                 if (isDeleteSucceeded.not()) {
                     println("!!! Error while deleting the goal.")
                 }
@@ -118,23 +109,42 @@ class LandingPageViewModel @Inject constructor(
     fun restoreDeletedGoal() {
         if (lastDeletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                useCase.insertGoal(lastDeletedGoal)
+                repository.insert(lastDeletedGoal)
             }
         }
     }
 
     suspend fun deleteAllGoals(): Boolean {
-        return useCase.deleteAllGoals()
+        return repository.deleteAll()
     }
 
     private fun getGoals() {
         viewModelScope.launch {
-            useCase.getAllGoals().collect { goals ->
-                state = state.copy(
-                    goals = goals
-                )
+            repository.getGoals().collect { response ->
+                when(response) {
+                    is Resource.Success -> {
+                        state = state.copy(
+                            goals = response.data?: emptyList(),
+                            isLoading = false,
+                            errorMessage = ""
+                        )
+                    }
+                    is Resource.Loading -> {
+                        state = state.copy(
+                            goals = emptyList(),
+                            isLoading = true,
+                            errorMessage = ""
+                        )
+                    }
+                    is Resource.Error -> {
+                        state = state.copy(
+                            goals = emptyList(),
+                            isLoading = false,
+                            errorMessage = response.message?:"Unknown error while loading data."
+                        )
+                    }
+                }
             }
-
         }
     }
 

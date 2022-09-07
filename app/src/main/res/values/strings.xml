@@ -13,6 +13,9 @@
 
     <string name="channel_name">AimissionLite Channel</string>
     <string name="channel_description">Aimission Lite Channel Description</string>
+
+    <string name="detail_goal_title">Goal Title</string>
+    <string name="detail_goal_description">Goal Description</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.

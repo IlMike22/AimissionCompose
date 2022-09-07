@@ -1,15 +1,15 @@
-package com.example.aimissionlite.models.domain
+package com.mind.market.aimissioncompose.domain.models
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.example.aimissionlite.models.domain.Genre
+import com.example.aimissionlite.models.domain.Status
+import java.time.LocalDateTime
 
-@Entity(tableName = "goal_table")
 data class Goal(
-    @PrimaryKey(autoGenerate = true) val id: Int,
+    val id: Int,
     val title: String,
     val description: String,
-    val creationDate: String,
-    val changeDate: String,
+    val creationDate: LocalDateTime,
+    val changeDate: LocalDateTime,
     val isRepeated: Boolean,
     val genre: Genre,
     val status: Status,
@@ -17,44 +17,20 @@ data class Goal(
 ) {
     companion object {
         val EMPTY = Goal(
-            id = 0,
-            "",
+            id = -1,
+            title = "",
             description = "",
-            creationDate = "",
-            changeDate = "",
+            creationDate = LocalDateTime.now(),
+            changeDate = LocalDateTime.now(),
             isRepeated = false,
             genre = Genre.UNKNOWN,
             status = Status.UNKNOWN,
             priority = Priority.UNKNOWN
         )
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (other is Goal) {
-            return this.id == other.id && this.genre == other.genre &&
-                    this.priority == other.priority &&
-                    this.title == other.title &&
-                    this.description == other.description &&
-                    this.isRepeated == other.isRepeated &&
-                    this.creationDate == other.creationDate &&
-                    this.status == other.status
-        }
-        return super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + title.hashCode()
-        result = 31 * result + description.hashCode()
-        result = 31 * result + creationDate.hashCode()
-        result = 31 * result + changeDate.hashCode()
-        result = 31 * result + isRepeated.hashCode()
-        result = 31 * result + genre.hashCode()
-        result = 31 * result + status.hashCode()
-        result = 31 * result + priority.hashCode()
-        return result
-    }
 }
+
+
 
 
 

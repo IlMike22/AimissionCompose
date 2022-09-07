@@ -1,6 +1,9 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
@@ -9,10 +12,11 @@ import com.example.aimissionlite.domain.detail.use_case.IDetailUseCase
 import com.example.aimissionlite.models.domain.*
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -25,8 +29,10 @@ class DetailViewModel @Inject constructor(
     val uiEvent = MutableSharedFlow<DetailUIEvent<GoalValidationStatusCode>>()
     private val resourceProvider = getApplication<AimissionComposeApplication>()
 
-    private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
-    val state = _state.asStateFlow()
+    var state by mutableStateOf(DetailState())
+
+   // private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
+    //val state = _state.asStateFlow()
 
     private var currentGoal = Goal.EMPTY
     var buttonText: String = resourceProvider.getString(R.string.button_done)
@@ -150,10 +156,10 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun showGoal(goal: Goal) {
-        _state.value = DetailState.ShowEditGoal(goal)
+        //_state.value = DetailState.ShowEditGoal(goal)
     }
 
-    private fun getCurrentDate(): String = LocalDateTime.now().toString()
+    private fun getCurrentDate() = LocalDateTime.now()
 
     private fun isGoalValid(goal: Goal): ValidationStatusCode {
         goal.apply {

@@ -19,6 +19,7 @@ import com.mind.market.aimissioncompose.presentation.landing_page.components.Goa
 
 @Composable
 fun LandingPageScreen(
+    onAddGoalClick: () -> Unit,
     viewModel: LandingPageViewModel = hiltViewModel()
 ) {
     val state = viewModel.state
@@ -29,7 +30,7 @@ fun LandingPageScreen(
     ) {
         FloatingActionButton(
             onClick = {
-                viewModel.onEvent(LandingPageUiEvent.OnAddGoalClicked)
+                onAddGoalClick()
             }) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
         }
@@ -48,7 +49,7 @@ fun LandingPageScreen(
                         .clickable {
                             viewModel.onEvent(LandingPageUiEvent.NavigateToDetailGoal(goal))
                         }
-                        .padding(16.dp),
+                        .padding(8.dp),
                     goal = goal,
                     onDeleteClicked = {
                         viewModel.onEvent(

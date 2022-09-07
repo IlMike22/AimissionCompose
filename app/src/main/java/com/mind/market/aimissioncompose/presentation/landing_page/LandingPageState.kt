@@ -1,7 +1,9 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
-import com.example.aimissionlite.models.domain.Goal
+import com.mind.market.aimissioncompose.domain.models.Goal
 
 data class LandingPageState(
-    val goals: List<Goal> = emptyList()
+    val goals: List<Goal> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String = ""
 )

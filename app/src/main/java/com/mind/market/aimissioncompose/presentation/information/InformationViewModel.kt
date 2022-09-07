@@ -19,7 +19,7 @@ class InformationViewModel @Inject constructor(
     }
 
     private fun setInformation() {
-        information.postValue(Resource.Loading())
+        information.postValue(Resource.Loading(true))
         information.postValue(
             Resource.Success(
                 data = useCase.getInformation()

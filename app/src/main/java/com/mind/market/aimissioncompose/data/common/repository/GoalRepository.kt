@@ -2,11 +2,16 @@ package com.mind.market.aimissioncompose.data.common.repository
 
 import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
-import com.mind.market.aimissioncompose.data.IGoalDao
-import com.mind.market.aimissioncompose.data.toStatusData
-import com.example.aimissionlite.models.domain.Goal
 import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.data.IGoalDao
+import com.mind.market.aimissioncompose.data.toGoal
+import com.mind.market.aimissioncompose.data.toGoalDto
+import com.mind.market.aimissioncompose.data.toStatusData
+import com.mind.market.aimissioncompose.domain.models.Goal
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import java.io.IOException
 
 class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
     @Suppress("RedundantSuspendModifier")
@@ -15,11 +20,11 @@ class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
         /**
         First we map the domain model to data before we use the dao to write the new goal into db.
          */
-        goalDao.insert(goal)
+        goalDao.insert(goal.toGoalDto())
     }
 
     @WorkerThread
-    override suspend fun getGoal(id: Int): Goal = goalDao.getGoal(id)
+    override suspend fun getGoal(id: Int): Goal = goalDao.getGoal(id).toGoal()
 
     @WorkerThread
     @CheckResult
@@ -46,7 +51,7 @@ class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
     @CheckResult
     override suspend fun deleteGoal(goal: Goal): Boolean {
         return try {
-            goalDao.deleteGoal(goal)
+            goalDao.deleteGoal(goal.toGoalDto())
             true
         } catch (exception: Exception) {
             false
@@ -57,14 +62,30 @@ class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
     @CheckResult
     override suspend fun updateGoal(goal: Goal): Boolean {
         return try {
-            goalDao.update(goal)
+            goalDao.update(goal.toGoalDto())
             true
         } catch (exception: Exception) {
             false
         }
     }
 
-    override suspend fun getGoals(): Flow<List<Goal>> {
-        return goalDao.getGoals()
+    override suspend fun getGoals(): Flow<Resource<List<Goal>>> {
+        return flow {
+            emit(Resource.Loading(true))
+            try {
+                val goals = goalDao.getGoals()
+                emit(Resource.Success(
+                    goals.let { goalsDto ->
+                        goalsDto.map { goalDto ->
+                            goalDto.toGoal()
+                        }
+                    }
+                ))
+            } catch (exception: IOException) {
+                exception.printStackTrace()
+                emit(Resource.Error(message = "Could not load data."))
+            }
+            emit(Resource.Loading(false))
+        }
     }
 }

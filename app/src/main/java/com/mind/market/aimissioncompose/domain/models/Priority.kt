@@ -1,4 +1,4 @@
-package com.example.aimissionlite.models.domain
+package com.mind.market.aimissioncompose.domain.models
 
 enum class Priority {
     LOW,

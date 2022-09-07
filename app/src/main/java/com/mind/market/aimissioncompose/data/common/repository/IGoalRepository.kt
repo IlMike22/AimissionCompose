@@ -1,7 +1,8 @@
 package com.mind.market.aimissioncompose.data.common.repository
 
-import com.example.aimissionlite.models.domain.Goal
 import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.domain.models.Goal
 import kotlinx.coroutines.flow.Flow
 
 interface IGoalRepository {
@@ -17,5 +18,5 @@ interface IGoalRepository {
 
     suspend fun updateGoal(goal: Goal): Boolean
 
-    suspend fun getGoals(): Flow<List<Goal>>
+    suspend fun getGoals(): Flow<Resource<List<Goal>>>
 }

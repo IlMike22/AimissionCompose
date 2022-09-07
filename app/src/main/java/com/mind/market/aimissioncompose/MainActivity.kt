@@ -4,12 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.mind.market.aimissioncompose.navigation.Route
+import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
 import com.mind.market.aimissioncompose.ui.theme.AimissionComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,13 +23,35 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AimissionComposeTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
+                val navController = rememberNavController()
+                val scaffoldState: ScaffoldState = rememberScaffoldState()
+                Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    scaffoldState = scaffoldState
                 ) {
-                    LandingPageScreen()
+                    NavHost(
+                        navController = navController,
+                        startDestination = Route.OVERVIEW
+                    ) {
+                        composable(Route.OVERVIEW) {
+                            Surface(
+                                modifier = Modifier.fillMaxSize(),
+                                color = MaterialTheme.colors.background
+                            ) {
+                                LandingPageScreen(
+                                    onAddGoalClick = {
+                                        navController.navigate(Route.ADD)
+                                    }
+                                )
+                            }
+                        }
+                        composable(Route.ADD) {
+                            DetailScreen()
+                        }
+                    }
                 }
+                // A surface container using the 'background' color from the theme
+
             }
         }
     }

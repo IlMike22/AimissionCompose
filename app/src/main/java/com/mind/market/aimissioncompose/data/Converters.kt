@@ -2,7 +2,7 @@ package com.mind.market.aimissioncompose.data
 
 import androidx.room.TypeConverter
 import com.example.aimissionlite.models.domain.Genre
-import com.example.aimissionlite.models.domain.Priority
+import com.mind.market.aimissioncompose.domain.models.Priority
 import com.example.aimissionlite.models.domain.Status
 
 class Converters {

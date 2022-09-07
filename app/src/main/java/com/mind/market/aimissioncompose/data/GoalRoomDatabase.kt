@@ -6,11 +6,12 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.aimissionlite.models.domain.Goal
+import com.mind.market.aimissioncompose.data.dto.GoalDto
+import com.mind.market.aimissioncompose.domain.models.Goal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Goal::class], version = 2, exportSchema = false)
+@Database(entities = [GoalDto::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class GoalRoomDatabase : RoomDatabase() {
     abstract fun goalDao(): IGoalDao
