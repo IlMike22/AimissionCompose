@@ -1,7 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
@@ -12,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.presentation.common.MainButton
 
 
 @Composable
@@ -56,8 +56,8 @@ fun DetailScreen(
         ) {
             Text(
                 text = stringResource(id = R.string.detail_goal_description),
-                fontWeight = FontWeight.Normal,
-                fontSize = 12.sp
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
             )
             Spacer(Modifier.width(24.dp))
             TextField(
@@ -72,5 +72,12 @@ fun DetailScreen(
                 }
             )
         }
+
+        MainButton(
+            text = "Add",
+            icon = 0,
+            onClick = {
+                viewModel.onSaveGoalButtonClicked()
+            })
     }
 }

@@ -6,12 +6,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
-import com.mind.market.aimissioncompose.data.Converters.Companion.toPriorityId
 import com.example.aimissionlite.domain.detail.use_case.IDetailUseCase
-import com.example.aimissionlite.models.domain.*
+import com.example.aimissionlite.models.domain.Genre
+import com.example.aimissionlite.models.domain.GoalValidationStatusCode
+import com.example.aimissionlite.models.domain.Status
+import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
+import com.mind.market.aimissioncompose.data.Converters.Companion.toPriorityId
+import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,15 +27,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val useCase: IDetailUseCase,
+    private val repository: IGoalRepository,
     app: Application
 ) : AndroidViewModel(app) {
-    val uiEvent = MutableSharedFlow<DetailUIEvent<GoalValidationStatusCode>>()
+    private val uiEvent = MutableSharedFlow<DetailUIEvent<GoalValidationStatusCode>>()
     private val resourceProvider = getApplication<AimissionComposeApplication>()
 
     var state by mutableStateOf(DetailState())
 
-   // private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
+    // private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
     //val state = _state.asStateFlow()
 
     private var currentGoal = Goal.EMPTY
@@ -56,28 +60,29 @@ class DetailViewModel @Inject constructor(
 //    }
 
     fun onSaveGoalButtonClicked() {
-        if (currentGoal != Goal.EMPTY) {
-            val newGoal = Goal(
-                id = currentGoal.id,
-                title = goalTitle.value.orEmpty(),
-                description = goalDescription.value.orEmpty(),
-                creationDate = currentGoal.creationDate,
-                changeDate = getCurrentDate(),
-                isRepeated = currentGoal.isRepeated,
-                genre = Genre.UNKNOWN, //TODO set Genre and Priority everywhere..
-                status = currentGoal.status,
-                priority = Priority.UNKNOWN
-            )
-
-            updateGoal(newGoal)
-            return
-        }
+//        state.goal.apply {
+//            if (this != Goal.EMPTY) {
+//                updateGoal(
+//                    Goal(
+//                        id = id,
+//                        title = title,
+//                        description = description,
+//                        creationDate = creationDate,
+//                        changeDate = getCurrentDate(),
+//                        isRepeated = isRepeated,
+//                        genre = Genre.UNKNOWN, //TODO set Genre and Priority everywhere..
+//                        status = status,
+//                        priority = Priority.UNKNOWN
+//                    )
+//                )
+//            }
+//        }
 
         createNewGoal()
     }
 
     fun getAndShowGoal(id: Int) = viewModelScope.launch {
-        currentGoal = useCase.getGoal(id)
+        currentGoal = repository.getGoal(id)
 
         goalTitle.value = currentGoal.title
         goalDescription.value = currentGoal.description
@@ -110,7 +115,7 @@ class DetailViewModel @Inject constructor(
 
         if (validationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
-                useCase.updateGoal(currentGoal)
+                repository.updateGoal(currentGoal)
             }
 
             navigateToMainFragment()
@@ -126,14 +131,14 @@ class DetailViewModel @Inject constructor(
 
         val newGoal = Goal(
             id = 0,
-            title = goalTitle.value.orEmpty(),
-            description = goalDescription.value.orEmpty(),
+            title = state.goal.title,
+            description = state.goal.description,
             creationDate = currentDate,
             changeDate = currentDate,
             isRepeated = false,
-            genre = Genre.UNKNOWN,
+            genre = Genre.HEALTH, // TODO add genre later
             status = Status.TODO,
-            priority = Priority.UNKNOWN
+            priority = Priority.LOW // TODO add prio later
         )
 
         val goalValidationStatusCode = GoalValidationStatusCode(
@@ -144,7 +149,7 @@ class DetailViewModel @Inject constructor(
 
         if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
-                useCase.insert(newGoal)
+                repository.insert(newGoal)
             }
 
             navigateToMainFragment()

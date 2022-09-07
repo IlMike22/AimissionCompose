@@ -131,9 +131,7 @@ class LandingPageViewModel @Inject constructor(
                     }
                     is Resource.Loading -> {
                         state = state.copy(
-                            goals = emptyList(),
-                            isLoading = true,
-                            errorMessage = ""
+                            isLoading = response.isLoading,
                         )
                     }
                     is Resource.Error -> {
