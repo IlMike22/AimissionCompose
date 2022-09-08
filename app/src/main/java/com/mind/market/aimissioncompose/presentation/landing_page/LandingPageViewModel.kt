@@ -35,6 +35,8 @@ class LandingPageViewModel @Inject constructor(
         getGoals()
     }
 
+    
+
     fun onEvent(event: LandingPageUiEvent) {
         when (event) {
             is LandingPageUiEvent.OnAddGoalClicked -> {

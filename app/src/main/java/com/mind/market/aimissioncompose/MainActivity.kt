@@ -31,9 +31,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = Route.OVERVIEW
+                        startDestination = Route.LandingPage
                     ) {
-                        composable(Route.OVERVIEW) {
+                        composable(Route.LandingPage) {
                             Surface(
                                 modifier = Modifier.fillMaxSize(),
                                 color = MaterialTheme.colors.background
@@ -46,7 +46,9 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                         composable(Route.ADD) {
-                            DetailScreen()
+                            DetailScreen(
+                                onNavigateToLandingPage = { navController.navigate(Route.LandingPage) }
+                            )
                         }
                     }
                 }

@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aimissionlite.domain.detail.use_case.IDetailUseCase
 import com.example.aimissionlite.models.domain.Genre
 import com.example.aimissionlite.models.domain.GoalValidationStatusCode
 import com.example.aimissionlite.models.domain.Status
@@ -16,11 +15,13 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
 import com.mind.market.aimissioncompose.data.Converters.Companion.toPriorityId
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.common.uiEvent.UiEvent
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -30,10 +31,12 @@ class DetailViewModel @Inject constructor(
     private val repository: IGoalRepository,
     app: Application
 ) : AndroidViewModel(app) {
-    private val uiEvent = MutableSharedFlow<DetailUIEvent<GoalValidationStatusCode>>()
+//    private val uiEvent = MutableSharedFlow<DetailUIEvent<GoalValidationStatusCode>>()
     private val resourceProvider = getApplication<AimissionComposeApplication>()
 
     var state by mutableStateOf(DetailState())
+    private val _uiEvent = Channel<DetailUIEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     // private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
     //val state = _state.asStateFlow()
@@ -121,9 +124,9 @@ class DetailViewModel @Inject constructor(
             navigateToMainFragment()
         }
 
-        viewModelScope.launch {
-            uiEvent.emit(DetailUIEvent.ShowValidationResult(validationStatusCode))
-        }
+//        viewModelScope.launch {
+//            uiEvent.emit(DetailUIEvent.ShowValidationResult(validationStatusCode))
+//        }
     }
 
     private fun createNewGoal() {
@@ -150,14 +153,16 @@ class DetailViewModel @Inject constructor(
         if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
                 repository.insert(newGoal)
+                _uiEvent.send(DetailUIEvent.NavigateToLandingPage)
             }
 
-            navigateToMainFragment()
+//            navigateToMainFragment()
+
         }
 
-        viewModelScope.launch {
-            uiEvent.emit(DetailUIEvent.ShowValidationResult(goalValidationStatusCode))
-        }
+//        viewModelScope.launch {
+//            uiEvent.emit(DetailUIEvent.ShowValidationResult(goalValidationStatusCode))
+//        }
     }
 
     private fun showGoal(goal: Goal) {
@@ -179,21 +184,21 @@ class DetailViewModel @Inject constructor(
 
     private fun navigateToMainFragment() {
         viewModelScope.launch {
-            uiEvent.emit(DetailUIEvent.HideKeyboard())
-            uiEvent.emit(DetailUIEvent.NavigateToLandingPage())
+//            uiEvent.emit(DetailUIEvent.HideKeyboard())
+//            uiEvent.emit(DetailUIEvent.NavigateToLandingPage())
         }
     }
 
     private fun navigateToSettings() {
         viewModelScope.launch {
-            uiEvent.emit(DetailUIEvent.NavigateToSettings())
+//            uiEvent.emit(DetailUIEvent.NavigateToSettings())
 
         }
     }
 
     private fun navigateToInfo() {
         viewModelScope.launch {
-            uiEvent.emit(DetailUIEvent.NavigateToInfo())
+//            uiEvent.emit(DetailUIEvent.NavigateToInfo())
         }
     }
 

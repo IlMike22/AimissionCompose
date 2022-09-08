@@ -56,7 +56,7 @@ class Converters {
     internal fun Priority.toPriorityData(): String {
         return when (this) {
             Priority.HIGH -> "HIGH"
-            Priority.NORMAL -> "NORMAL"
+            Priority.MEDIUM -> "MEDIUM"
             Priority.LOW -> "LOW"
             else -> "UNKNOWN"
         }
@@ -66,7 +66,7 @@ class Converters {
     fun String.toDomainPriority(): Priority =
         when (this) {
             "LOW" -> Priority.LOW
-            "NORMAL" -> Priority.NORMAL
+            "MEDIUM" -> Priority.MEDIUM
             "HIGH"-> Priority.HIGH
             else -> Priority.UNKNOWN
         }
@@ -90,7 +90,7 @@ class Converters {
             return when (this) {
                 Priority.UNKNOWN -> -1
                 Priority.HIGH -> 0
-                Priority.NORMAL -> 1
+                Priority.MEDIUM -> 1
                 Priority.LOW -> 2
             }
         }
