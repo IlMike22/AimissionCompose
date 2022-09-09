@@ -21,7 +21,7 @@ fun Chip(
         modifier = Modifier.padding(4.dp),
         elevation = 8.dp,
         shape = MaterialTheme.shapes.medium,
-        color = if (isSelected) Color.LightGray else MaterialTheme.colors.primary
+        color = if (isSelected) MaterialTheme.colors.primary else Color.LightGray
     ) {
         Row(
             modifier = Modifier

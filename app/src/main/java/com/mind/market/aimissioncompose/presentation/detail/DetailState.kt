@@ -4,6 +4,5 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 
 data class DetailState(
-    val goal: Goal = Goal.EMPTY,
-    val selectedPriority: Priority? = null
+    val goal: Goal = Goal.EMPTY
 )

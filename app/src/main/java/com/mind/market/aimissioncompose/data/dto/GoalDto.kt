@@ -2,7 +2,7 @@ package com.mind.market.aimissioncompose.data.dto
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.aimissionlite.models.domain.Genre
+import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
 import com.example.aimissionlite.models.domain.Status
 

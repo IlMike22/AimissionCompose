@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.domain.models.getPriorities
-import com.mind.market.aimissioncompose.domain.models.getPriority
-import com.mind.market.aimissioncompose.presentation.common.ChipGroup
+import com.mind.market.aimissioncompose.domain.models.*
+import com.mind.market.aimissioncompose.presentation.common.ChipGroupGenre
+import com.mind.market.aimissioncompose.presentation.common.ChipGroupPriority
 import com.mind.market.aimissioncompose.presentation.common.MainButton
 import kotlinx.coroutines.flow.collect
 
@@ -47,7 +47,7 @@ fun DetailScreen(
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
@@ -57,7 +57,9 @@ fun DetailScreen(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
+
             Spacer(Modifier.width(24.dp))
+
             TextField(
                 value = state.goal.title,
                 modifier = Modifier.fillMaxWidth(),
@@ -71,7 +73,7 @@ fun DetailScreen(
             )
         }
         Spacer(Modifier.height(16.dp))
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
@@ -81,7 +83,9 @@ fun DetailScreen(
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp
             )
+
             Spacer(Modifier.width(24.dp))
+
             TextField(
                 value = state.goal.description,
                 modifier = Modifier.fillMaxWidth(),
@@ -94,24 +98,65 @@ fun DetailScreen(
                 }
             )
         }
-
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            ChipGroup(values = getPriorities(),
-                selectedValue = viewModel.state.selectedPriority,
-                onSelectedChanged = {
-                    viewModel.state = viewModel.state.copy(
-                        selectedPriority = getPriority(it)
-                    )
-                }
+            Text(
+                text = stringResource(id = R.string.detail_goal_priority),
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                ChipGroupPriority(
+                    values = getPriorities(),
+                    selectedValue = state.goal.priority,
+                    onSelectedChanged = {
+                        viewModel.state = state.copy(
+                            goal = state.goal.copy(
+                                priority = getPriority(it) ?: Priority.UNKNOWN
+                            )
+                        )
+                    }
+                )
+            }
         }
 
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.detail_goal_genre),
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                ChipGroupGenre(
+                    values = getGenres(),
+                    selectedValue = state.goal.genre,
+                    onSelectedChanged = {
+                        viewModel.state = state.copy(
+                            goal = state.goal.copy(
+                                genre = getGenre(it) ?: Genre.UNKNOWN
+                            )
+                        )
+                    }
+                )
+            }
+        }
+
+
         MainButton(
-            text = "Add",
+            text = stringResource(id = R.string.button_add),
             icon = 0,
             onClick = {
                 viewModel.onSaveGoalButtonClicked()

@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aimissionlite.models.domain.Genre
+import com.mind.market.aimissioncompose.domain.models.Genre
 import com.example.aimissionlite.models.domain.GoalValidationStatusCode
 import com.example.aimissionlite.models.domain.Status
 import com.example.aimissionlite.models.domain.ValidationStatusCode
@@ -15,7 +15,6 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
 import com.mind.market.aimissioncompose.data.Converters.Companion.toPriorityId
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
-import com.mind.market.aimissioncompose.domain.common.uiEvent.UiEvent
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -153,7 +152,7 @@ class DetailViewModel @Inject constructor(
         if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
                 repository.insert(newGoal)
-                _uiEvent.send(DetailUIEvent.NavigateToLandingPage)
+                _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
             }
 
 //            navigateToMainFragment()
