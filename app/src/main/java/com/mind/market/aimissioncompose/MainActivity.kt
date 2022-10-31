@@ -8,9 +8,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
@@ -39,13 +41,19 @@ class MainActivity : ComponentActivity() {
                                 color = MaterialTheme.colors.background
                             ) {
                                 LandingPageScreen(
-                                    onAddGoalClick = {
-                                        navController.navigate(Route.ADD)
-                                    }
+                                    navController = navController
                                 )
                             }
                         }
-                        composable(Route.ADD) {
+                        composable(
+                            route = Route.ADD + "?goalId={goalId}",
+                            arguments = listOf(navArgument(
+                                name = "goalId"
+                            ) {
+                                type = NavType.IntType
+                                defaultValue = -1
+                            })
+                        ) {
                             DetailScreen(
                                 onNavigateToLandingPage = { navController.navigate(Route.LandingPage) }
                             )

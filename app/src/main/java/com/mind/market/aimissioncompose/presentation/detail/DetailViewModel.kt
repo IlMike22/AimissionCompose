@@ -1,12 +1,11 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import android.app.Application
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.mind.market.aimissioncompose.domain.models.Genre
 import com.example.aimissionlite.models.domain.GoalValidationStatusCode
 import com.example.aimissionlite.models.domain.Status
 import com.example.aimissionlite.models.domain.ValidationStatusCode
@@ -15,6 +14,7 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
 import com.mind.market.aimissioncompose.data.Converters.Companion.toPriorityId
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,17 +28,26 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: IGoalRepository,
+    savedStateHandle: SavedStateHandle,
     app: Application
 ) : AndroidViewModel(app) {
-//    private val uiEvent = MutableSharedFlow<DetailUIEvent<GoalValidationStatusCode>>()
     private val resourceProvider = getApplication<AimissionComposeApplication>()
 
-    var state by mutableStateOf(DetailState())
+    init {
+        val goalId: Int = checkNotNull(savedStateHandle["goalId"])
+        if (goalId != -1) {
+            getAndShowGoal(goalId)
+        }
+    }
+
+    private var _state = mutableStateOf(DetailState())
+    val state: State<DetailState> = _state
+
     private val _uiEvent = Channel<DetailUIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    // private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
-    //val state = _state.asStateFlow()
+//     private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
+//    val state = _state.asStateFlow()
 
     private var currentGoal = Goal.EMPTY
     var buttonText: String = resourceProvider.getString(R.string.button_done)
@@ -48,6 +57,36 @@ class DetailViewModel @Inject constructor(
 
     var selectedChipGenre: Int? = null
     var selectedChipPriority: Int? = null
+
+    fun onEvent(event: DetailEvent) {
+        when (event) {
+            is DetailEvent.OnTitleChanged -> {
+                _state.value = _state.value.copy(
+                    title = event.newTitle
+                )
+            }
+            is DetailEvent.OnDescriptionChanged -> {
+                _state.value = _state.value.copy(
+                    description = event.newDescription
+                )
+            }
+            is DetailEvent.OnPriorityChanged -> {
+                _state.value = _state.value.copy(
+                    priority = event.newPriority
+                )
+            }
+            is DetailEvent.OnGenreChanged -> {
+                _state.value = _state.value.copy(
+                    genre = event.newGenre
+                )
+            }
+            is DetailEvent.OnStatusChanged -> {
+                _state.value = _state.value.copy(
+                    status = event.newStatus
+                )
+            }
+        }
+    }
 
 
 //    fun setSelectedChipGroupItem(chipGroup: ChipGroupName, selectedId: Int) {
@@ -133,8 +172,8 @@ class DetailViewModel @Inject constructor(
 
         val newGoal = Goal(
             id = 0,
-            title = state.goal.title,
-            description = state.goal.description,
+            title = state.value.title,
+            description = state.value.description,
             creationDate = currentDate,
             changeDate = currentDate,
             isRepeated = false,
@@ -165,7 +204,15 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun showGoal(goal: Goal) {
-        //_state.value = DetailState.ShowEditGoal(goal)
+        goal.apply {
+            _state.value = DetailState(
+                title = title,
+                description = description,
+                genre = genre,
+                status = status,
+                priority = priority
+            )
+        }
     }
 
     private fun getCurrentDate() = LocalDateTime.now()

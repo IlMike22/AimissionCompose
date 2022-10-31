@@ -19,14 +19,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.navigation.Route
 
 @Composable
 fun Goal(
     modifier: Modifier = Modifier,
     goal: Goal,
     onDeleteClicked: () -> Unit,
-    onStatusChangeClicked: () -> Unit
+    onStatusChangeClicked: () -> Unit,
+    navController: NavController
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -53,7 +56,8 @@ fun Goal(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    onClick = onDeleteClicked
+                    onClick = {
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
