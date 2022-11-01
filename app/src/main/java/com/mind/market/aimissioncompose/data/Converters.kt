@@ -1,9 +1,9 @@
 package com.mind.market.aimissioncompose.data
 
 import androidx.room.TypeConverter
+import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
-import com.example.aimissionlite.models.domain.Status
 
 class Converters {
     @TypeConverter
@@ -67,13 +67,13 @@ class Converters {
         when (this) {
             "LOW" -> Priority.LOW
             "MEDIUM" -> Priority.MEDIUM
-            "HIGH"-> Priority.HIGH
+            "HIGH" -> Priority.HIGH
             else -> Priority.UNKNOWN
         }
 
     companion object {
         @TypeConverter
-        fun Genre.toGenreId():Int {
+        fun Genre.toGenreId(): Int {
             return when (this) {
                 Genre.UNKNOWN -> -1
                 Genre.PARTNERSHIP -> 0
@@ -86,7 +86,7 @@ class Converters {
         }
 
         @TypeConverter
-        fun Priority.toPriorityId():Int {
+        fun Priority.toPriorityId(): Int {
             return when (this) {
                 Priority.UNKNOWN -> -1
                 Priority.HIGH -> 0

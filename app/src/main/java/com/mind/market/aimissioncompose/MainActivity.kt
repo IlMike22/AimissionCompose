@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
                             })
                         ) {
                             DetailScreen(
-                                onNavigateToLandingPage = { navController.navigate(Route.LandingPage) }
+                                navController = navController
                             )
                         }
                     }

@@ -19,6 +19,7 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -32,9 +33,9 @@ class DetailViewModel @Inject constructor(
     app: Application
 ) : AndroidViewModel(app) {
     private val resourceProvider = getApplication<AimissionComposeApplication>()
+    private val goalId: Int = checkNotNull(savedStateHandle[ARGUMENT_GOAL_ID])
 
     init {
-        val goalId: Int = checkNotNull(savedStateHandle["goalId"])
         if (goalId != -1) {
             getAndShowGoal(goalId)
         }
@@ -46,17 +47,7 @@ class DetailViewModel @Inject constructor(
     private val _uiEvent = Channel<DetailUIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-//     private val _state = MutableStateFlow(DetailState.ShowEditGoal(Goal.EMPTY))
-//    val state = _state.asStateFlow()
-
     private var currentGoal = Goal.EMPTY
-    var buttonText: String = resourceProvider.getString(R.string.button_done)
-
-    val goalTitle = MutableStateFlow<String?>(null)
-    val goalDescription = MutableStateFlow<String?>(null)
-
-    var selectedChipGenre: Int? = null
-    var selectedChipPriority: Int? = null
 
     fun onEvent(event: DetailEvent) {
         when (event) {
@@ -101,35 +92,29 @@ class DetailViewModel @Inject constructor(
 //    }
 
     fun onSaveGoalButtonClicked() {
-//        state.goal.apply {
-//            if (this != Goal.EMPTY) {
-//                updateGoal(
-//                    Goal(
-//                        id = id,
-//                        title = title,
-//                        description = description,
-//                        creationDate = creationDate,
-//                        changeDate = getCurrentDate(),
-//                        isRepeated = isRepeated,
-//                        genre = Genre.UNKNOWN, //TODO set Genre and Priority everywhere..
-//                        status = status,
-//                        priority = Priority.UNKNOWN
-//                    )
-//                )
-//            }
-//        }
+        if (goalId != -1) {
+            updateGoal(
+                Goal(
+                    id = goalId,
+                    title = state.value.title,
+                    description = state.value.description,
+                    creationDate = state.value.createdDate,
+                    changeDate = getCurrentDate(),
+                    isRepeated = state.value.isRepeated,
+                    genre = state.value.genre,
+                    status = state.value.status,
+                    priority = state.value.priority
+                )
+            )
+
+            return
+        }
 
         createNewGoal()
     }
 
     fun getAndShowGoal(id: Int) = viewModelScope.launch {
         currentGoal = repository.getGoal(id)
-
-        goalTitle.value = currentGoal.title
-        goalDescription.value = currentGoal.description
-        selectedChipGenre = currentGoal.genre.toGenreId()
-        selectedChipPriority = currentGoal.priority.toPriorityId()
-
         showGoal(currentGoal)
     }
 
@@ -142,11 +127,6 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun updateGoal(newGoal: Goal) {
-        if (newGoal == currentGoal) {
-            navigateToMainFragment()
-            return
-        }
-
         currentGoal = newGoal
 
         val validationStatusCode = GoalValidationStatusCode(
@@ -157,29 +137,22 @@ class DetailViewModel @Inject constructor(
         if (validationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
                 repository.updateGoal(currentGoal)
+                navigateToMainFragment()
             }
-
-            navigateToMainFragment()
         }
-
-//        viewModelScope.launch {
-//            uiEvent.emit(DetailUIEvent.ShowValidationResult(validationStatusCode))
-//        }
     }
 
     private fun createNewGoal() {
-        val currentDate = getCurrentDate()
-
         val newGoal = Goal(
             id = 0,
             title = state.value.title,
             description = state.value.description,
-            creationDate = currentDate,
-            changeDate = currentDate,
-            isRepeated = false,
-            genre = Genre.HEALTH, // TODO add genre later
+            creationDate = state.value.createdDate,
+            changeDate = getCurrentDate(),
+            isRepeated = state.value.isRepeated,
+            genre = state.value.genre,
             status = Status.TODO,
-            priority = Priority.LOW // TODO add prio later
+            priority = state.value.priority
         )
 
         val goalValidationStatusCode = GoalValidationStatusCode(
@@ -193,14 +166,7 @@ class DetailViewModel @Inject constructor(
                 repository.insert(newGoal)
                 _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
             }
-
-//            navigateToMainFragment()
-
         }
-
-//        viewModelScope.launch {
-//            uiEvent.emit(DetailUIEvent.ShowValidationResult(goalValidationStatusCode))
-//        }
     }
 
     private fun showGoal(goal: Goal) {
@@ -210,7 +176,8 @@ class DetailViewModel @Inject constructor(
                 description = description,
                 genre = genre,
                 status = status,
-                priority = priority
+                priority = priority,
+                isRepeated = isRepeated
             )
         }
     }
@@ -223,6 +190,7 @@ class DetailViewModel @Inject constructor(
                 title.isBlank() -> ValidationStatusCode.NO_TITLE
                 description.isBlank() -> ValidationStatusCode.NO_DESCRIPTION
                 genre.isGenreNotSet() -> ValidationStatusCode.NO_GENRE
+                priority.isPriorityNotSet() -> ValidationStatusCode.NO_PRIORITY
                 else -> ValidationStatusCode.OK
             }
         }
@@ -230,25 +198,26 @@ class DetailViewModel @Inject constructor(
 
     private fun navigateToMainFragment() {
         viewModelScope.launch {
-//            uiEvent.emit(DetailUIEvent.HideKeyboard())
-//            uiEvent.emit(DetailUIEvent.NavigateToLandingPage())
+            _uiEvent.send(DetailUIEvent.HideKeyboard)
+            _uiEvent.send(DetailUIEvent.NavigateToLandingPage)
         }
     }
 
     private fun navigateToSettings() {
         viewModelScope.launch {
-//            uiEvent.emit(DetailUIEvent.NavigateToSettings())
+            _uiEvent.send(DetailUIEvent.NavigateToSettings)
 
         }
     }
 
     private fun navigateToInfo() {
         viewModelScope.launch {
-//            uiEvent.emit(DetailUIEvent.NavigateToInfo())
+            _uiEvent.send(DetailUIEvent.NavigateToInfo)
         }
     }
 
     companion object {
+        const val ARGUMENT_GOAL_ID = "goalId"
 //        private fun Int.toGenre(): Genre =
 //            when (this) {
 //                R.id.chip_genre_business -> Genre.BUSINESS
@@ -267,12 +236,7 @@ class DetailViewModel @Inject constructor(
 //                else -> Priority.NORMAL
 //            }
 //    }
-
-        private fun Genre.isGenreNotSet(): Boolean {
-            if (this == Genre.UNKNOWN) {
-                return true
-            }
-            return false
-        }
+        private fun Genre.isGenreNotSet(): Boolean = (this == Genre.UNKNOWN)
+        private fun Priority.isPriorityNotSet() = this == Priority.UNKNOWN
     }
 }
