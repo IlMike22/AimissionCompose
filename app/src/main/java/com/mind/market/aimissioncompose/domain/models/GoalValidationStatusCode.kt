@@ -17,6 +17,7 @@ enum class ValidationStatusCode {
     NO_TITLE,
     NO_DESCRIPTION,
     NO_GENRE,
+    NO_PRIORITY,
     OK,
     UNKNOWN
 }

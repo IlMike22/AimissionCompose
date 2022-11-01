@@ -14,9 +14,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
 import com.mind.market.aimissioncompose.domain.models.getGenres
 import com.mind.market.aimissioncompose.domain.models.getPriorities
+import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupGenre
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupPriority
 import com.mind.market.aimissioncompose.presentation.common.MainButton
@@ -30,7 +33,7 @@ import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
 fun DetailScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = hiltViewModel(),
-    onNavigateToLandingPage: () -> Unit
+    navController: NavController
 ) {
     val state = viewModel.state
 
@@ -39,7 +42,7 @@ fun DetailScreen(
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is DetailUIEvent.NavigateToLandingPage -> {
-                    onNavigateToLandingPage()
+                   navController.popBackStack()
                 }
             }
         }
