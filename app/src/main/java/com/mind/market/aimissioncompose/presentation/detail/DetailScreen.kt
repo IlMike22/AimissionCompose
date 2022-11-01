@@ -15,11 +15,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.domain.models.*
+import com.mind.market.aimissioncompose.domain.models.getGenres
+import com.mind.market.aimissioncompose.domain.models.getPriorities
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupGenre
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupPriority
 import com.mind.market.aimissioncompose.presentation.common.MainButton
-import kotlinx.coroutines.flow.collect
+import com.mind.market.aimissioncompose.presentation.utils.Converters.toGenre
+import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -31,6 +33,7 @@ fun DetailScreen(
     onNavigateToLandingPage: () -> Unit
 ) {
     val state = viewModel.state
+
     val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(key1 = keyboardController) {
         viewModel.uiEvent.collect { uiEvent ->
@@ -61,14 +64,10 @@ fun DetailScreen(
             Spacer(Modifier.width(24.dp))
 
             TextField(
-                value = state.goal.title,
+                value = state.value.title,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = { newTitle ->
-                    viewModel.state = viewModel.state.copy(
-                        goal = state.goal.copy(
-                            title = newTitle
-                        )
-                    )
+                    viewModel.onEvent(DetailEvent.OnTitleChanged(newTitle))
                 }
             )
         }
@@ -87,14 +86,10 @@ fun DetailScreen(
             Spacer(Modifier.width(24.dp))
 
             TextField(
-                value = state.goal.description,
+                value = state.value.description,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = { newDescription ->
-                    viewModel.state = viewModel.state.copy(
-                        goal = state.goal.copy(
-                            description = newDescription
-                        )
-                    )
+                    viewModel.onEvent(DetailEvent.OnDescriptionChanged(newDescription))
                 }
             )
         }
@@ -114,13 +109,9 @@ fun DetailScreen(
             ) {
                 ChipGroupPriority(
                     values = getPriorities(),
-                    selectedValue = state.goal.priority,
-                    onSelectedChanged = {
-                        viewModel.state = state.copy(
-                            goal = state.goal.copy(
-                                priority = getPriority(it) ?: Priority.UNKNOWN
-                            )
-                        )
+                    selectedValue = state.value.priority,
+                    onSelectedChanged = { newPriority ->
+                        viewModel.onEvent(DetailEvent.OnPriorityChanged(newPriority.toPriority()))
                     }
                 )
             }
@@ -142,13 +133,9 @@ fun DetailScreen(
             ) {
                 ChipGroupGenre(
                     values = getGenres(),
-                    selectedValue = state.goal.genre,
-                    onSelectedChanged = {
-                        viewModel.state = state.copy(
-                            goal = state.goal.copy(
-                                genre = getGenre(it) ?: Genre.UNKNOWN
-                            )
-                        )
+                    selectedValue = state.value.genre,
+                    onSelectedChanged = { newGenre ->
+                        viewModel.onEvent(DetailEvent.OnGenreChanged(newGenre.toGenre()))
                     }
                 )
             }

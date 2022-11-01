@@ -15,12 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 
 @Composable
 fun LandingPageScreen(
-    onAddGoalClick: () -> Unit,
-    viewModel: LandingPageViewModel = hiltViewModel()
+    viewModel: LandingPageViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val state = viewModel.state
     Column(
@@ -29,12 +31,10 @@ fun LandingPageScreen(
             .padding(24.dp)
     ) {
         FloatingActionButton(
-            onClick = {
-                onAddGoalClick()
-            }) {
+            onClick = { navController.navigate(Route.ADD) }
+        ) {
             Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
         }
-
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
@@ -47,7 +47,8 @@ fun LandingPageScreen(
                         .fillMaxWidth()
                         .fillMaxSize()
                         .clickable {
-                            viewModel.onEvent(LandingPageUiEvent.NavigateToDetailGoal(goal))
+//                            viewModel.onEvent(LandingPageUiEvent.NavigateToDetailGoal(goal))
+                            navController.navigate(Route.ADD + "?goalId=${goal.id}")
                         }
                         .padding(8.dp),
                     goal = goal,
@@ -64,7 +65,9 @@ fun LandingPageScreen(
                                 goal
                             )
                         )
-                    })
+                    },
+                    navController = navController
+                )
 
                 if (index < state.goals.size) {
                     Divider(

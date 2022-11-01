@@ -7,7 +7,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mind.market.aimissioncompose.data.dto.GoalDto
-import com.mind.market.aimissioncompose.domain.models.Goal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
