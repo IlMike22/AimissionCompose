@@ -2,10 +2,10 @@ package com.mind.market.aimissioncompose.presentation.detail
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -16,15 +16,18 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
 import com.mind.market.aimissioncompose.domain.models.getGenres
 import com.mind.market.aimissioncompose.domain.models.getPriorities
-import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupGenre
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupPriority
 import com.mind.market.aimissioncompose.presentation.common.MainButton
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toGenre
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -37,12 +40,26 @@ fun DetailScreen(
 ) {
     val state = viewModel.state
 
+    var pickedDate by remember {
+        mutableStateOf(LocalDate.now())
+    }
+
+    val formattedDate by remember {
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("dd.MM.yyyy")
+                .format(pickedDate)
+        }
+    }
+
+    val dateDialogState = rememberMaterialDialogState()
+
     val keyboardController = LocalSoftwareKeyboardController.current
     LaunchedEffect(key1 = keyboardController) {
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is DetailUIEvent.NavigateToLandingPage -> {
-                   navController.popBackStack()
+                    navController.navigateUp()
                 }
             }
         }
@@ -144,6 +161,33 @@ fun DetailScreen(
             }
         }
 
+        Column(
+            modifier = Modifier
+                .padding(8.dp)
+        ) {
+            Text(
+                text = stringResource(id = R.string.detail_goal_finish_date),
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Button(onClick = {
+                    dateDialogState.show()
+                }) {
+                    Text(text = "Pick a date")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = formattedDate
+                )
+            }
+        }
 
         MainButton(
             text = stringResource(id = R.string.button_add),
@@ -151,5 +195,20 @@ fun DetailScreen(
             onClick = {
                 viewModel.onSaveGoalButtonClicked()
             })
+    }
+
+    MaterialDialog(
+        dialogState = dateDialogState,
+        buttons = {
+            positiveButton(text = "OK")
+            negativeButton(text = "Cancel")
+        }
+    ) {
+        datepicker(
+            initialDate = LocalDate.now(),
+            title = "Pick a date"
+        ) { picked ->
+            pickedDate = picked
+        }
     }
 }

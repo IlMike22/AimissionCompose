@@ -17,7 +17,8 @@
     <string name="detail_goal_title">Goal Title</string>
     <string name="detail_goal_description">Goal Description</string>
     <string name="detail_goal_priority">Select priority</string>
-        <string name="detail_goal_genre">Select genre</string>
+    <string name="detail_goal_genre">Select genre</string>
+    <string name="detail_goal_finish_date">Select finishing date</string>
 
     <string name="button_add">Add</string>
     <!--

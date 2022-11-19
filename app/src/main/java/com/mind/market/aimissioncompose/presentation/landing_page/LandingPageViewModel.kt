@@ -35,8 +35,6 @@ class LandingPageViewModel @Inject constructor(
         getGoals()
     }
 
-    
-
     fun onEvent(event: LandingPageUiEvent) {
         when (event) {
             is LandingPageUiEvent.OnAddGoalClicked -> {
@@ -120,7 +118,7 @@ class LandingPageViewModel @Inject constructor(
         return repository.deleteAll()
     }
 
-    private fun getGoals() {
+    fun getGoals() {
         viewModelScope.launch {
             repository.getGoals().collect { response ->
                 when(response) {

@@ -36,12 +36,14 @@ class MainActivity : ComponentActivity() {
                         startDestination = Route.LandingPage
                     ) {
                         composable(Route.LandingPage) {
+                            val isInvalidateScreen = it.arguments?.getString("isInvalidate")
                             Surface(
                                 modifier = Modifier.fillMaxSize(),
                                 color = MaterialTheme.colors.background
                             ) {
                                 LandingPageScreen(
-                                    navController = navController
+                                    navController = navController,
+                                    isInvalidateScreen = isInvalidateScreen
                                 )
                             }
                         }

@@ -21,6 +21,12 @@ android {
         }
     }
 
+    kapt {
+        arguments {
+            arg("room.schemaLocation","$projectDir/schemas")
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -90,4 +96,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$rootProject.coroutines"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutines"
+
+    // Date picker library
+    implementation "io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc"
 }

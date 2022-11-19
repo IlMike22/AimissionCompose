@@ -3,7 +3,6 @@ package com.mind.market.aimissioncompose.data
 import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.domain.models.Goal
-import java.sql.Timestamp
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -30,11 +29,12 @@ fun GoalDto.toGoal(): Goal {
         isRepeated = this.isRepeated,
         genre = this.genre,
         status = this.status,
-        priority = this.priority
+        priority = this.priority,
+        finishDate = if (this.finishDate.isNotBlank()) LocalDateTime.parse(this.finishDate) else LocalDateTime.now()
     )
 }
 
-fun Goal.toGoalDto():GoalDto =
+fun Goal.toGoalDto(): GoalDto =
     GoalDto(
         id = this.id,
         title = this.title,
@@ -44,5 +44,6 @@ fun Goal.toGoalDto():GoalDto =
         isRepeated = this.isRepeated,
         genre = this.genre,
         status = this.status,
-        priority = this.priority
+        priority = this.priority,
+        finishDate = this.finishDate.toString()
     )

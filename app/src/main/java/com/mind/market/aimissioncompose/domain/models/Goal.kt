@@ -12,7 +12,8 @@ data class Goal(
     val isRepeated: Boolean,
     val genre: Genre,
     val status: Status,
-    val priority: Priority
+    val priority: Priority,
+    val finishDate: LocalDateTime
 ) {
     companion object {
         val EMPTY = Goal(
@@ -24,7 +25,8 @@ data class Goal(
             isRepeated = false,
             genre = Genre.UNKNOWN,
             status = Status.UNKNOWN,
-            priority = Priority.UNKNOWN
+            priority = Priority.UNKNOWN,
+            finishDate = LocalDateTime.now()
         )
     }
 }

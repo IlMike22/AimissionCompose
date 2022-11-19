@@ -13,5 +13,6 @@ data class DetailState(
     val status: Status = Status.UNKNOWN,
     val createdDate: LocalDateTime = LocalDateTime.now(),
     val currentDate: LocalDateTime = LocalDateTime.now(),
+    val finishDate: LocalDateTime = LocalDateTime.now(),
     val isRepeated: Boolean = false
 )

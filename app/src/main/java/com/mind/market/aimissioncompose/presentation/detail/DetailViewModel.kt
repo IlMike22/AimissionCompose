@@ -103,7 +103,8 @@ class DetailViewModel @Inject constructor(
                     isRepeated = state.value.isRepeated,
                     genre = state.value.genre,
                     status = state.value.status,
-                    priority = state.value.priority
+                    priority = state.value.priority,
+                    finishDate = state.value.finishDate
                 )
             )
 
@@ -152,7 +153,8 @@ class DetailViewModel @Inject constructor(
             isRepeated = state.value.isRepeated,
             genre = state.value.genre,
             status = Status.TODO,
-            priority = state.value.priority
+            priority = state.value.priority,
+            finishDate = state.value.finishDate
         )
 
         val goalValidationStatusCode = GoalValidationStatusCode(

@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.data.dto
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mind.market.aimissioncompose.domain.models.Genre
@@ -16,7 +17,9 @@ data class GoalDto(
     val isRepeated: Boolean,
     val genre: Genre,
     val status: Status,
-    val priority: Priority
+    val priority: Priority,
+    @ColumnInfo(name = "finishDate", defaultValue = "")
+    val finishDate: String
 ) {
     override fun equals(other: Any?): Boolean {
         if (other is GoalDto) {
@@ -26,7 +29,8 @@ data class GoalDto(
                     this.description == other.description &&
                     this.isRepeated == other.isRepeated &&
                     this.creationDate == other.creationDate &&
-                    this.status == other.status
+                    this.status == other.status &&
+                    this.finishDate == other.finishDate
         }
         return super.equals(other)
     }
@@ -41,6 +45,7 @@ data class GoalDto(
         result = 31 * result + genre.hashCode()
         result = 31 * result + status.hashCode()
         result = 31 * result + priority.hashCode()
+        result = 31 * result + finishDate.hashCode()
         return result
     }
 }
