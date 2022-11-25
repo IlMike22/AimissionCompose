@@ -48,7 +48,7 @@ fun DetailScreen(
         derivedStateOf {
             DateTimeFormatter
                 .ofPattern("dd.MM.yyyy")
-                .format(pickedDate)
+                .format(state.value.finishDate)
         }
     }
 
@@ -193,7 +193,7 @@ fun DetailScreen(
             text = stringResource(id = R.string.button_add),
             icon = 0,
             onClick = {
-                viewModel.onSaveGoalButtonClicked()
+                viewModel.onEvent(DetailEvent.OnSaveButtonClicked)
             })
     }
 
@@ -209,6 +209,7 @@ fun DetailScreen(
             title = "Pick a date"
         ) { picked ->
             pickedDate = picked
+            viewModel.onEvent(DetailEvent.OnFinishDateChanged(picked))
         }
     }
 }

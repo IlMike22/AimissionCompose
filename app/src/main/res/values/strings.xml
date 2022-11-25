@@ -21,9 +21,5 @@
     <string name="detail_goal_finish_date">Select finishing date</string>
 
     <string name="button_add">Add</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
 
 </resources>

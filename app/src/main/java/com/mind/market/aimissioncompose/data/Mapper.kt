@@ -3,9 +3,8 @@ package com.mind.market.aimissioncompose.data
 import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.domain.models.Goal
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 fun Status.toStatusData(): String {
     return when (this) {
@@ -18,8 +17,6 @@ fun Status.toStatusData(): String {
 }
 
 fun GoalDto.toGoal(): Goal {
-    val pattern = "yyyy-MM-dd HH:mm:ss"
-    val formatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
     return Goal(
         id = this.id,
         title = this.title,
@@ -30,7 +27,7 @@ fun GoalDto.toGoal(): Goal {
         genre = this.genre,
         status = this.status,
         priority = this.priority,
-        finishDate = if (this.finishDate.isNotBlank()) LocalDateTime.parse(this.finishDate) else LocalDateTime.now()
+        finishDate = if (this.finishDate.isNotBlank()) LocalDate.parse(this.finishDate) else LocalDate.now()
     )
 }
 

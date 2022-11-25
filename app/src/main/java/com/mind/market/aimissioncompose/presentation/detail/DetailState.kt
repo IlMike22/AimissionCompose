@@ -3,6 +3,7 @@ package com.mind.market.aimissioncompose.presentation.detail
 import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class DetailState(
@@ -13,6 +14,6 @@ data class DetailState(
     val status: Status = Status.UNKNOWN,
     val createdDate: LocalDateTime = LocalDateTime.now(),
     val currentDate: LocalDateTime = LocalDateTime.now(),
-    val finishDate: LocalDateTime = LocalDateTime.now(),
+    val finishDate: LocalDate = LocalDate.now(),
     val isRepeated: Boolean = false
 )

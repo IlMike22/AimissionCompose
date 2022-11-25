@@ -1,6 +1,7 @@
 package com.mind.market.aimissioncompose.domain.models
 
 import com.example.aimissionlite.models.domain.Status
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class Goal(
@@ -13,7 +14,7 @@ data class Goal(
     val genre: Genre,
     val status: Status,
     val priority: Priority,
-    val finishDate: LocalDateTime
+    val finishDate: LocalDate
 ) {
     companion object {
         val EMPTY = Goal(
@@ -26,7 +27,7 @@ data class Goal(
             genre = Genre.UNKNOWN,
             status = Status.UNKNOWN,
             priority = Priority.UNKNOWN,
-            finishDate = LocalDateTime.now()
+            finishDate = LocalDate.now()
         )
     }
 }

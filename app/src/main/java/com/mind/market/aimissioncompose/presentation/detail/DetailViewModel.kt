@@ -10,17 +10,12 @@ import com.example.aimissionlite.models.domain.GoalValidationStatusCode
 import com.example.aimissionlite.models.domain.Status
 import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
-import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.data.Converters.Companion.toGenreId
-import com.mind.market.aimissioncompose.data.Converters.Companion.toPriorityId
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -53,65 +48,55 @@ class DetailViewModel @Inject constructor(
         when (event) {
             is DetailEvent.OnTitleChanged -> {
                 _state.value = _state.value.copy(
-                    title = event.newTitle
+                    title = event.title
                 )
             }
             is DetailEvent.OnDescriptionChanged -> {
                 _state.value = _state.value.copy(
-                    description = event.newDescription
+                    description = event.description
                 )
             }
             is DetailEvent.OnPriorityChanged -> {
                 _state.value = _state.value.copy(
-                    priority = event.newPriority
+                    priority = event.priority
                 )
             }
             is DetailEvent.OnGenreChanged -> {
                 _state.value = _state.value.copy(
-                    genre = event.newGenre
+                    genre = event.genre
                 )
             }
             is DetailEvent.OnStatusChanged -> {
                 _state.value = _state.value.copy(
-                    status = event.newStatus
+                    status = event.status
                 )
             }
-        }
-    }
-
-
-//    fun setSelectedChipGroupItem(chipGroup: ChipGroupName, selectedId: Int) {
-//        when (chipGroup) {
-//            ChipGroupName.GENRE -> {
-//                selectedChipGenre = selectedId
-//            }
-//            ChipGroupName.PRIORITY -> {
-//                selectedChipPriority = selectedId
-//            }
-//        }
-//    }
-
-    fun onSaveGoalButtonClicked() {
-        if (goalId != -1) {
-            updateGoal(
-                Goal(
-                    id = goalId,
-                    title = state.value.title,
-                    description = state.value.description,
-                    creationDate = state.value.createdDate,
-                    changeDate = getCurrentDate(),
-                    isRepeated = state.value.isRepeated,
-                    genre = state.value.genre,
-                    status = state.value.status,
-                    priority = state.value.priority,
-                    finishDate = state.value.finishDate
+            is DetailEvent.OnFinishDateChanged -> {
+                _state.value = _state.value.copy(
+                    finishDate = event.finishDate
                 )
-            )
-
-            return
+            }
+            is DetailEvent.OnSaveButtonClicked -> {
+                if (goalId != -1) {
+                    updateGoal(
+                        Goal(
+                            id = goalId,
+                            title = state.value.title,
+                            description = state.value.description,
+                            creationDate = state.value.createdDate,
+                            changeDate = getCurrentDate(),
+                            isRepeated = state.value.isRepeated,
+                            genre = state.value.genre,
+                            status = state.value.status,
+                            priority = state.value.priority,
+                            finishDate = state.value.finishDate
+                        )
+                    )
+                    return
+                }
+                createNewGoal()
+            }
         }
-
-        createNewGoal()
     }
 
     fun getAndShowGoal(id: Int) = viewModelScope.launch {
@@ -179,7 +164,8 @@ class DetailViewModel @Inject constructor(
                 genre = genre,
                 status = status,
                 priority = priority,
-                isRepeated = isRepeated
+                isRepeated = isRepeated,
+                finishDate = finishDate
             )
         }
     }
@@ -220,24 +206,6 @@ class DetailViewModel @Inject constructor(
 
     companion object {
         const val ARGUMENT_GOAL_ID = "goalId"
-//        private fun Int.toGenre(): Genre =
-//            when (this) {
-//                R.id.chip_genre_business -> Genre.BUSINESS
-//                R.id.chip_genre_socialising -> Genre.SOCIALISING
-//                R.id.chip_genre_fitness -> Genre.FITNESS
-//                R.id.chip_genre_money -> Genre.MONEY
-//                R.id.chip_genre_partnership -> Genre.PARTNERSHIP
-//                R.id.chip_genre_health -> Genre.HEALTH
-//                else -> Genre.UNKNOWN
-//            }
-
-//        private fun Int.toPriority(): Priority =
-//            when (this) {
-//                R.id.chip_priority_low -> Priority.LOW
-//                R.id.chip_priority_high -> Priority.HIGH
-//                else -> Priority.NORMAL
-//            }
-//    }
         private fun Genre.isGenreNotSet(): Boolean = (this == Genre.UNKNOWN)
         private fun Priority.isPriorityNotSet() = this == Priority.UNKNOWN
     }
