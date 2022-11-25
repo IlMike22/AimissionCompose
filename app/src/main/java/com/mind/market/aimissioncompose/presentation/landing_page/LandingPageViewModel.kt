@@ -3,14 +3,12 @@ package com.mind.market.aimissioncompose.presentation.landing_page
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.presentation.detail.DetailViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -19,9 +17,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
-    private val repository: IGoalRepository
+    private val repository: IGoalRepository,
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     var state by mutableStateOf(LandingPageState())
+//    private val invalidate: Boolean = checkNotNull(savedStateHandle[ARGUMENT_INVALIDATE])
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
 
@@ -153,4 +153,8 @@ class LandingPageViewModel @Inject constructor(
             Status.IN_PROGRESS -> Status.DONE
             else -> Status.UNKNOWN
         }
+
+    companion object {
+        private const val ARGUMENT_INVALIDATE = "invalidate"
+    }
 }

@@ -59,7 +59,9 @@ fun DetailScreen(
         viewModel.uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is DetailUIEvent.NavigateToLandingPage -> {
-                    navController.navigateUp()
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle?.set("invalidate", true)
+                    navController.popBackStack()
                 }
             }
         }

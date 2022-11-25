@@ -123,7 +123,7 @@ class DetailViewModel @Inject constructor(
         if (validationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
                 repository.updateGoal(currentGoal)
-                navigateToMainFragment()
+                navigateToLandingPage()
             }
         }
     }
@@ -184,7 +184,7 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun navigateToMainFragment() {
+    private fun navigateToLandingPage() {
         viewModelScope.launch {
             _uiEvent.send(DetailUIEvent.HideKeyboard)
             _uiEvent.send(DetailUIEvent.NavigateToLandingPage)

@@ -13,19 +13,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.navigation.Route
-import com.mind.market.aimissioncompose.presentation.detail.DetailUIEvent
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 
 @Composable
 fun LandingPageScreen(
     viewModel: LandingPageViewModel = hiltViewModel(),
     navController: NavController,
-    isInvalidateScreen:String?
+    isInvalidateScreen: String?
 ) {
     val state = viewModel.state
 
@@ -34,6 +34,15 @@ fun LandingPageScreen(
             if (isNotBlank()) {
                 viewModel.getGoals()
             }
+        }
+    }
+
+    val detailPageScreenResult = navController.currentBackStackEntry
+        ?.savedStateHandle
+        ?.getLiveData<Boolean>("invalidate")?.observeAsState()
+    detailPageScreenResult?.value?.let { isUpdateList ->
+        if (isUpdateList) {
+            viewModel.getGoals()
         }
     }
 
