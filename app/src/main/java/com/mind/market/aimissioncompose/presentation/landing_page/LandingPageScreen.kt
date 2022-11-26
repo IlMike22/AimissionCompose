@@ -24,18 +24,9 @@ import com.mind.market.aimissioncompose.presentation.landing_page.components.Goa
 @Composable
 fun LandingPageScreen(
     viewModel: LandingPageViewModel = hiltViewModel(),
-    navController: NavController,
-    isInvalidateScreen: String?
+    navController: NavController
 ) {
     val state = viewModel.state
-
-    LaunchedEffect(key1 = null) {
-        isInvalidateScreen?.apply {
-            if (isNotBlank()) {
-                viewModel.getGoals()
-            }
-        }
-    }
 
     val detailPageScreenResult = navController.currentBackStackEntry
         ?.savedStateHandle
