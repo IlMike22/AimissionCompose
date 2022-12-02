@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,7 +20,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
+import com.mind.market.aimissioncompose.presentation.information.InformationScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
+import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
+import com.mind.market.aimissioncompose.presentation.settings.SettingsState
 import com.mind.market.aimissioncompose.ui.theme.AimissionComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -44,16 +47,34 @@ class MainActivity : ComponentActivity() {
                             },
                             actions = {
                                 // RowScope here, so these icons will be placed horizontally
-                                IconButton(onClick = { /* doSomething() */ }) {
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate(Route.ADD)
+                                    }
+                                ) {
                                     Icon(
                                         Icons.Filled.Create,
-                                        contentDescription = "Localized description"
+                                        contentDescription = "Add new goal"
                                     )
                                 }
-                                IconButton(onClick = { /* doSomething() */ }) {
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate(Route.SETTINGS)
+                                    }
+                                ) {
                                     Icon(
                                         Icons.Filled.Settings,
-                                        contentDescription = "Localized description"
+                                        contentDescription = "Open settings"
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate(Route.INFORMATION)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Info,
+                                        contentDescription = "Open app info"
                                     )
                                 }
                             },
@@ -64,9 +85,9 @@ class MainActivity : ComponentActivity() {
                     }, content = {
                         NavHost(
                             navController = navController,
-                            startDestination = Route.LandingPage
+                            startDestination = Route.LANDING_PAGE
                         ) {
-                            composable(Route.LandingPage) {
+                            composable(Route.LANDING_PAGE) {
                                 Surface(
                                     modifier = Modifier.fillMaxSize(),
                                     color = MaterialTheme.colors.background
@@ -83,9 +104,24 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     type = NavType.IntType
                                     defaultValue = -1
-                                })
+                                }
+                                )
                             ) {
                                 DetailScreen(
+                                    navController = navController
+                                )
+                            }
+                            composable(
+                                route = Route.INFORMATION
+                            ) {
+                                InformationScreen(
+                                    navController = navController
+                                )
+                            }
+                            composable(
+                                route = Route.SETTINGS
+                            ) {
+                                SettingsScreen(
                                     navController = navController
                                 )
                             }

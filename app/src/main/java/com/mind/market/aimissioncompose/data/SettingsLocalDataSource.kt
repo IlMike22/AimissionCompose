@@ -9,11 +9,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 data class SettingsLocalDataSource(
-    val context: Context
+    val context: Context,
+    private val goalDao: IGoalDao
 ) {
     private val Context.dataStore by preferencesDataStore(
         name = USER_SETTINGS_NAME
     )
+
+    suspend fun duplicateGoals() {
+        val goals = goalDao.getGoals()
+        goals.forEachIndexed { index, goalDto ->
+            goalDao.insert(
+                goalDto.copy(
+                    id = index // TODO be careful with that, we need to generate the id
+                )
+            )
+        }
+    }
 
     suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {
         context.dataStore.edit { preferences ->

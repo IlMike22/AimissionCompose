@@ -1,8 +1,8 @@
 package com.mind.market.aimissioncompose.di
 
 import com.mind.market.aimissioncompose.data.info.repository.InformationRepository
-import com.example.aimissionlite.domain.information.use_case.IInformationUseCase
-import com.example.aimissionlite.domain.information.use_case.implementation.InformationUseCase
+import com.mind.market.aimissioncompose.domain.information.use_case.IInformationUseCase
+import com.mind.market.aimissioncompose.domain.information.use_case.implementation.InformationUseCase
 import com.mind.market.aimissioncompose.data.info.repository.IInformationRepository
 import dagger.Module
 import dagger.Provides

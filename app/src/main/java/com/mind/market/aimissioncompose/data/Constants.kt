@@ -1,9 +1,10 @@
 package com.mind.market.aimissioncompose.data
 
-const val AUTHOR_NAME_LABEL = "Author: "
-const val AUTHOR_NAME_VALUE = "Michael Widlok"
-const val VERSION_NAME_LABEL = "Version: "
-const val VERSION_NAME_VALUE = "0.2"
+const val AUTHOR_NAME = "Author: Michael Widlok"
+const val APP_NAME = "AimissionCompose"
+const val VERSION = "Version: 0.2"
+const val USED_TECHNOLOGIES =
+    "Used technologies: Compose, Navigation, ViewModels, Clean Code, Room, Flow, Coroutines"
 
 // bundle ids
 const val BUNDLE_ID_GOAL = "GOAL_ID"

@@ -1,9 +1,9 @@
 package com.mind.market.aimissioncompose.navigation
 
 object Route {
-    const val LandingPage = "landing_page"
+    const val LANDING_PAGE = "landing_page"
     const val ADD = "add"
     const val DETAIL = "detail"
     const val SETTINGS = "settings"
-    const val INFO = "info"
+    const val INFORMATION = "info"
 }

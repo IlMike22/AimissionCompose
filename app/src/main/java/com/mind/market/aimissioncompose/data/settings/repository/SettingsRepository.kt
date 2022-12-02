@@ -1,15 +1,19 @@
 package com.mind.market.aimissioncompose.data.settings.repository
 
-import android.content.Context
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource
-import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository
 
-class SettingsRepository(context: Context) : ISettingsRepository {
-    private val localDataSource = SettingsLocalDataSource(context)
+class SettingsRepository(
+    private val localDataSource: SettingsLocalDataSource
+) : ISettingsRepository {
+    //private val localDataSource = SettingsLocalDataSource(context)
 
     override suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {
         localDataSource.setDeleteGoalsOnStartup(enabled)
     }
 
     override fun getDeleteGoalsOnStartup() = localDataSource.getDeleteGoalsOnStartup()
+
+    override suspend fun duplicateGoals() {
+        localDataSource.duplicateGoals()
+    }
 }

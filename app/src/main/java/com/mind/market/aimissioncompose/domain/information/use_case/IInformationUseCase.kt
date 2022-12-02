@@ -1,5 +1,5 @@
-package com.example.aimissionlite.domain.information.use_case
+package com.mind.market.aimissioncompose.domain.information.use_case
 
 interface IInformationUseCase {
-    fun getInformation(): Map<String, String>
+    suspend fun getInformation(): List<String>
 }

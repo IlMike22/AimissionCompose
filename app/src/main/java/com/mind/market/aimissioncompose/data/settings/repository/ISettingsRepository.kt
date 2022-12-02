@@ -7,4 +7,6 @@ interface ISettingsRepository {
     suspend fun setDeleteGoalsOnStartup(enabled: Boolean)
 
     fun getDeleteGoalsOnStartup(): Flow<Boolean>
+
+    suspend fun duplicateGoals()
 }

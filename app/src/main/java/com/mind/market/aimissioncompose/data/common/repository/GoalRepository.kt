@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
+//TODO add GoalLocalDataSource because it`s not clear to go directly to Dao in Repo
+
 class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread

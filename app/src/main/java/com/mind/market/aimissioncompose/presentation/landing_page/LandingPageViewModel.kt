@@ -3,15 +3,16 @@ package com.mind.market.aimissioncompose.presentation.landing_page
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.*
-import com.mind.market.aimissioncompose.domain.models.Goal
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
-import com.mind.market.aimissioncompose.presentation.detail.DetailViewModel
+import com.mind.market.aimissioncompose.domain.models.Goal
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,7 +26,7 @@ class LandingPageViewModel @Inject constructor(
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
 
-//    val allGoals: Flow<List<Goal>> = useCase.getAllGoals()
+    //    val allGoals: Flow<List<Goal>> = useCase.getAllGoals()
     private var lastDeletedGoal: Goal = Goal.EMPTY
 
     val uiEvent = MutableSharedFlow<LandingPageUiEvent>()
@@ -121,10 +122,10 @@ class LandingPageViewModel @Inject constructor(
     fun getGoals() {
         viewModelScope.launch {
             repository.getGoals().collect { response ->
-                when(response) {
+                when (response) {
                     is Resource.Success -> {
                         state = state.copy(
-                            goals = response.data?: emptyList(),
+                            goals = response.data ?: emptyList(),
                             isLoading = false,
                             errorMessage = ""
                         )
@@ -138,7 +139,7 @@ class LandingPageViewModel @Inject constructor(
                         state = state.copy(
                             goals = emptyList(),
                             isLoading = false,
-                            errorMessage = response.message?:"Unknown error while loading data."
+                            errorMessage = response.message ?: "Unknown error while loading data."
                         )
                     }
                 }

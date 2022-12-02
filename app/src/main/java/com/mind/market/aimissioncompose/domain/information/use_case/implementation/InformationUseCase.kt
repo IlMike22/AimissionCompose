@@ -1,10 +1,10 @@
-package com.example.aimissionlite.domain.information.use_case.implementation
+package com.mind.market.aimissioncompose.domain.information.use_case.implementation
 
-import com.example.aimissionlite.domain.information.use_case.IInformationUseCase
 import com.mind.market.aimissioncompose.data.info.repository.IInformationRepository
+import com.mind.market.aimissioncompose.domain.information.use_case.IInformationUseCase
 
 class InformationUseCase(
     val repository: IInformationRepository
 ) : IInformationUseCase {
-    override fun getInformation(): Map<String, String> = repository.getInformation()
+    override suspend fun getInformation(): List<String> = repository.getInformation()
 }

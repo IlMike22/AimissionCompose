@@ -11,6 +11,10 @@ class SettingsUseCase(
         return repository.getDeleteGoalsOnStartup()
     }
 
+    override suspend fun duplicateGoals() {
+        repository.duplicateGoals()
+    }
+
     override suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {
         return repository.setDeleteGoalsOnStartup(enabled)
     }
