@@ -2,7 +2,7 @@ package com.mind.market.aimissioncompose.di
 
 import android.content.Context
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.example.aimissionlite.domain.settings.use_case.implementation.SettingsUseCase
+import com.mind.market.aimissioncompose.domain.settings.use_case.implementation.SettingsUseCase
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource
 import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository

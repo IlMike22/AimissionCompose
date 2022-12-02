@@ -2,6 +2,7 @@ package com.mind.market.aimissioncompose.presentation.settings
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,8 +19,9 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val isDeleteGoalOnStartup = MutableLiveData<Resource<Flow<Boolean>>>()
 
-    private val _settingsState by mutableStateOf(SettingsState())
-    val settingsState = _settingsState
+    var _settingsState by mutableStateOf(SettingsState())
+//    private var _settingsState by mutableStateOf(SettingsState())
+//    val settingsState = _settingsState
 
     init {
         val result = useCase.getDeleteGoalsOnStartup()
@@ -30,10 +32,20 @@ class SettingsViewModel @Inject constructor(
         when (event) {
             SettingsEvent.DuplicateGoals -> {
                 viewModelScope.launch {
-                    useCase.duplicateGoals()
-                    _settingsState.copy(
-                        duplicateGoalsMessage = "Goals were successfully duplicated!"
-                    )
+                    val isSuccess = useCase.duplicateGoals()
+                    _settingsState = if (isSuccess) {
+                        _settingsState.copy(
+                            duplicateGoalsMessage = "Goals were successfully duplicated!",
+                            snackBarDuplicateGoalsSuccessMessage = "Goals successfully duplicated!",
+                            isShowSnackbar = true
+                        )
+                    } else {
+                        _settingsState.copy(
+                            duplicateGoalsMessage = "Error while duplicating goals.",
+                            snackBarDuplicateGoalsSuccessMessage = "Goal duplication failed!",
+                            isShowSnackbar = true
+                        )
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.aimissionlite.domain.settings.use_case.implementation
+package com.mind.market.aimissioncompose.domain.settings.use_case.implementation
 
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository
@@ -11,8 +11,8 @@ class SettingsUseCase(
         return repository.getDeleteGoalsOnStartup()
     }
 
-    override suspend fun duplicateGoals() {
-        repository.duplicateGoals()
+    override suspend fun duplicateGoals(): Boolean {
+        return repository.duplicateGoals()
     }
 
     override suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {

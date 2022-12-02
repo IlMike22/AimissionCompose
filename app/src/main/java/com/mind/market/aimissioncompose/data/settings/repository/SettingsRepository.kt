@@ -13,7 +13,7 @@ class SettingsRepository(
 
     override fun getDeleteGoalsOnStartup() = localDataSource.getDeleteGoalsOnStartup()
 
-    override suspend fun duplicateGoals() {
-        localDataSource.duplicateGoals()
+    override suspend fun duplicateGoals(): Boolean {
+        return localDataSource.duplicateGoals()
     }
 }

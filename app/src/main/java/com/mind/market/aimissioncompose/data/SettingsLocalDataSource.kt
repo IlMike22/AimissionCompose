@@ -16,15 +16,17 @@ data class SettingsLocalDataSource(
         name = USER_SETTINGS_NAME
     )
 
-    suspend fun duplicateGoals() {
-        val goals = goalDao.getGoals()
-        goals.forEachIndexed { index, goalDto ->
-            goalDao.insert(
-                goalDto.copy(
-                    id = index // TODO be careful with that, we need to generate the id
-                )
-            )
+    suspend fun duplicateGoals(): Boolean {
+        try {
+            val goals = goalDao.getGoals()
+            goals.forEach { goalDto ->
+                goalDao.insert(goalDto)
+            }
+        } catch (exception: Exception) {
+            println("!! some crash while duplicating the goal")
+            return false
         }
+        return true
     }
 
     suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {

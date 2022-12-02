@@ -1,6 +1,5 @@
 package com.mind.market.aimissioncompose.data.settings.repository
 
-import android.content.Context
 import kotlinx.coroutines.flow.Flow
 
 interface ISettingsRepository {
@@ -8,5 +7,5 @@ interface ISettingsRepository {
 
     fun getDeleteGoalsOnStartup(): Flow<Boolean>
 
-    suspend fun duplicateGoals()
+    suspend fun duplicateGoals(): Boolean
 }
