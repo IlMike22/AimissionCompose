@@ -29,7 +29,6 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -48,7 +47,7 @@ fun DetailScreen(
         derivedStateOf {
             DateTimeFormatter
                 .ofPattern("dd.MM.yyyy")
-                .format(state.value.finishDate)
+                .format(state.finishDate)
         }
     }
 
@@ -86,7 +85,7 @@ fun DetailScreen(
             Spacer(Modifier.width(24.dp))
 
             TextField(
-                value = state.value.title,
+                value = state.title,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = { newTitle ->
                     viewModel.onEvent(DetailEvent.OnTitleChanged(newTitle))
@@ -108,7 +107,7 @@ fun DetailScreen(
             Spacer(Modifier.width(24.dp))
 
             TextField(
-                value = state.value.description,
+                value = state.description,
                 modifier = Modifier.fillMaxWidth(),
                 onValueChange = { newDescription ->
                     viewModel.onEvent(DetailEvent.OnDescriptionChanged(newDescription))
@@ -131,7 +130,7 @@ fun DetailScreen(
             ) {
                 ChipGroupPriority(
                     values = getPriorities(),
-                    selectedValue = state.value.priority,
+                    selectedValue = state.priority,
                     onSelectedChanged = { newPriority ->
                         viewModel.onEvent(DetailEvent.OnPriorityChanged(newPriority.toPriority()))
                     }
@@ -155,7 +154,7 @@ fun DetailScreen(
             ) {
                 ChipGroupGenre(
                     values = getGenres(),
-                    selectedValue = state.value.genre,
+                    selectedValue = state.genre,
                     onSelectedChanged = { newGenre ->
                         viewModel.onEvent(DetailEvent.OnGenreChanged(newGenre.toGenre()))
                     }

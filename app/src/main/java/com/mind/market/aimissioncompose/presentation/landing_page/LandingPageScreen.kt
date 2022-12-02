@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -26,10 +27,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun LandingPageScreen(
     viewModel: LandingPageViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier,
     navController: NavController
 ) {
     val state = viewModel.state
     val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
 
     val detailPageScreenResult = navController.currentBackStackEntry
         ?.savedStateHandle
@@ -51,89 +54,98 @@ fun LandingPageScreen(
         bottomSheetState = sheetState
     )
 
-    BottomSheetScaffold(
-        scaffoldState = bottomSheetScaffoldState,
-        sheetContent = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(250.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Bottom Sheet Content",
-                    fontSize = 16.sp,
-                )
-            }
-        },
-        sheetBackgroundColor = Color.Blue,
-        sheetPeekHeight = 36.dp,
-
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Button(
-                onClick = {
-                    scope.launch {
-                        if (sheetState.isCollapsed) sheetState.expand() else sheetState.collapse()
-                    }
-                }) {
-                Text("Show/Hide Bottom Sheet")
-            }
+    if (state.showSnackbar) {
+        LaunchedEffect(scaffoldState.snackbarHostState) {
+            scaffoldState.snackbarHostState.showSnackbar(
+                message = state.snackbarMessage
+            )
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
+    Scaffold(
+        modifier = modifier,
+        scaffoldState = scaffoldState
     ) {
-        FloatingActionButton(
-            onClick = { navController.navigate(Route.ADD) }
-        ) {
-            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            val goals = state.goals
-            items(goals.size) { index ->
-                val goal = goals[index]
-                Goal(
+        BottomSheetScaffold(
+            scaffoldState = bottomSheetScaffoldState,
+            sheetContent = {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxSize()
-                        .clickable {
-//                            viewModel.onEvent(LandingPageUiEvent.NavigateToDetailGoal(goal))
-                            navController.navigate(Route.ADD + "?goalId=${goal.id}")
-                        }
-                        .padding(8.dp),
-                    goal = goal,
-                    onDeleteClicked = {
-                        viewModel.onEvent(
-                            LandingPageUiEvent.OnDeleteGoalClicked(
-                                goal
-                            )
-                        )
-                    },
-                    onStatusChangeClicked = {
-                        viewModel.onEvent(
-                            LandingPageUiEvent.OnStatusChangedClicked(
-                                goal
-                            )
-                        )
-                    },
-                    navController = navController
-                )
-
-                if (index < state.goals.size) {
-                    Divider(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
+                        .height(250.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "Bottom Sheet Content",
+                        fontSize = 16.sp,
                     )
+                }
+            },
+            sheetBackgroundColor = Color.Blue,
+            sheetPeekHeight = 36.dp,
+
+            ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            if (sheetState.isCollapsed) sheetState.expand() else sheetState.collapse()
+                        }
+                    }) {
+                    Text("Show/Hide Bottom Sheet")
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+        ) {
+            FloatingActionButton(
+                onClick = { navController.navigate(Route.ADD) }
+            ) {
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                val goals = state.goals
+                items(goals.size) { index ->
+                    val goal = goals[index]
+                    Goal(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxSize()
+                            .clickable {
+//                            viewModel.onEvent(LandingPageUiEvent.NavigateToDetailGoal(goal))
+                                navController.navigate(Route.ADD + "?goalId=${goal.id}")
+                            }
+                            .padding(8.dp),
+                        goal = goal,
+                        onDeleteClicked = { goalToDelete ->
+                            viewModel.onEvent(
+                                LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete)
+                            )
+                        },
+                        onStatusChangeClicked = {
+                            viewModel.onEvent(
+                                LandingPageUiEvent.OnStatusChangedClicked(goal)
+                            )
+                        },
+                        navController = navController
+                    )
+
+                    if (index < state.goals.size) {
+                        Divider(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                        )
+                    }
                 }
             }
         }

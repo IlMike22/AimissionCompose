@@ -21,13 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.domain.models.Goal
-import com.mind.market.aimissioncompose.navigation.Route
 
 @Composable
 fun Goal(
     modifier: Modifier = Modifier,
     goal: Goal,
-    onDeleteClicked: () -> Unit,
+    onDeleteClicked: (goal: Goal) -> Unit,
     onStatusChangeClicked: () -> Unit,
     navController: NavController
 ) {
@@ -67,7 +66,7 @@ fun Goal(
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(
-                    onClick = onStatusChangeClicked
+                    onClick = { onDeleteClicked(goal) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
@@ -105,7 +104,7 @@ fun Goal(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    onClick = onDeleteClicked
+                    onClick = { onStatusChangeClicked() }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,

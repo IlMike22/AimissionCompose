@@ -19,9 +19,8 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
     private val isDeleteGoalOnStartup = MutableLiveData<Resource<Flow<Boolean>>>()
 
-    var _settingsState by mutableStateOf(SettingsState())
-//    private var _settingsState by mutableStateOf(SettingsState())
-//    val settingsState = _settingsState
+    var settingsState by mutableStateOf(SettingsState())
+    private set
 
     init {
         val result = useCase.getDeleteGoalsOnStartup()
@@ -33,14 +32,14 @@ class SettingsViewModel @Inject constructor(
             SettingsEvent.DuplicateGoals -> {
                 viewModelScope.launch {
                     val isSuccess = useCase.duplicateGoals()
-                    _settingsState = if (isSuccess) {
-                        _settingsState.copy(
+                    settingsState = if (isSuccess) {
+                        settingsState.copy(
                             duplicateGoalsMessage = "Goals were successfully duplicated!",
                             snackBarDuplicateGoalsSuccessMessage = "Goals successfully duplicated!",
                             isShowSnackbar = true
                         )
                     } else {
-                        _settingsState.copy(
+                        settingsState.copy(
                             duplicateGoalsMessage = "Error while duplicating goals.",
                             snackBarDuplicateGoalsSuccessMessage = "Goal duplication failed!",
                             isShowSnackbar = true

@@ -1,8 +1,9 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import android.app.Application
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -36,8 +37,8 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private var _state = mutableStateOf(DetailState())
-    val state: State<DetailState> = _state
+    var state by mutableStateOf(DetailState())
+        private set
 
     private val _uiEvent = Channel<DetailUIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -47,32 +48,32 @@ class DetailViewModel @Inject constructor(
     fun onEvent(event: DetailEvent) {
         when (event) {
             is DetailEvent.OnTitleChanged -> {
-                _state.value = _state.value.copy(
+                state = state.copy(
                     title = event.title
                 )
             }
             is DetailEvent.OnDescriptionChanged -> {
-                _state.value = _state.value.copy(
+                state = state.copy(
                     description = event.description
                 )
             }
             is DetailEvent.OnPriorityChanged -> {
-                _state.value = _state.value.copy(
+                state = state.copy(
                     priority = event.priority
                 )
             }
             is DetailEvent.OnGenreChanged -> {
-                _state.value = _state.value.copy(
+                state = state.copy(
                     genre = event.genre
                 )
             }
             is DetailEvent.OnStatusChanged -> {
-                _state.value = _state.value.copy(
+                state.copy(
                     status = event.status
                 )
             }
             is DetailEvent.OnFinishDateChanged -> {
-                _state.value = _state.value.copy(
+                state = state.copy(
                     finishDate = event.finishDate
                 )
             }
@@ -81,15 +82,15 @@ class DetailViewModel @Inject constructor(
                     updateGoal(
                         Goal(
                             id = goalId,
-                            title = state.value.title,
-                            description = state.value.description,
-                            creationDate = state.value.createdDate,
+                            title = state.title,
+                            description = state.description,
+                            creationDate = state.createdDate,
                             changeDate = getCurrentDate(),
-                            isRepeated = state.value.isRepeated,
-                            genre = state.value.genre,
-                            status = state.value.status,
-                            priority = state.value.priority,
-                            finishDate = state.value.finishDate
+                            isRepeated = state.isRepeated,
+                            genre = state.genre,
+                            status = state.status,
+                            priority = state.priority,
+                            finishDate = state.finishDate
                         )
                     )
                     return
@@ -131,15 +132,15 @@ class DetailViewModel @Inject constructor(
     private fun createNewGoal() {
         val newGoal = Goal(
             id = 0,
-            title = state.value.title,
-            description = state.value.description,
-            creationDate = state.value.createdDate,
+            title = state.title,
+            description = state.description,
+            creationDate = state.createdDate,
             changeDate = getCurrentDate(),
-            isRepeated = state.value.isRepeated,
-            genre = state.value.genre,
+            isRepeated = state.isRepeated,
+            genre = state.genre,
             status = Status.TODO,
-            priority = state.value.priority,
-            finishDate = state.value.finishDate
+            priority = state.priority,
+            finishDate = state.finishDate
         )
 
         val goalValidationStatusCode = GoalValidationStatusCode(
@@ -158,7 +159,7 @@ class DetailViewModel @Inject constructor(
 
     private fun showGoal(goal: Goal) {
         goal.apply {
-            _state.value = DetailState(
+            state = DetailState(
                 title = title,
                 description = description,
                 genre = genre,

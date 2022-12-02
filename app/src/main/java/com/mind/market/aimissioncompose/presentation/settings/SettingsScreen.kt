@@ -20,7 +20,7 @@ fun SettingsScreen(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val state = viewModel._settingsState // TODO dont use mutable state in screen
+    val state = viewModel.settingsState
     val scaffoldState = rememberScaffoldState()
 
     if (state.isShowSnackbar) {

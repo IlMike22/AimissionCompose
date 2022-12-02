@@ -22,7 +22,7 @@ class LandingPageViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     var state by mutableStateOf(LandingPageState())
-//    private val invalidate: Boolean = checkNotNull(savedStateHandle[ARGUMENT_INVALIDATE])
+        private set
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
 
@@ -42,15 +42,14 @@ class LandingPageViewModel @Inject constructor(
                 onAddGoalClicked()
             }
             is LandingPageUiEvent.NavigateToDetailGoal -> {
-                println("!! navigate to detail goal")
                 onGoalContainerClicked(event.goal)
             }
-            is LandingPageUiEvent.NavigateToInfo -> {}
-            is LandingPageUiEvent.NavigateToSettings -> {
-                onSettingsClicked()
+            is LandingPageUiEvent.OnDeleteGoalClicked -> {
+                deleteGoal(event.goal)
             }
-            is LandingPageUiEvent.OnDeleteGoalClicked -> TODO()
-            is LandingPageUiEvent.OnStatusChangedClicked -> TODO()
+            is LandingPageUiEvent.OnStatusChangedClicked -> {
+                onGoalStatusClicked(event.goal)
+            }
             is LandingPageUiEvent.ShowSnackbar -> TODO()
         }
     }
@@ -61,20 +60,7 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    fun onInfoClicked() {
-        viewModelScope.launch {
-            uiEvent.emit(LandingPageUiEvent.NavigateToInfo)
-        }
-    }
-
-    fun onSettingsClicked() {
-        viewModelScope.launch {
-            uiEvent.emit(LandingPageUiEvent.NavigateToSettings)
-        }
-    }
-
-
-    fun onGoalStatusClicked(goal: Goal?) {
+    private fun onGoalStatusClicked(goal: Goal?) {
         goal?.apply {
             viewModelScope.launch {
                 repository.updateStatus(
@@ -85,7 +71,7 @@ class LandingPageViewModel @Inject constructor(
         } ?: println("!!! Goal is null. Cannot update goal status.")
     }
 
-    fun onGoalContainerClicked(goal: Goal?) {
+    private fun onGoalContainerClicked(goal: Goal?) {
         viewModelScope.launch {
             goal?.apply {
                 uiEvent.emit(LandingPageUiEvent.NavigateToDetailGoal(this))
@@ -93,19 +79,33 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    fun onGoalDeleteClicked(goal: Goal?) {
+    private fun deleteGoal(goal: Goal?): Boolean {
         lastDeletedGoal = goal ?: Goal.EMPTY
+        var isDeleteSucceeded = false
         goal?.apply {
             viewModelScope.launch {
-                val isDeleteSucceeded = repository.deleteGoal(goal)
-                if (isDeleteSucceeded.not()) {
-                    println("!!! Error while deleting the goal.")
-                }
+                isDeleteSucceeded = repository.deleteGoal(goal)
+                if (isDeleteSucceeded) {
+                    getGoals()
 
-                uiEvent.emit(LandingPageUiEvent.ShowSnackbar("Goal deleted."))
+                    state = state.copy(
+                        showSnackbar = true,
+                        snackbarMessage = "The goal was successfully deleted."
+                    )
+                } else {
+                    state = state.copy(
+                        showSnackbar = true,
+                        snackbarMessage = "The goal could not be deleted. Please try again."
+                    )
+                }
+//                    println("!!! Error while deleting the goal.")
+//                }
+//                uiEvent.emit(LandingPageUiEvent.ShowSnackbar("Goal deleted."))
             }
         } ?: println("!!! Goal is null. Cannot delete goal.")
+        return isDeleteSucceeded
     }
+
 
     fun restoreDeletedGoal() {
         if (lastDeletedGoal != Goal.EMPTY) {

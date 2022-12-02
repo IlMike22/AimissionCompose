@@ -6,8 +6,6 @@ sealed class LandingPageUiEvent(val message: String? = null, val goal: Goal? = n
     class ShowSnackbar(message: String) : LandingPageUiEvent(message)
     object OnAddGoalClicked : LandingPageUiEvent()
     class NavigateToDetailGoal(goal: Goal? = null) : LandingPageUiEvent(goal = goal)
-    object NavigateToInfo : LandingPageUiEvent()
-    object NavigateToSettings : LandingPageUiEvent()
-    class OnDeleteGoalClicked(goal: Goal):LandingPageUiEvent()
-    class OnStatusChangedClicked(goal: Goal):LandingPageUiEvent()
+    class OnDeleteGoalClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
+    class OnStatusChangedClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
 }
