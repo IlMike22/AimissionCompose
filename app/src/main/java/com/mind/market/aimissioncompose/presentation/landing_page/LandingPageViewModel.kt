@@ -32,7 +32,6 @@ class LandingPageViewModel @Inject constructor(
     val uiEvent = MutableSharedFlow<LandingPageUiEvent>()
 
     init {
-//        isDeleteAllGoals = repository.getDeleteGoalsOnStartup().asLiveData()
         getGoals()
     }
 
@@ -47,9 +46,9 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnDeleteGoalClicked -> {
                 deleteGoal(event.goal)
             }
-//            is LandingPageUiEvent.OnStatusChangedClicked -> {
-//                updateGoalStatus(event.goal)
-//            }
+            is LandingPageUiEvent.OnStatusChangedClicked -> {
+                updateGoalStatus(event.goal)
+            }
             is LandingPageUiEvent.ShowSnackbar -> TODO()
         }
     }
@@ -60,20 +59,18 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-//    private fun updateGoalStatus(goalState: GoalState?) {
-//        goalState?.apply {
-//            viewModelScope.launch {
-//                val newStatus = getNewGoalStatus(goal.status)
-//                repository.updateStatus(
-//                    id = goal.id,
-//                    status = newStatus
-//                )
-//                goalState = copy(
-//                    statusIcon = if (newStatus == Status.IN_PROGRESS) Icons.Default.Build else Icons.Default.CheckCircle
-//                )
-//            }
-//        } ?: println("!!! Goal is null. Cannot update goal status.")
-//    }
+    private fun updateGoalStatus(goal: Goal?) {
+        goal?.apply {
+            viewModelScope.launch {
+                val newStatus = getNewGoalStatus(goal.status)
+                repository.updateStatus(
+                    id = id,
+                    status = newStatus
+                )
+                getGoals() // TODO not good to get all goals again after updating them
+            }
+        }
+    }
 
     private fun onGoalContainerClicked(goal: Goal?) {
         viewModelScope.launch {
@@ -89,22 +86,19 @@ class LandingPageViewModel @Inject constructor(
         goal?.apply {
             viewModelScope.launch {
                 isDeleteSucceeded = repository.deleteGoal(goal)
-                if (isDeleteSucceeded) {
+                state = if (isDeleteSucceeded) {
                     getGoals()
 
-                    state = state.copy(
+                    state.copy(
                         showSnackbar = true,
                         snackbarMessage = "The goal was successfully deleted."
                     )
                 } else {
-                    state = state.copy(
+                    state.copy(
                         showSnackbar = true,
                         snackbarMessage = "The goal could not be deleted. Please try again."
                     )
                 }
-//                    println("!!! Error while deleting the goal.")
-//                }
-//                uiEvent.emit(LandingPageUiEvent.ShowSnackbar("Goal deleted."))
             }
         } ?: println("!!! Goal is null. Cannot delete goal.")
         return isDeleteSucceeded

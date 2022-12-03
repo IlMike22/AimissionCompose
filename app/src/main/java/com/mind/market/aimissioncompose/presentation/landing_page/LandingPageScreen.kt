@@ -133,11 +133,11 @@ fun LandingPageScreen(
                                 LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete)
                             )
                         },
-//                        onStatusChangeClicked = {
-//                            viewModel.onEvent(
-//                                LandingPageUiEvent.OnStatusChangedClicked(goal)
-//                            )
-//                        },
+                        onStatusChangeClicked = { selectedGoal ->
+                            viewModel.onEvent(
+                                LandingPageUiEvent.OnStatusChangedClicked(selectedGoal)
+                            )
+                        },
                         navController = navController
                     )
 
