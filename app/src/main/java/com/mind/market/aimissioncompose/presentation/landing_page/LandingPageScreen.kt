@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.clickable
@@ -23,6 +24,7 @@ import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LandingPageScreen(
@@ -122,7 +124,6 @@ fun LandingPageScreen(
                             .fillMaxWidth()
                             .fillMaxSize()
                             .clickable {
-//                            viewModel.onEvent(LandingPageUiEvent.NavigateToDetailGoal(goal))
                                 navController.navigate(Route.ADD + "?goalId=${goal.id}")
                             }
                             .padding(8.dp),
@@ -132,11 +133,11 @@ fun LandingPageScreen(
                                 LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete)
                             )
                         },
-                        onStatusChangeClicked = {
-                            viewModel.onEvent(
-                                LandingPageUiEvent.OnStatusChangedClicked(goal)
-                            )
-                        },
+//                        onStatusChangeClicked = {
+//                            viewModel.onEvent(
+//                                LandingPageUiEvent.OnStatusChangedClicked(goal)
+//                            )
+//                        },
                         navController = navController
                     )
 

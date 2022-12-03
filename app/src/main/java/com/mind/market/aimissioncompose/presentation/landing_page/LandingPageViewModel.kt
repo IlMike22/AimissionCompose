@@ -47,9 +47,9 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnDeleteGoalClicked -> {
                 deleteGoal(event.goal)
             }
-            is LandingPageUiEvent.OnStatusChangedClicked -> {
-                onGoalStatusClicked(event.goal)
-            }
+//            is LandingPageUiEvent.OnStatusChangedClicked -> {
+//                updateGoalStatus(event.goal)
+//            }
             is LandingPageUiEvent.ShowSnackbar -> TODO()
         }
     }
@@ -60,16 +60,20 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private fun onGoalStatusClicked(goal: Goal?) {
-        goal?.apply {
-            viewModelScope.launch {
-                repository.updateStatus(
-                    id = goal.id,
-                    status = getNewGoalStatus(goal.status)
-                )
-            }
-        } ?: println("!!! Goal is null. Cannot update goal status.")
-    }
+//    private fun updateGoalStatus(goalState: GoalState?) {
+//        goalState?.apply {
+//            viewModelScope.launch {
+//                val newStatus = getNewGoalStatus(goal.status)
+//                repository.updateStatus(
+//                    id = goal.id,
+//                    status = newStatus
+//                )
+//                goalState = copy(
+//                    statusIcon = if (newStatus == Status.IN_PROGRESS) Icons.Default.Build else Icons.Default.CheckCircle
+//                )
+//            }
+//        } ?: println("!!! Goal is null. Cannot update goal status.")
+//    }
 
     private fun onGoalContainerClicked(goal: Goal?) {
         viewModelScope.launch {

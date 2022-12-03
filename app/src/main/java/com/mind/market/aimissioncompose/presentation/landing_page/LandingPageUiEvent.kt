@@ -7,5 +7,5 @@ sealed class LandingPageUiEvent(val message: String? = null, val goal: Goal? = n
     object OnAddGoalClicked : LandingPageUiEvent()
     class NavigateToDetailGoal(goal: Goal? = null) : LandingPageUiEvent(goal = goal)
     class OnDeleteGoalClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
-    class OnStatusChangedClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
+//    class OnStatusChangedClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
 }
