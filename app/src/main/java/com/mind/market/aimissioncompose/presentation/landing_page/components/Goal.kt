@@ -117,9 +117,9 @@ fun Goal(
 
 fun getStatusIcon(status: Status): ImageVector {
     return when (status) {
-        Status.IN_PROGRESS -> Icons.Default.Build
-        Status.TODO -> Icons.Default.Create
-        Status.DONE -> Icons.Default.Done
+        Status.IN_PROGRESS -> Icons.Default.Done
+        Status.TODO -> Icons.Default.CheckCircle
+        Status.DONE -> Icons.Default.Create
         else -> Icons.Default.Home
     }
 }
