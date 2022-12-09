@@ -14,5 +14,4 @@ sealed class LandingPageUiEvent(val goal: Goal? = null) {
     class OnDeleteGoalClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
     class OnStatusChangedClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
     object OnUndoDeleteGoalClicked : LandingPageUiEvent()
-    object OnListUpdated : LandingPageUiEvent()
 }

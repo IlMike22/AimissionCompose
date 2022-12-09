@@ -7,19 +7,27 @@ import kotlinx.coroutines.flow.Flow
 class SettingsUseCase(
     val repository: ISettingsRepository
 ) : ISettingsUseCase {
-    override fun getDeleteGoalsOnStartup(): Flow<Boolean> {
-        return repository.getDeleteGoalsOnStartup()
-    }
+//    override fun getDeleteGoalsOnStartup(): Flow<Boolean> {
+//        return repository.getDeleteGoalsOnStartup()
+//    }
 
     override suspend fun duplicateGoals(): Boolean {
         return repository.duplicateGoals()
     }
 
-    override suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {
-        return repository.setDeleteGoalsOnStartup(enabled)
+//    override suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {
+//        return repository.setDeleteGoalsOnStartup(enabled)
+//    }
+
+    override suspend fun setHideDoneGoals(isHide: Boolean) {
+        return repository.setHideDoneGoals(isHide)
     }
 
     override fun getHeaderText(): String {
         return "Define your settings here"
+    }
+
+    override fun getUserSettings(): Flow<Boolean> {
+        return repository.getUserSettings()
     }
 }

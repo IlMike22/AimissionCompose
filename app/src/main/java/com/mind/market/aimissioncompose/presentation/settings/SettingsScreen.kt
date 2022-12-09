@@ -2,12 +2,10 @@ package com.mind.market.aimissioncompose.presentation.settings
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -49,6 +47,21 @@ fun SettingsScreen(
             }
             Spacer(modifier = modifier.height(16.dp))
             Text(text = state.duplicateGoalsMessage)
+            Spacer(modifier = modifier.height(24.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = state.isDoneGoalsHidden,
+                    onCheckedChange = { isChecked ->
+                        viewModel.onEvent(SettingsEvent.HideDoneGoals(isChecked))
+                    })
+                Spacer(modifier = modifier.width(8.dp))
+                Text(text = "Hide successfully done goals in list")
+            }
+
         }
     }
 

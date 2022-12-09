@@ -5,7 +5,11 @@ import kotlinx.coroutines.flow.Flow
 interface ISettingsRepository {
     suspend fun setDeleteGoalsOnStartup(enabled: Boolean)
 
-    fun getDeleteGoalsOnStartup(): Flow<Boolean>
+//    fun getDeleteGoalsOnStartup(): Flow<Boolean>
 
     suspend fun duplicateGoals(): Boolean
+
+    suspend fun setHideDoneGoals(isHide: Boolean)
+
+    fun getUserSettings(): Flow<Boolean>
 }

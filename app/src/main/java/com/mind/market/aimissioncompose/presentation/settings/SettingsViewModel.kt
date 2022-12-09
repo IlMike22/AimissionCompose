@@ -20,11 +20,16 @@ class SettingsViewModel @Inject constructor(
     private val isDeleteGoalOnStartup = MutableLiveData<Resource<Flow<Boolean>>>()
 
     var settingsState by mutableStateOf(SettingsState())
-    private set
+        private set
 
     init {
-        val result = useCase.getDeleteGoalsOnStartup()
-        isDeleteGoalOnStartup.postValue(Resource.Success(result))
+        viewModelScope.launch {
+            useCase.getUserSettings().collect {
+                settingsState = settingsState.copy(
+                    isDoneGoalsHidden = it
+                )
+            }
+        }
     }
 
     fun onEvent(event: SettingsEvent) {
@@ -47,14 +52,22 @@ class SettingsViewModel @Inject constructor(
                     }
                 }
             }
+            is SettingsEvent.HideDoneGoals -> {
+                viewModelScope.launch {
+                    useCase.setHideDoneGoals(event.hide)
+                    settingsState = settingsState.copy(
+                        isDoneGoalsHidden = event.hide
+                    )
+                }
+            }
         }
     }
 
-    fun onDeleteGoalsClicked(isEnabled: Boolean) {
-        viewModelScope.launch {
-            useCase.setDeleteGoalsOnStartup(isEnabled)
-        }
-    }
+//    fun onDeleteGoalsClicked(isEnabled: Boolean) {
+//        viewModelScope.launch {
+//            useCase.setDeleteGoalsOnStartup(isEnabled)
+//        }
+//    }
 
     fun getHeaderText() = useCase.getHeaderText()
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
     private val repository: IGoalRepository,
+    private val settingsUseCase: ISettingsUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val TAG = LandingPageViewModel.javaClass.toString()
@@ -29,6 +31,7 @@ class LandingPageViewModel @Inject constructor(
         private set
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
+    var isDoneGoalHidden = false
     private lateinit var deletedGoal: Goal
     private var deletedGoalIndex = -1
     private var getGoalsJob: Job? = null
@@ -38,7 +41,12 @@ class LandingPageViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        getGoals()
+        viewModelScope.launch {
+            settingsUseCase.getUserSettings().collect { doneGoalsHidden ->
+                isDoneGoalHidden = doneGoalsHidden
+                getGoals()
+            }
+        }
     }
 
     fun onEvent(event: LandingPageUiEvent) {
@@ -57,8 +65,6 @@ class LandingPageViewModel @Inject constructor(
             }
             is LandingPageUiEvent.OnUndoDeleteGoalClicked -> {
                 restoreDeletedGoal()
-            }
-            is LandingPageUiEvent.OnListUpdated -> {
             }
         }
     }
@@ -127,33 +133,38 @@ class LandingPageViewModel @Inject constructor(
         return repository.deleteAll()
     }
 
-    fun getGoals() {
-        getGoalsJob?.cancel()
-        getGoalsJob = viewModelScope.launch {
-            repository.getGoals().collect { response ->
-                when (response) {
-                    is Resource.Success -> {
-                        state = state.copy(
-                            goals = response.data ?: emptyList(),
-                            isLoading = false,
-                            errorMessage = ""
-                        )
-                    }
-                    is Resource.Loading -> {
-                        state = state.copy(
-                            isLoading = response.isLoading
-                        )
-                    }
-                    is Resource.Error -> {
-                        state = state.copy(
-                            goals = emptyList(),
-                            isLoading = false,
-                            errorMessage = response.message ?: "Unknown error while loading data."
-                        )
-                    }
+    suspend fun getGoals() {
+        repository.getGoals().collect { response ->
+            when (response) {
+                is Resource.Success -> {
+                    state = state.copy(
+                        goals = filterGoals(response.data ?: emptyList()),
+                        isLoading = false,
+                        errorMessage = ""
+                    )
+                }
+                is Resource.Loading -> {
+                    state = state.copy(
+                        isLoading = response.isLoading
+                    )
+                }
+                is Resource.Error -> {
+                    state = state.copy(
+                        goals = emptyList(),
+                        isLoading = false,
+                        errorMessage = response.message ?: "Unknown error while loading data."
+                    )
                 }
             }
         }
+    }
+
+    private fun filterGoals(goals: List<Goal>): List<Goal> {
+        return if (isDoneGoalHidden) {
+            goals.filter { goal ->
+                goal.status != Status.DONE
+            }
+        } else { goals }
     }
 
     private fun getNewGoalStatus(oldStatus: Status): Status =

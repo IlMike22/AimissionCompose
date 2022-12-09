@@ -42,8 +42,9 @@ fun LandingPageScreen(
         ?.getLiveData<Boolean>("invalidate")?.observeAsState()
     detailPageScreenResult?.value?.let { isUpdateList ->
         if (isUpdateList) {
-            viewModel.getGoals()
-            viewModel.onEvent(LandingPageUiEvent.OnListUpdated)
+            scope.launch {
+                viewModel.getGoals()
+            }
             navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
         }
     }
