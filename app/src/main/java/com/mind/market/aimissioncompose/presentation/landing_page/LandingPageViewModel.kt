@@ -11,8 +11,11 @@ import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,15 +24,18 @@ class LandingPageViewModel @Inject constructor(
     private val repository: IGoalRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    val TAG = LandingPageViewModel.javaClass.toString()
     var state by mutableStateOf(LandingPageState())
         private set
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
+    private lateinit var deletedGoal: Goal
+    private var deletedGoalIndex = -1
+    private var getGoalsJob: Job? = null
 
     //    val allGoals: Flow<List<Goal>> = useCase.getAllGoals()
-    private var lastDeletedGoal: Goal = Goal.EMPTY
-
-    val uiEvent = MutableSharedFlow<LandingPageUiEvent>()
+    private val _uiEvent = Channel<LandingPageUiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
         getGoals()
@@ -38,7 +44,7 @@ class LandingPageViewModel @Inject constructor(
     fun onEvent(event: LandingPageUiEvent) {
         when (event) {
             is LandingPageUiEvent.OnAddGoalClicked -> {
-                onAddGoalClicked()
+                navigateToAddGoalScreen()
             }
             is LandingPageUiEvent.NavigateToDetailGoal -> {
                 onGoalContainerClicked(event.goal)
@@ -49,13 +55,17 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnStatusChangedClicked -> {
                 updateGoalStatus(event.goal)
             }
-            is LandingPageUiEvent.ShowSnackbar -> TODO()
+            is LandingPageUiEvent.OnUndoDeleteGoalClicked -> {
+                restoreDeletedGoal()
+            }
+            is LandingPageUiEvent.OnListUpdated -> {
+            }
         }
     }
 
-    private fun onAddGoalClicked() {
+    private fun navigateToAddGoalScreen() {
         viewModelScope.launch {
-            uiEvent.emit(LandingPageUiEvent.NavigateToDetailGoal())
+            _uiEvent.send(LandingPageUiEvent.NavigateToDetailGoal())
         }
     }
 
@@ -67,7 +77,7 @@ class LandingPageViewModel @Inject constructor(
                     id = id,
                     status = newStatus
                 )
-                getGoals() // TODO not good to get all goals again after updating them
+                getGoals()
             }
         }
     }
@@ -75,40 +85,40 @@ class LandingPageViewModel @Inject constructor(
     private fun onGoalContainerClicked(goal: Goal?) {
         viewModelScope.launch {
             goal?.apply {
-                uiEvent.emit(LandingPageUiEvent.NavigateToDetailGoal(this))
+                _uiEvent.send(LandingPageUiEvent.NavigateToDetailGoal(this))
             }
         }
     }
 
-    private fun deleteGoal(goal: Goal?): Boolean {
-        lastDeletedGoal = goal ?: Goal.EMPTY
-        var isDeleteSucceeded = false
-        goal?.apply {
+    private fun deleteGoal(goal: Goal?) {
+        deletedGoal = goal ?: Goal.EMPTY
+        deletedGoalIndex = state.goals.indexOf(deletedGoal)
+        deletedGoal.apply {
             viewModelScope.launch {
-                isDeleteSucceeded = repository.deleteGoal(goal)
-                state = if (isDeleteSucceeded) {
+                try {
+                    repository.deleteGoal(deletedGoal)
                     getGoals()
-
-                    state.copy(
-                        showSnackbar = true,
-                        snackbarMessage = "The goal was successfully deleted."
+                    _uiEvent.send(
+                        LandingPageUiEvent.ShowSnackbar(
+                            message = "The goal was successfully deleted.",
+                            snackbarAction = SnackBarAction.UNDO
+                        )
                     )
-                } else {
-                    state.copy(
-                        showSnackbar = true,
-                        snackbarMessage = "The goal could not be deleted. Please try again."
-                    )
+                } catch (exception: java.lang.Exception) {
+                    _uiEvent.send(LandingPageUiEvent.ShowSnackbar(message = "The goal could not be deleted. Try again."))
                 }
             }
-        } ?: println("!!! Goal is null. Cannot delete goal.")
-        return isDeleteSucceeded
+        }
     }
 
 
-    fun restoreDeletedGoal() {
-        if (lastDeletedGoal != Goal.EMPTY) {
+    private fun restoreDeletedGoal() {
+        if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                repository.insert(lastDeletedGoal)
+                repository.insert(deletedGoal)
+                state = state.copy(
+                    goals = state.goals + deletedGoal
+                )
             }
         }
     }
@@ -118,7 +128,8 @@ class LandingPageViewModel @Inject constructor(
     }
 
     fun getGoals() {
-        viewModelScope.launch {
+        getGoalsJob?.cancel()
+        getGoalsJob = viewModelScope.launch {
             repository.getGoals().collect { response ->
                 when (response) {
                     is Resource.Success -> {
@@ -130,7 +141,7 @@ class LandingPageViewModel @Inject constructor(
                     }
                     is Resource.Loading -> {
                         state = state.copy(
-                            isLoading = response.isLoading,
+                            isLoading = response.isLoading
                         )
                     }
                     is Resource.Error -> {

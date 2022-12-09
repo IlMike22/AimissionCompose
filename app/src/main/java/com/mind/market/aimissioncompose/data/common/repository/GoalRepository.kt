@@ -51,13 +51,9 @@ class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
 
     @WorkerThread
     @CheckResult
-    override suspend fun deleteGoal(goal: Goal): Boolean {
-        return try {
-            goalDao.deleteGoal(goal.toGoalDto())
-            true
-        } catch (exception: Exception) {
-            false
-        }
+    override suspend fun deleteGoal(goal: Goal)  {
+        goalDao.deleteGoal(goal.toGoalDto())
+
     }
 
     @WorkerThread

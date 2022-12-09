@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.navigation.Route
+import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 import kotlinx.coroutines.launch
 
@@ -42,6 +43,8 @@ fun LandingPageScreen(
     detailPageScreenResult?.value?.let { isUpdateList ->
         if (isUpdateList) {
             viewModel.getGoals()
+            viewModel.onEvent(LandingPageUiEvent.OnListUpdated)
+            navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
         }
     }
 
@@ -56,12 +59,41 @@ fun LandingPageScreen(
         bottomSheetState = sheetState
     )
 
-    if (state.showSnackbar) {
-        LaunchedEffect(scaffoldState.snackbarHostState) {
-            scaffoldState.snackbarHostState.showSnackbar(
-                message = state.snackbarMessage
-            )
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is LandingPageUiEvent.ShowSnackbar -> {
+                    val snackBarResult = scaffoldState.snackbarHostState.showSnackbar(
+                        message = event.message,
+                        actionLabel = if (event.snackbarAction == SnackBarAction.UNDO) "Undo" else null
+                    )
+                    when (snackBarResult) {
+                        SnackbarResult.ActionPerformed -> {
+                            when (event.snackbarAction) {
+                                SnackBarAction.UNDO -> {
+                                    viewModel.onEvent(LandingPageUiEvent.OnUndoDeleteGoalClicked)
+                                }
+                            }
+                        }
+                        SnackbarResult.Dismissed -> Unit
+                    }
+                }
+            }
         }
+//        if (state.showSnackbar) {
+//            val result = scaffoldState.snackbarHostState.showSnackbar(
+//                message = state.snackbarMessage,
+//                actionLabel = "Undo"
+//            )
+//
+//            when (result) {
+//                SnackbarResult.ActionPerformed -> {
+//                    viewModel.onEvent(LandingPageUiEvent.OnUndoDeleteGoalClicked)
+//                }
+//                SnackbarResult.Dismissed -> Unit
+//            }
+//        }
     }
 
     Scaffold(
