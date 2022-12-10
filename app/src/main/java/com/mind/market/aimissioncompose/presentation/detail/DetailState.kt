@@ -1,6 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
 import java.time.LocalDate

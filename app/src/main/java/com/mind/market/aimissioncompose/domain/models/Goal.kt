@@ -1,6 +1,5 @@
 package com.mind.market.aimissioncompose.domain.models
 
-import com.example.aimissionlite.models.domain.Status
 import java.time.LocalDate
 import java.time.LocalDateTime
 

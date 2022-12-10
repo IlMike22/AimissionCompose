@@ -2,7 +2,7 @@ package com.mind.market.aimissioncompose.data.common.repository
 
 import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.IGoalDao
 import com.mind.market.aimissioncompose.data.toGoal

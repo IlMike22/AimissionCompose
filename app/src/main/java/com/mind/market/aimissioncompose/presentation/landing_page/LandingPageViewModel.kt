@@ -4,11 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
@@ -24,7 +23,6 @@ import javax.inject.Inject
 class LandingPageViewModel @Inject constructor(
     private val repository: IGoalRepository,
     private val settingsUseCase: ISettingsUseCase,
-    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     val TAG = LandingPageViewModel.javaClass.toString()
     var state by mutableStateOf(LandingPageState())
@@ -36,7 +34,6 @@ class LandingPageViewModel @Inject constructor(
     private var deletedGoalIndex = -1
     private var getGoalsJob: Job? = null
 
-    //    val allGoals: Flow<List<Goal>> = useCase.getAllGoals()
     private val _uiEvent = Channel<LandingPageUiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 

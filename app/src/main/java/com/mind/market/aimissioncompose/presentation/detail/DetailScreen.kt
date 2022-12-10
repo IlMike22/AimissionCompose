@@ -1,6 +1,7 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -9,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -16,11 +18,14 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.domain.models.Priority
 import com.mind.market.aimissioncompose.domain.models.getGenres
 import com.mind.market.aimissioncompose.domain.models.getPriorities
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupGenre
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupPriority
 import com.mind.market.aimissioncompose.presentation.common.MainButton
+import com.mind.market.aimissioncompose.presentation.utils.Converters.getGenreIcon
+import com.mind.market.aimissioncompose.presentation.utils.Converters.getPriorityIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toGenre
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -118,11 +123,22 @@ fun DetailScreen(
             modifier = Modifier
                 .padding(8.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.detail_goal_priority),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.detail_goal_priority),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                if (state.priority != Priority.UNKNOWN && state.priority != Priority.MEDIUM) {
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Image(
+                        painter = painterResource(
+                            id = getPriorityIcon(state.priority)
+                        ),
+                        contentDescription = "Genre"
+                    )
+                }
+            }
 
             Row(
                 modifier = Modifier
@@ -142,11 +158,20 @@ fun DetailScreen(
             modifier = Modifier
                 .padding(8.dp)
         ) {
-            Text(
-                text = stringResource(id = R.string.detail_goal_genre),
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
-            )
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = stringResource(id = R.string.detail_goal_genre),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Image(
+                    painter = painterResource(
+                        id = getGenreIcon(state.genre)
+                    ),
+                    contentDescription = "Genre"
+                )
+            }
 
             Row(
                 modifier = Modifier

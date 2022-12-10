@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 
 @Entity(tableName = "goal_table")
 data class GoalDto(

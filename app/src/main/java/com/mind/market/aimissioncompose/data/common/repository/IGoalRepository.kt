@@ -1,6 +1,6 @@
 package com.mind.market.aimissioncompose.data.common.repository
 
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.models.Goal
 import kotlinx.coroutines.flow.Flow

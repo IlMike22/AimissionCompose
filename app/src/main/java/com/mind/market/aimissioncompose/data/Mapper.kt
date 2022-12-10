@@ -1,6 +1,6 @@
 package com.mind.market.aimissioncompose.data
 
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.domain.models.Goal
 import java.time.LocalDate

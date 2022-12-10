@@ -8,7 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.models.domain.GoalValidationStatusCode
-import com.example.aimissionlite.models.domain.Status
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository

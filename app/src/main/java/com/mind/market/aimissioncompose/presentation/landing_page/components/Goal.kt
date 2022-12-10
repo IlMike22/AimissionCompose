@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.landing_page.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,18 +9,21 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.aimissionlite.models.domain.Status
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.domain.models.Priority
+import com.mind.market.aimissioncompose.presentation.utils.Converters.getGenreIcon
+import com.mind.market.aimissioncompose.presentation.utils.Converters.getPriorityIcon
+import com.mind.market.aimissioncompose.presentation.utils.Converters.getStatusIcon
 
 @Composable
 fun Goal(
@@ -29,7 +33,7 @@ fun Goal(
     onStatusChangeClicked: (goal: Goal) -> Unit,
     navController: NavController
 ) {
-    Card(
+    Card( // TODO add click listener to whole Card for detail view..
         shape = RoundedCornerShape(8.dp),
         backgroundColor = Color.LightGray,
         modifier = Modifier.padding(4.dp)
@@ -54,24 +58,23 @@ fun Goal(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    onClick = {
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit goal"
-                    )
-
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(
                     onClick = { onDeleteClicked(goal) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete goal"
                     )
+
                 }
+                Spacer(modifier = Modifier.width(8.dp))
+                Image(
+                    painter = painterResource(id = getGenreIcon(goal.genre)),
+                    contentDescription = "Genre",
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .height(24.dp)
+                        .width(24.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -94,32 +97,31 @@ fun Goal(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                Icon(
-                    imageVector = Icons.Default.Home,
-                    contentDescription = "Priority",
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-
+                if (goal.priority != Priority.MEDIUM && goal.priority != Priority.UNKNOWN) {
+                    Image(
+                        painter = painterResource(id = getPriorityIcon(goal.priority)),
+                        contentDescription = "Priority",
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .height(36.dp)
+                            .width(36.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
                     onClick = { onStatusChangeClicked(goal) }
                 ) {
-                    Icon(
-                        imageVector = getStatusIcon(goal.status),
-                        contentDescription = "Complete"
+                    Image(
+                        painter = painterResource(id = getStatusIcon(goal.status)),
+                        contentDescription = "Status",
+                        modifier = Modifier
+                            .padding(top = 10.dp)
+                            .height(36.dp)
+                            .width(36.dp)
                     )
                 }
             }
         }
-    }
-}
-
-fun getStatusIcon(status: Status): ImageVector {
-    return when (status) {
-        Status.IN_PROGRESS -> Icons.Default.Done
-        Status.TODO -> Icons.Default.CheckCircle
-        Status.DONE -> Icons.Default.Create
-        else -> Icons.Default.Home
     }
 }
