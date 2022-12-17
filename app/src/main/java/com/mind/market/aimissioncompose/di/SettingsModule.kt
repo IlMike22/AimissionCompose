@@ -2,11 +2,11 @@ package com.mind.market.aimissioncompose.di
 
 import android.content.Context
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.mind.market.aimissioncompose.domain.settings.use_case.implementation.SettingsUseCase
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource
 import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository
 import com.mind.market.aimissioncompose.data.settings.repository.SettingsRepository
+import com.mind.market.aimissioncompose.domain.settings.use_case.implementation.SettingsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,7 +37,10 @@ object SettingsModule {
 
     @Provides
     @Singleton
-    fun provideSettingsRepository(localDataSource: SettingsLocalDataSource): ISettingsRepository {
-        return SettingsRepository(localDataSource)
+    fun provideSettingsRepository(
+        localDataSource: SettingsLocalDataSource,
+        database: GoalRoomDatabase
+    ): ISettingsRepository {
+        return SettingsRepository(localDataSource, database.goalDao())
     }
 }

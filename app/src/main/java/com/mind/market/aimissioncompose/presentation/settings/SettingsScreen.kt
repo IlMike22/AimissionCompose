@@ -40,14 +40,17 @@ fun SettingsScreen(
         ) {
             Text(text = "Your personal settings")
             Spacer(modifier = modifier.height(8.dp))
+
             Button(onClick = {
                 viewModel.onEvent(SettingsEvent.DuplicateGoals)
             }) {
                 Text(text = "Duplicate the goals!")
             }
+
             Spacer(modifier = modifier.height(16.dp))
             Text(text = state.duplicateGoalsMessage)
             Spacer(modifier = modifier.height(24.dp))
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -58,10 +61,32 @@ fun SettingsScreen(
                     onCheckedChange = { isChecked ->
                         viewModel.onEvent(SettingsEvent.HideDoneGoals(isChecked))
                     })
+
                 Spacer(modifier = modifier.width(8.dp))
+
                 Text(text = "Hide successfully done goals in list")
             }
 
+            Spacer(modifier.height(16.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = state.showGoalOverdueDialogOnStart,
+                    onCheckedChange = { isChecked ->
+                        viewModel.onEvent(SettingsEvent.ShowGoalOverdueDialog(isChecked))
+                    })
+
+                Spacer(modifier = modifier.width(8.dp))
+                Text(text = "Show goal overdue dialog on startup")
+            }
+
+            Spacer(modifier.height(16.dp))
+            Text(text = "Full amount of completed goals is ${state.goalsCompleted}")
+            Text(text = "Full amount of open goals is ${state.goalsTodo}")
+            Text(text = "Full amount of goals in progress is ${state.goalsInProgress}")
         }
     }
 

@@ -41,7 +41,7 @@ fun MainButton(
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = stringResource(id = R.string.button_add),
+            contentDescription = stringResource(id = R.string.button_text_add),
             tint = color
         )
 

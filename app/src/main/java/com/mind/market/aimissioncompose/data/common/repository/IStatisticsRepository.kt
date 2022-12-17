@@ -1,4 +1,10 @@
 package com.mind.market.aimissioncompose.data.common.repository
 
-interface StatisticsRepository {
+import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.domain.models.Status
+import kotlinx.coroutines.flow.Flow
+
+interface IStatisticsRepository {
+    suspend fun getAmountGoalsForStatus(): Flow<Resource<Map<Status, Int>>>
+    fun getAmountGoalsByGenre(): Flow<Resource<Map<String, Int>>>
 }

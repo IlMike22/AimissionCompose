@@ -23,6 +23,10 @@ import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.message
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import com.vanpra.composematerialdialogs.title
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -36,6 +40,7 @@ fun LandingPageScreen(
     val state = viewModel.state
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
+    val alertDialogState = rememberMaterialDialogState()
 
     val detailPageScreenResult = navController.currentBackStackEntry
         ?.savedStateHandle
@@ -79,6 +84,10 @@ fun LandingPageScreen(
                         }
                         SnackbarResult.Dismissed -> Unit
                     }
+                }
+                is LandingPageUiEvent.ShowGoalOverdueDialog -> {
+
+                    alertDialogState.show()
                 }
             }
         }
@@ -181,6 +190,16 @@ fun LandingPageScreen(
                         )
                     }
                 }
+            }
+
+            MaterialDialog(
+                dialogState = alertDialogState,
+                buttons = {
+                    positiveButton("OK")
+                }
+            ) {
+                title(text = "Goal(s) overdued")
+                message(text = "At least one goal is overdued. Take care of your goals.")
             }
         }
     }

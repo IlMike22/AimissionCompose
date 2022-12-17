@@ -2,6 +2,7 @@ package com.mind.market.aimissioncompose.data
 
 import androidx.room.*
 import com.mind.market.aimissioncompose.data.dto.GoalDto
+import com.mind.market.aimissioncompose.domain.models.Status
 
 @Dao
 interface IGoalDao {
@@ -25,4 +26,7 @@ interface IGoalDao {
 
     @Delete
     suspend fun deleteGoal(goal: GoalDto)
+
+    @Query("SELECT COUNT(status) FROM  goal_table WHERE status = :status")
+    suspend fun getAmountGoalsForStatus(status: Status): Int
 }

@@ -6,7 +6,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource.PreferencesKeys.DELETE_GOALS_ON_STARTUP
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource.PreferencesKeys.HIDE_DONE_GOALS
-import com.mind.market.aimissioncompose.data.settings.UserSettings
+import com.mind.market.aimissioncompose.data.SettingsLocalDataSource.PreferencesKeys.SHOW_GOAL_OVERDUE_DIALOG_ON_STARTUP
+import com.mind.market.aimissioncompose.data.settings.repository.SettingEntries
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -44,10 +45,18 @@ data class SettingsLocalDataSource(
         }
     }
 
-    fun getUserSettings() = context.dataStore.data.map { preferences ->
-            preferences[HIDE_DONE_GOALS] ?: false
+    suspend fun showGoalOverdueDialog(show: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[SHOW_GOAL_OVERDUE_DIALOG_ON_STARTUP] = show
         }
+    }
 
+    fun getUserSettings() = context.dataStore.data.map { preferences ->
+        SettingEntries(
+            isHideDoneGoals = preferences[HIDE_DONE_GOALS] ?: false,
+            showGoalOverdueDialog = preferences[SHOW_GOAL_OVERDUE_DIALOG_ON_STARTUP] ?: false,
+        )
+    }
 
 //    fun getDeleteGoalsOnStartup(): Flow<Boolean> =
 //        context.dataStore.data.map { preferences ->
@@ -57,6 +66,7 @@ data class SettingsLocalDataSource(
     private object PreferencesKeys {
         val DELETE_GOALS_ON_STARTUP = booleanPreferencesKey("delete_goals_on_startup")
         val HIDE_DONE_GOALS = booleanPreferencesKey("hide_done_goals")
+        val SHOW_GOAL_OVERDUE_DIALOG_ON_STARTUP = booleanPreferencesKey("show_goal_overdue_dialog")
     }
 
     companion object {

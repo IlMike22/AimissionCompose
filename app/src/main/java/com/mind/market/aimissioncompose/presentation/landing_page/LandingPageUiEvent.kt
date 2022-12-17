@@ -2,6 +2,7 @@ package com.mind.market.aimissioncompose.presentation.landing_page
 
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
+import com.mind.market.aimissioncompose.presentation.detail.DetailUIEvent
 
 sealed class LandingPageUiEvent(val goal: Goal? = null) {
     data class ShowSnackbar(
@@ -14,4 +15,5 @@ sealed class LandingPageUiEvent(val goal: Goal? = null) {
     class OnDeleteGoalClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
     class OnStatusChangedClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
     object OnUndoDeleteGoalClicked : LandingPageUiEvent()
+    data class ShowGoalOverdueDialog(val title: String, val message: String) : LandingPageUiEvent()
 }

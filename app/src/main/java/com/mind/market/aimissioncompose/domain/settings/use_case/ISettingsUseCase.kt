@@ -1,5 +1,7 @@
 package com.example.aimissionlite.domain.settings.use_case
 
+import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.data.settings.repository.SettingEntries
 import kotlinx.coroutines.flow.Flow
 
 interface ISettingsUseCase {
@@ -10,8 +12,11 @@ interface ISettingsUseCase {
 //    suspend fun setDeleteGoalsOnStartup(enabled: Boolean)
 
     suspend fun setHideDoneGoals(isHide: Boolean)
+    suspend fun setShowGoalOverdueDialog(show:Boolean)
 
     fun getHeaderText(): String
 
-    fun getUserSettings(): Flow<Boolean>
+    fun getUserSettings(): Flow<SettingEntries>
+
+    suspend fun getGoalsComplete(): Flow<Resource<Int>>
 }

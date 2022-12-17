@@ -7,10 +7,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,14 +23,15 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
     private val repository: IGoalRepository,
+    private val useCase: ILandingPageUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
-    val TAG = LandingPageViewModel.javaClass.toString()
     var state by mutableStateOf(LandingPageState())
         private set
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
-    var isDoneGoalHidden = false
+    private var isDoneGoalHidden = false
+    private var showGoalOverdueDialog = false
     private lateinit var deletedGoal: Goal
     private var deletedGoalIndex = -1
     private var getGoalsJob: Job? = null
@@ -39,8 +41,9 @@ class LandingPageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settingsUseCase.getUserSettings().collect { doneGoalsHidden ->
-                isDoneGoalHidden = doneGoalsHidden
+            settingsUseCase.getUserSettings().collect { userSettings ->
+                isDoneGoalHidden = userSettings.isHideDoneGoals
+                showGoalOverdueDialog = userSettings.showGoalOverdueDialog
                 getGoals()
             }
         }
@@ -134,12 +137,15 @@ class LandingPageViewModel @Inject constructor(
         repository.getGoals().collect { response ->
             when (response) {
                 is Resource.Success -> {
+                    val goals = response.data ?: emptyList()
                     state = state.copy(
-                        goals = filterGoals(response.data ?: emptyList()),
+                        goals = filterGoals(goals),
                         isLoading = false,
                         errorMessage = ""
                     )
+                    showGoalOverdueDialogIfNeeded(goals)
                 }
+
                 is Resource.Loading -> {
                     state = state.copy(
                         isLoading = response.isLoading
@@ -156,12 +162,35 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
+    private fun showGoalOverdueDialogIfNeeded(goals: List<Goal>) {
+        if (showGoalOverdueDialog.not()) {
+            return
+        }
+
+        goals.filter { goal ->
+            useCase.isGoalOverdue(goal)
+        }.apply {
+            if (this.isNotEmpty()) {
+                viewModelScope.launch {
+                    _uiEvent.send(
+                        LandingPageUiEvent.ShowGoalOverdueDialog(
+                            title = "Goal(s) overdue!",
+                            message = "At least one goal is overdue. Take care of your goals."
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     private fun filterGoals(goals: List<Goal>): List<Goal> {
         return if (isDoneGoalHidden) {
             goals.filter { goal ->
                 goal.status != Status.DONE
             }
-        } else { goals }
+        } else {
+            goals
+        }
     }
 
     private fun getNewGoalStatus(oldStatus: Status): Status =

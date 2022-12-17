@@ -1,7 +1,10 @@
 package com.mind.market.aimissioncompose.domain.settings.use_case.implementation
 
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
+import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository
+import com.mind.market.aimissioncompose.data.settings.repository.SettingEntries
+import com.mind.market.aimissioncompose.domain.models.Status
 import kotlinx.coroutines.flow.Flow
 
 class SettingsUseCase(
@@ -23,11 +26,19 @@ class SettingsUseCase(
         return repository.setHideDoneGoals(isHide)
     }
 
+    override suspend fun setShowGoalOverdueDialog(show: Boolean) {
+        return repository.showGoalOverdueDialog(show)
+    }
+
     override fun getHeaderText(): String {
         return "Define your settings here"
     }
 
-    override fun getUserSettings(): Flow<Boolean> {
+    override fun getUserSettings(): Flow<SettingEntries> {
         return repository.getUserSettings()
+    }
+
+    override suspend fun getGoalsComplete(): Flow<Resource<Int>> {
+        return repository.getAmountGoalsForStatus(Status.DONE)
     }
 }
