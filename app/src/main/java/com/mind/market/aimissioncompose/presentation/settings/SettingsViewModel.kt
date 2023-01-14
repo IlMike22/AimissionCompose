@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.data.common.repository.IStatisticsRepository
+import com.mind.market.aimissioncompose.data.common.repository.ICommonStatisticsRepository
 import com.mind.market.aimissioncompose.domain.models.Status
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val useCase: ISettingsUseCase,
-    private val statisticsRepository: IStatisticsRepository
+    private val statisticsRepository: ICommonStatisticsRepository
 ) : ViewModel() {
     private val TAG = SettingsViewModel::class.java.toString()
     private val isDeleteGoalOnStartup = MutableLiveData<Resource<Flow<Boolean>>>()

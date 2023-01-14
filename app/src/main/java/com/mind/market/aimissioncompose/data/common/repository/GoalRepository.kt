@@ -67,7 +67,7 @@ class GoalRepository(private val goalDao: IGoalDao) : IGoalRepository {
         }
     }
 
-    override suspend fun getGoals(): Flow<Resource<List<Goal>>> {
+    override fun getGoals(): Flow<Resource<List<Goal>>> {
         return flow {
             emit(Resource.Loading(true))
             try {

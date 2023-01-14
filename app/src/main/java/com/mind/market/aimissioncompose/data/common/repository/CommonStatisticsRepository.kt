@@ -6,9 +6,9 @@ import com.mind.market.aimissioncompose.domain.models.Status
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class StatisticsRepository(
+class CommonStatisticsRepository(
     private val goalDao: IGoalDao
-) : IStatisticsRepository {
+) : ICommonStatisticsRepository {
     override suspend fun getAmountGoalsForStatus(): Flow<Resource<Map<Status, Int>>> {
         return flow {
             emit(Resource.Loading(true))
