@@ -1,8 +1,8 @@
 package com.mind.market.aimissioncompose.data.common.repository
 
-import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.domain.models.Status
 import kotlinx.coroutines.flow.Flow
 
 interface IGoalRepository {

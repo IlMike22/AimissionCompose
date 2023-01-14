@@ -4,17 +4,20 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mind.market.aimissioncompose.data.dto.GoalDto
+import com.mind.market.aimissioncompose.statistics.data.IStatisticsEntityDao
+import com.mind.market.aimissioncompose.statistics.data.dto.StatisticsEntityDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [GoalDto::class],
-    version = 3,
+    entities = [GoalDto::class, StatisticsEntityDto::class],
+    version = 4,
     autoMigrations = [AutoMigration(from = 2, to = 3)]
 )
 @TypeConverters(Converters::class)
 abstract class GoalRoomDatabase : RoomDatabase() {
     abstract fun goalDao(): IGoalDao
+    abstract fun getStatisticsDao(): IStatisticsEntityDao
 
     private class GoalDatabaseCallback(
         private val scope: CoroutineScope
@@ -23,13 +26,17 @@ abstract class GoalRoomDatabase : RoomDatabase() {
             super.onCreate(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    populateDatabase(database.goalDao())
+                    populateDatabase(
+                        database.goalDao(),
+                        database.getStatisticsDao()
+                    )
                 }
             }
         }
 
-        suspend fun populateDatabase(goalDao: IGoalDao) {
+        suspend fun populateDatabase(goalDao: IGoalDao, statisticsDao:IStatisticsEntityDao) {
             goalDao.deleteAll()
+            statisticsDao.deleteAll()
         }
     }
 
