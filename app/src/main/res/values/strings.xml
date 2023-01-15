@@ -22,5 +22,7 @@
 
     <string name="button_text_add">ADD</string>
     <string name="button_text_update">UPDATE</string>
+    <string name="hello_success">\"Hello Statistics Screen! We have succesfully loaded the data!\"</string>
+    <string name="hello_error">Hello statistics world. We`ve got an error.</string>
 
 </resources>

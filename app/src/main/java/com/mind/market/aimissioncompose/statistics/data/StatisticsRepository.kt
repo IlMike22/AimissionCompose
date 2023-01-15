@@ -27,12 +27,14 @@ class StatisticsRepository(
                 entities
                     .map { it.toDomain() }
                     .apply {
+                        emit(Resource.Loading(false))
                         emit(Resource.Success(this))
                     }
             } catch (exception: Throwable) {
+                emit(Resource.Loading(false))
                 emit(Resource.Error(message = "An error occured while reading the database."))
             }
-            emit(Resource.Loading(false))
+
         }
     }
 }
