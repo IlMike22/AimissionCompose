@@ -1,16 +1,13 @@
 package com.mind.market.aimissioncompose.statistics.presentation
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.statistics.domain.use_case.IStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,17 +15,36 @@ import javax.inject.Inject
 class StatisticsViewModel @Inject constructor(
     private val useCase: IStatisticsUseCase
 ) : ViewModel() {
-
-    var state by mutableStateOf(StatisticsState())
-        private set
+    private val _state = MutableStateFlow(StatisticsState())
+    val state = _state.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),StatisticsState()
+    )
 
     init {
         viewModelScope.launch {
             useCase.getStatistics().collect { response ->
                 when (response) {
-                    is Resource.Error -> TODO()
-                    is Resource.Loading -> TODO()
-                    is Resource.Success -> TODO()
+                    is Resource.Error -> _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = response.message
+                        )
+                    }
+                    is Resource.Loading -> {
+                        _state.update {
+                            it.copy(
+                                isLoading = true
+                            )
+                        }
+                        delay(3000) // TODO MIC just test
+                    }
+                    is Resource.Success -> _state.update {
+                        it.copy(
+                            isLoading = false,
+                            statisticsEntities = response.data ?: emptyList()
+                        )
+                    }
                 }
             }
         }

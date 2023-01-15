@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface IStatisticsEntityDao {
     @Query("SELECT * FROM statistics_table")
-    fun getStatisticsEntities(): Flow<List<StatisticsEntityDto>>
+    fun getStatisticsEntities(): List<StatisticsEntityDto>
 
     @Query("SELECT * FROM statistics_table WHERE id = :id")
     suspend fun getStatisticsEntity(id: Int): StatisticsEntityDto

@@ -4,16 +4,20 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +28,8 @@ import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.information.InformationScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
 import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
-import com.mind.market.aimissioncompose.presentation.settings.SettingsState
+import com.mind.market.aimissioncompose.statistics.presentation.StatisticsScreen
+import com.mind.market.aimissioncompose.statistics.presentation.StatisticsViewModel
 import com.mind.market.aimissioncompose.ui.theme.AimissionComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -58,7 +63,17 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Icon(
                                         Icons.Filled.Create,
-                                        contentDescription = "Add new goal"
+                                        contentDescription = "Open Statistics"
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        navController.navigate(Route.STATISTICS)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.Create,
+                                        contentDescription = "Open statistics"
                                     )
                                 }
                                 IconButton(
@@ -127,6 +142,16 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 SettingsScreen(
                                     navController = navController
+                                )
+                            }
+                            composable(
+                                route = Route.STATISTICS
+                            ) {
+                                val viewModel = hiltViewModel<StatisticsViewModel>()
+                                val state by viewModel.state.collectAsState()
+                                StatisticsScreen(
+                                    state = state,
+                                    onEvent = viewModel::onEvent
                                 )
                             }
                         }
