@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "statistics_table")
 data class StatisticsEntityDto(
-    @PrimaryKey val id: Int,
+    @PrimaryKey val id: Int? = null, // room creates an id for us..
     val title: String,
     val amountGoalsCompleted: Int,
     val amountGoalsCreated: Int,
@@ -36,21 +36,21 @@ data class StatisticsEntityDto(
         return super.equals(other)
     }
 
-    override fun hashCode(): Int {
-        var result = id
-        result = 31 * result + title.hashCode()
-        result = 31 * result + amountGoalsCreated.hashCode()
-        result = 31 * result + amountGoalsCompleted.hashCode()
-        result = 31 * result + amountGoalsStarted.hashCode()
-        result = 31 * result + amountGoalsNotCompleted.hashCode()
-        result = 31 * result + grade.hashCode()
-        result = 31 * result + month.hashCode()
-        result = 31 * result + year.hashCode()
-        result = 31 * result + lastUpdated.hashCode()
-        result = 31 * result + created.hashCode()
-
-        return result
-    }
+//    override fun hashCode(): Int {
+//        var result = id
+//        result = 31 * result + title.hashCode()
+//        result = 31 * result + amountGoalsCreated.hashCode()
+//        result = 31 * result + amountGoalsCompleted.hashCode()
+//        result = 31 * result + amountGoalsStarted.hashCode()
+//        result = 31 * result + amountGoalsNotCompleted.hashCode()
+//        result = 31 * result + grade.hashCode()
+//        result = 31 * result + month.hashCode()
+//        result = 31 * result + year.hashCode()
+//        result = 31 * result + lastUpdated.hashCode()
+//        result = 31 * result + created.hashCode()
+//
+//        return result
+//    }
 }
 
 enum class Grade {

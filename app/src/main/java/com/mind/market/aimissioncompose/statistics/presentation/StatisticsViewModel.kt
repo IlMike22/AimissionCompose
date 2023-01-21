@@ -2,7 +2,6 @@ package com.mind.market.aimissioncompose.statistics.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.statistics.domain.use_case.IStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +17,7 @@ class StatisticsViewModel @Inject constructor(
     private val _state = MutableStateFlow(StatisticsState())
     val state = _state.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),StatisticsState()
+        SharingStarted.WhileSubscribed(5000), StatisticsState()
     )
 
     init {
@@ -37,12 +36,12 @@ class StatisticsViewModel @Inject constructor(
                                 isLoading = true
                             )
                         }
-                        delay(3000) // TODO MIC just test
+                        delay(2000) // TODO MIC just test
                     }
                     is Resource.Success -> _state.update {
                         it.copy(
                             isLoading = false,
-                            statisticsEntities = response.data ?: emptyList()
+                            statisticsEntities = response.data?.first() ?: emptyList() // TODO atm only one element is observed
                         )
                     }
                 }

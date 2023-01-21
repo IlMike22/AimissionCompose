@@ -5,5 +5,5 @@ import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntit
 import kotlinx.coroutines.flow.Flow
 
 interface IStatisticsUseCase {
-    fun getStatistics():  Flow<Resource<List<StatisticsEntity>>>
+    fun getStatistics():  Flow<Resource<Flow<List<StatisticsEntity>>>>
 }

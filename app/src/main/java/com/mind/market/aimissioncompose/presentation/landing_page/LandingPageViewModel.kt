@@ -13,16 +13,22 @@ import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPag
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
+import com.mind.market.aimissioncompose.statistics.data.dto.Grade
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
+import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.Month
 import javax.inject.Inject
 
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
     private val repository: IGoalRepository,
+    private val statisticsRepository: IStatisticsRepository,
     private val useCase: ILandingPageUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
@@ -41,10 +47,40 @@ class LandingPageViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            settingsUseCase.getUserSettings().collect { userSettings ->
-                isDoneGoalHidden = userSettings.isHideDoneGoals
-                showGoalOverdueDialog = userSettings.showGoalOverdueDialog
-                getGoals()
+            launch {
+                settingsUseCase.getUserSettings().collect { userSettings ->
+                    isDoneGoalHidden = userSettings.isHideDoneGoals
+                    showGoalOverdueDialog = userSettings.showGoalOverdueDialog
+                    getGoals()
+                }
+            }
+
+            launch {
+                val currentDate = LocalDateTime.now()
+                val currentMonthValue = currentDate.monthValue
+                val currentMonth = currentDate.month
+                val currentYear = currentDate.year
+
+                if (statisticsRepository.getStatisticsEntityByDate( // TODO MIC maybe just return boolean is better
+                        currentMonthValue,
+                        currentYear
+                    ) ==  StatisticsEntity.EMPTY
+                ) {
+                    statisticsRepository.insertStatisticsEntity(
+                        StatisticsEntity(
+                            title = currentMonth.toMonthName(),
+                            amountGoalsCompleted = 0,
+                            amountGoalsStarted = 0,
+                            amountGoalsNotCompleted = 0,
+                            amountGoalsCreated = 0,
+                            grade = Grade.NO_GOALS_COMPLEDTED,
+                            month = currentMonthValue,
+                            year = currentYear,
+                            created = currentDate,
+                            lastUpdated = currentDate
+                        )
+                    )
+                }
             }
         }
     }
@@ -66,6 +102,8 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnUndoDeleteGoalClicked -> {
                 restoreDeletedGoal()
             }
+            is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
+            is LandingPageUiEvent.ShowSnackbar -> TODO()
         }
     }
 
@@ -202,6 +240,23 @@ class LandingPageViewModel @Inject constructor(
         }
 
     companion object {
+
+        private fun Month.toMonthName(): String =
+            when (this) {
+                Month.JANUARY -> "January"
+                Month.FEBRUARY -> "February"
+                Month.MARCH -> "March"
+                Month.APRIL -> "April"
+                Month.MAY -> "May"
+                Month.JUNE -> "June"
+                Month.JULY -> "July"
+                Month.AUGUST -> "August"
+                Month.SEPTEMBER -> "September"
+                Month.OCTOBER -> "October"
+                Month.NOVEMBER -> "November"
+                Month.DECEMBER -> "December"
+            }
+
         private const val ARGUMENT_INVALIDATE = "invalidate"
     }
 }

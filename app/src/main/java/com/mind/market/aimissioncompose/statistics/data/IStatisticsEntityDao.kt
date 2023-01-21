@@ -8,10 +8,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface IStatisticsEntityDao {
     @Query("SELECT * FROM statistics_table")
-    fun getStatisticsEntities(): List<StatisticsEntityDto>
+    fun getStatisticsEntities(): Flow<List<StatisticsEntityDto>>
 
     @Query("SELECT * FROM statistics_table WHERE id = :id")
     suspend fun getStatisticsEntity(id: Int): StatisticsEntityDto
+
+    @Query("SELECT * FROM statistics_table WHERE month = :month AND year = :year")
+    suspend fun getStatisticsEntityByDate(month: Int, year: Int): StatisticsEntityDto
 
     @Query("UPDATE statistics_table SET grade = :grade WHERE id = :id")
     suspend fun updateGrade(id: Int, grade: Grade)
@@ -19,7 +22,7 @@ interface IStatisticsEntityDao {
     @Update(onConflict = OnConflictStrategy.IGNORE)
     suspend fun update(statisticsEntity: StatisticsEntityDto)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(statisticsEntity: StatisticsEntityDto)
 
     @Delete

@@ -1,18 +1,18 @@
 package com.mind.market.aimissioncompose.statistics.presentation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.mind.market.aimissioncompose.R
+import androidx.compose.ui.unit.sp
+import com.mind.market.aimissioncompose.statistics.presentation.components.StatisticsItem
 
 @Composable
 fun StatisticsScreen(
@@ -31,14 +31,31 @@ fun StatisticsScreen(
                 color = MaterialTheme.colors.primary,
                 strokeWidth = 3.dp
             )
+        } else if (state.errorMessage.isNullOrBlank()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(4.dp)
+            ) {
+                item {
+                    Text(
+                        text = "Your statistics overview",
+                        modifier = Modifier.align(Alignment.Center),
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+
+                items(state.statisticsEntities) { entity ->
+                    StatisticsItem(item = entity)
+                }
+            }
         } else {
-            val text =
-                if (state.errorMessage.isNullOrBlank()) stringResource(id = R.string.hello_success)
-                else stringResource(id = R.string.hello_error)
+            val text = state.errorMessage
             Text(
                 text = text,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h2
+                style = MaterialTheme.typography.body1
             )
         }
     }

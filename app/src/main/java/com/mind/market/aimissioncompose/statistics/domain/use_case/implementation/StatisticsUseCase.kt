@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 class StatisticsUseCase(
     private val repository: IStatisticsRepository
 ) : IStatisticsUseCase {
-    override fun getStatistics(): Flow<Resource<List<StatisticsEntity>>> {
+    override fun getStatistics(): Flow<Resource<Flow<List<StatisticsEntity>>>> {
         return repository.getStatisticsEntities()
     }
 }

@@ -4,7 +4,7 @@ import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import java.time.LocalDateTime
 
 data class StatisticsEntity(
-    val id: Int,
+    val id: Int? = null,
     val title: String,
     val amountGoalsCompleted: Int,
     val amountGoalsCreated: Int,
