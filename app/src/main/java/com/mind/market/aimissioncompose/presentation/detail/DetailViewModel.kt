@@ -12,6 +12,8 @@ import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.detail.use_case.IDetailUseCase
+import com.mind.market.aimissioncompose.domain.detail.use_case.implementation.UpdateStatisticsWithNewGoalCreatedUseCase
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
@@ -26,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: IGoalRepository,
+    private val updateStatistic: UpdateStatisticsWithNewGoalCreatedUseCase,
     savedStateHandle: SavedStateHandle,
     app: Application
 ) : AndroidViewModel(app) {
@@ -173,6 +176,7 @@ class DetailViewModel @Inject constructor(
         if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
                 repository.insert(newGoal)
+                updateStatistic(newGoal)
                 _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
             }
         }

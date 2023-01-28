@@ -27,7 +27,9 @@ fun StatisticsScreen(
     ) {
         if (state.isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier
+                    .size(22.dp)
+                    .align(Alignment.Center),
                 color = MaterialTheme.colors.primary,
                 strokeWidth = 3.dp
             )
