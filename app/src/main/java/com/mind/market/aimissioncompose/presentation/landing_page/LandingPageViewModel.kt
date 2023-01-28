@@ -8,14 +8,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.landing_page.use_case.GoalOperation
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
-import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -27,8 +26,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
-    private val repository: IGoalRepository,
-    private val statisticsRepository: IStatisticsRepository,
     private val useCase: ILandingPageUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
@@ -61,12 +58,8 @@ class LandingPageViewModel @Inject constructor(
                 val currentMonth = currentDate.month
                 val currentYear = currentDate.year
 
-                if (statisticsRepository.getStatisticsEntityByDate( // TODO MIC maybe just return boolean is better
-                        currentMonthValue,
-                        currentYear
-                    ) ==  StatisticsEntity.EMPTY
-                ) {
-                    statisticsRepository.insertStatisticsEntity(
+                if (useCase.doesStatisticExist(currentMonthValue, currentYear)) {
+                    useCase.insertStatisticEntity(
                         StatisticsEntity(
                             title = currentMonth.toMonthName(),
                             amountGoalsCompleted = 0,
@@ -117,9 +110,11 @@ class LandingPageViewModel @Inject constructor(
         goal?.apply {
             viewModelScope.launch {
                 val newStatus = getNewGoalStatus(goal.status)
-                repository.updateStatus(
-                    id = id,
-                    status = newStatus
+                useCase.executeGoalOperation(
+                    GoalOperation.UpdateStatus(
+                        id = id,
+                        newStatus = newStatus
+                    )
                 )
                 getGoals()
             }
@@ -140,7 +135,7 @@ class LandingPageViewModel @Inject constructor(
         deletedGoal.apply {
             viewModelScope.launch {
                 try {
-                    repository.deleteGoal(deletedGoal)
+                    useCase.executeGoalOperation(GoalOperation.Delete(deletedGoal))
                     getGoals()
                     _uiEvent.send(
                         LandingPageUiEvent.ShowSnackbar(
@@ -159,7 +154,7 @@ class LandingPageViewModel @Inject constructor(
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                repository.insert(deletedGoal)
+                useCase.executeGoalOperation(GoalOperation.Insert(deletedGoal))
                 state = state.copy(
                     goals = state.goals + deletedGoal
                 )
@@ -167,12 +162,8 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    suspend fun deleteAllGoals(): Boolean {
-        return repository.deleteAll()
-    }
-
     suspend fun getGoals() {
-        repository.getGoals().collect { response ->
+        useCase.getGoals().collect { response ->
             when (response) {
                 is Resource.Success -> {
                     val goals = response.data ?: emptyList()
@@ -256,7 +247,5 @@ class LandingPageViewModel @Inject constructor(
                 Month.NOVEMBER -> "November"
                 Month.DECEMBER -> "December"
             }
-
-        private const val ARGUMENT_INVALIDATE = "invalidate"
     }
 }

@@ -1,7 +1,11 @@
 package com.mind.market.aimissioncompose.di
 
+import com.mind.market.aimissioncompose.data.GoalRoomDatabase
+import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.implementation.LandingPageUseCase
+import com.mind.market.aimissioncompose.statistics.data.StatisticsRepository
+import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +17,13 @@ import javax.inject.Singleton
 object LandingPageModule {
     @Provides
     @Singleton
-    fun provideUseCase(): ILandingPageUseCase {
-        return LandingPageUseCase()
+    fun provideUseCase(
+        goalRepository: IGoalRepository,
+        statisticsRepository: IStatisticsRepository
+    ): ILandingPageUseCase {
+        return LandingPageUseCase(
+            goalRepository = goalRepository,
+            statisticsRepository = statisticsRepository
+        )
     }
 }

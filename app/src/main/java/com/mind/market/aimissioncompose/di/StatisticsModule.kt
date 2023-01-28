@@ -1,4 +1,4 @@
-package com.mind.market.aimissioncompose.statistics.di
+package com.mind.market.aimissioncompose.di
 
 import android.app.Application
 import androidx.room.Room
