@@ -1,7 +1,5 @@
 package com.mind.market.aimissioncompose.di
 
-import android.app.Application
-import androidx.room.Room
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.statistics.data.StatisticsRepository
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository

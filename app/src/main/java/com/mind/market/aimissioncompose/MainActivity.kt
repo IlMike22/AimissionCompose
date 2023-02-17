@@ -23,6 +23,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.mind.market.aimissioncompose.auth.presentation.AuthenticationScreen
+import com.mind.market.aimissioncompose.auth.presentation.AuthenticationViewModel
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.information.InformationScreen
@@ -104,7 +106,7 @@ class MainActivity : ComponentActivity() {
                     }, content = {
                         NavHost(
                             navController = navController,
-                            startDestination = Route.LANDING_PAGE
+                            startDestination = Route.AUTHENTICATION//Route.LANDING_PAGE
                         ) {
                             composable(Route.LANDING_PAGE) {
                                 Surface(
@@ -150,6 +152,16 @@ class MainActivity : ComponentActivity() {
                                 val viewModel = hiltViewModel<StatisticsViewModel>()
                                 val state by viewModel.state.collectAsState()
                                 StatisticsScreen(
+                                    state = state,
+                                    onEvent = viewModel::onEvent
+                                )
+                            }
+                            composable(
+                                route = Route.AUTHENTICATION
+                            ) {
+                                val viewModel = hiltViewModel<AuthenticationViewModel>()
+                                val state by viewModel.state.collectAsState()
+                                AuthenticationScreen(
                                     state = state,
                                     onEvent = viewModel::onEvent
                                 )

@@ -18,6 +18,7 @@ import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import com.mind.market.aimissioncompose.domain.models.Status
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsOperation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -176,7 +177,7 @@ class DetailViewModel @Inject constructor(
         if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
                 repository.insert(newGoal)
-                updateStatistic(newGoal)
+                updateStatistic(StatisticsOperation.AddGoal(newGoal))
                 _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
             }
         }

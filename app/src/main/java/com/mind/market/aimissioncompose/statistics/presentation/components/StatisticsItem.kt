@@ -59,6 +59,7 @@ fun StatisticsItem(
                 fontSize = 24.sp,
                 fontStyle = FontStyle.Normal
             )
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

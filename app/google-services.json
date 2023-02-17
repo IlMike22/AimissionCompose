@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "159187691800",
+    "project_id": "aimissioncompose",
+    "storage_bucket": "aimissioncompose.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:159187691800:android:cceb69f76fbf86e19e166d",
+        "android_client_info": {
+          "package_name": "com.mind.market.aimissioncompose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "159187691800-bu46k5emjqsooset3f30tanks2s14lru.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK0qYjw1qroQWZRYJKJQavkDPl5nxvq4c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "159187691800-bu46k5emjqsooset3f30tanks2s14lru.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

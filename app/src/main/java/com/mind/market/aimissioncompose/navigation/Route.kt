@@ -7,4 +7,5 @@ object Route {
     const val SETTINGS = "settings"
     const val INFORMATION = "info"
     const val STATISTICS = "statistics"
+    const val AUTHENTICATION = "authentication"
 }

@@ -36,7 +36,7 @@ class StatisticsViewModel @Inject constructor(
                                 isLoading = true
                             )
                         }
-                        delay(2000) // TODO MIC just test
+                        delay(500) // TODO MIC just test
                     }
                     is Resource.Success -> _state.update {
                         it.copy(
