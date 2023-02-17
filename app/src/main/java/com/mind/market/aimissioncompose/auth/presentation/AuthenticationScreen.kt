@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -19,26 +20,48 @@ fun AuthenticationScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Type email here:")
-            Spacer(modifier = Modifier.width(24.dp))
-            TextField(value = state.email, onValueChange = {
-                onEvent(AuthenticationEvent.OnEmailChanged(it))
-            })
-        }
+        Text("Sign up with an existing account", style = TextStyle.Default)
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(text = "Your email:")
+        Spacer(modifier = Modifier.height(24.dp))
+        TextField(value = state.email, onValueChange = {
+           //TODO
+        })
         Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Type password here:")
-            Spacer(modifier = Modifier.width(24.dp))
-            TextField(value = state.password, onValueChange = {
-                onEvent(AuthenticationEvent.OnPasswordChanged(it))
-            })
-        }
+
+        Text(text = "Your password:")
+        Spacer(modifier = Modifier.height(24.dp))
+
+        TextField(value = state.password, onValueChange = {
+            //TODO
+        })
+        Spacer(modifier = Modifier.height(24.dp))
+         Button(onClick = {
+             //TODO LOGIN USER
+         }) {
+             Text(text = "Login")
+         }
+
         Spacer(modifier = Modifier.height(32.dp))
+
+        Text("Or register a new account if you want", style = TextStyle.Default)
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(text = "Type email here:")
+        Spacer(modifier = Modifier.height(24.dp))
+        TextField(value = state.email, onValueChange = {
+            onEvent(AuthenticationEvent.OnEmailChanged(it))
+        })
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(text = "Type password here:")
+        Spacer(modifier = Modifier.height(24.dp))
+
+        TextField(value = state.password, onValueChange = {
+            onEvent(AuthenticationEvent.OnPasswordChanged(it))
+        })
+
+        Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = { onEvent(AuthenticationEvent.OnCreateNewUser) }
         ) {
