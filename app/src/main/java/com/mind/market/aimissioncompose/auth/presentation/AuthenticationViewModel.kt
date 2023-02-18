@@ -1,9 +1,10 @@
 package com.mind.market.aimissioncompose.auth.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.auth.domain.CreateUser
-import dagger.hilt.android.HiltAndroidApp
+import com.mind.market.aimissioncompose.auth.domain.LoginUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -14,9 +15,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val createUser: CreateUser
+    private val createUser: CreateUser,
+    private val loginUser: LoginUser
 ) : ViewModel() {
-
+    private val TAG = "AuthenticationViewModel"
     private val _state = MutableStateFlow(AuthenticationState())
     var state = _state.stateIn(
         viewModelScope,
@@ -40,6 +42,29 @@ class AuthenticationViewModel @Inject constructor(
                     password = event.password
                 )
             }
+            AuthenticationEvent.OnLoginUser -> {
+                val resultCode = validateLogin()
+                if (resultCode == ValidationCode.OK) {
+                    viewModelScope.launch {
+                        loginUser(_state.value.email, _state.value.password)
+                    }
+                } else {
+                    Log.e(TAG, "Cannot login user. Email or password are invalid or empty.")
+                }
+            }
         }
+    }
+
+    private fun validateLogin(): ValidationCode {
+        return if (_state.value.email.isBlank() || _state.value.password.isBlank()) {
+            ValidationCode.MISSING_EMAIL_OR_PASSWORD
+        } else {
+            ValidationCode.OK
+        }
+    }
+
+    enum class ValidationCode {
+        OK,
+        MISSING_EMAIL_OR_PASSWORD
     }
 }

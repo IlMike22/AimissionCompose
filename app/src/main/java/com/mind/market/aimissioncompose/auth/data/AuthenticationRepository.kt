@@ -6,4 +6,8 @@ class AuthenticationRepository(
     override suspend fun createUser(email: String, password: String) {
         remoteDataSource.createUser(email, password)
     }
+
+    override suspend fun loginUser(email: String, password: String) {
+        remoteDataSource.loginUser(email, password)
+    }
 }

@@ -25,7 +25,7 @@ fun AuthenticationScreen(
         Text(text = "Your email:")
         Spacer(modifier = Modifier.height(24.dp))
         TextField(value = state.email, onValueChange = {
-           //TODO
+            onEvent(AuthenticationEvent.OnEmailChanged(it))
         })
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -33,14 +33,14 @@ fun AuthenticationScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         TextField(value = state.password, onValueChange = {
-            //TODO
+            onEvent(AuthenticationEvent.OnPasswordChanged(it))
         })
         Spacer(modifier = Modifier.height(24.dp))
-         Button(onClick = {
-             //TODO LOGIN USER
-         }) {
-             Text(text = "Login")
-         }
+        Button(onClick = {
+            onEvent(AuthenticationEvent.OnLoginUser)
+        }) {
+            Text(text = "Login")
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
