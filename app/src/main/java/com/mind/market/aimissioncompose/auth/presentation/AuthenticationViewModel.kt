@@ -45,6 +45,12 @@ class AuthenticationViewModel @Inject constructor(
                 )
             }
             AuthenticationEvent.OnLoginUser -> {
+                _state.update {
+                    it.copy(
+                        toastMessage = null,
+                        isLoading = true
+                    )
+                }
                 val resultCode = validateLogin()
                 if (resultCode == ValidationCode.OK) {
                     viewModelScope.launch {
@@ -52,20 +58,25 @@ class AuthenticationViewModel @Inject constructor(
                             if (error == null && user != null) {
                                 // success case
                                 _state.update {
-                                    it.copy(user = user)
+                                    it.copy(
+                                        user = user,
+                                        toastMessage = "User ${user.id} successfully logged in.",
+                                        isLoading = false
+                                    )
                                 }
                             } else {
                                 // error case - show in ui
                                 _state.update {
                                     it.copy(
-                                        errorMessage = error?.message
-                                            ?: "Unknown error while trying to login user."
+                                        toastMessage = error?.message
+                                            ?: "Unknown error while trying to login user.",
+                                        isLoading = false
                                     )
                                 }
                             }
                         }
 
-                        if (_state.value.errorMessage.isBlank()) { // no error occurred
+                        if (_state.value.toastMessage == null) { // no error occurred
                             storeLocalUser(_state.value.user)
                         }
                     }

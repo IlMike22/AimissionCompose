@@ -89,5 +89,4 @@ fun SettingsScreen(
             Text(text = "Full amount of goals in progress is ${state.goalsInProgress}")
         }
     }
-
 }

@@ -59,6 +59,7 @@ class AuthenticationRemoteDataSource : IAuthenticationRemoteDataSource {
 
     private fun FirebaseUser.mapFirebaseUserToUser(): User {
         return User(
+            id = uid,
             name = displayName ?: "",
             email = email ?: "",
             tenantId = tenantId ?: ""

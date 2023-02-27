@@ -1,14 +1,14 @@
 package com.mind.market.aimissioncompose.auth.presentation.components
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -18,55 +18,83 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationEvent
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationState
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AuthenticationLoginUser(
     modifier: Modifier = Modifier,
     state: AuthenticationState,
     onEvent: (AuthenticationEvent) -> Unit
 ) {
-    Text(
-        text = stringResource(R.string.authentication_login_header),
-        style = TextStyle.Default
-    )
-    Spacer(modifier = Modifier.height(24.dp))
-    Text(text = stringResource(R.string.authentication_login_email_text))
-    Spacer(modifier = Modifier.height(24.dp))
-    OutlinedTextField(
-        value = state.email,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        onValueChange = {
-            onEvent(AuthenticationEvent.OnEmailChanged(it))
+    val scaffoldState = rememberScaffoldState()
+
+    if (state.toastMessage != null) {
+        LaunchedEffect(scaffoldState.snackbarHostState) {
+            scaffoldState.snackbarHostState.showSnackbar(state.toastMessage)
         }
-    )
-    Spacer(modifier = Modifier.height(16.dp))
+    }
 
-    Text(text = stringResource(R.string.authentication_login_password_text))
-    Spacer(modifier = Modifier.height(24.dp))
-
-    OutlinedTextField(
-        value = state.password,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        onValueChange = {
-            onEvent(AuthenticationEvent.OnPasswordChanged(it))
-        },
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-    )
-
-    Spacer(modifier = Modifier.height(24.dp))
-    Button(
-        onClick = {
-            onEvent(AuthenticationEvent.OnLoginUser)
-        },
-        modifier = Modifier
-            .height(82.dp)
-            .fillMaxWidth()
-            .padding(16.dp)
+    Scaffold(
+        modifier = modifier,
+        scaffoldState = scaffoldState
     ) {
-        Text(text = stringResource(R.string.authentication_login_button_text))
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                text = stringResource(R.string.authentication_login_header),
+                style = TextStyle.Default
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(text = stringResource(R.string.authentication_login_email_text))
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = state.email,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onValueChange = {
+                    onEvent(AuthenticationEvent.OnEmailChanged(it))
+                }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(text = stringResource(R.string.authentication_login_password_text))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            OutlinedTextField(
+                value = state.password,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                onValueChange = {
+                    onEvent(AuthenticationEvent.OnPasswordChanged(it))
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    onEvent(AuthenticationEvent.OnLoginUser)
+                },
+                modifier = Modifier
+                    .height(82.dp)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .fillMaxSize(),
+                        color = MaterialTheme.colors.primary,
+                        strokeWidth = 3.dp
+                    )
+                } else {
+                    Text(text = stringResource(R.string.authentication_login_button_text))
+                }
+            }
+        }
     }
 }
