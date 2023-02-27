@@ -26,6 +26,4 @@ object DetailModule {
     fun provideStatisticsUseCase(repository: IStatisticsRepository): UpdateStatisticsWithNewGoalCreatedUseCase { // TODO MIC look for a better place
         return UpdateStatisticsWithNewGoalCreatedUseCase(repository)
     }
-
-
 }

@@ -1,71 +1,62 @@
 package com.mind.market.aimissioncompose.auth.presentation
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import com.mind.market.aimissioncompose.auth.presentation.components.AuthenticationCreateUser
+import com.mind.market.aimissioncompose.auth.presentation.components.AuthenticationLoginUser
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun AuthenticationScreen(
     modifier: Modifier = Modifier,
     state: AuthenticationState,
     onEvent: (AuthenticationEvent) -> Unit
 ) {
+    val pagerState = rememberPagerState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Sign up with an existing account", style = TextStyle.Default)
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(text = "Your email:")
-        Spacer(modifier = Modifier.height(24.dp))
-        TextField(value = state.email, onValueChange = {
-            onEvent(AuthenticationEvent.OnEmailChanged(it))
-        })
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(text = "Your password:")
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TextField(value = state.password, onValueChange = {
-            onEvent(AuthenticationEvent.OnPasswordChanged(it))
-        })
-        Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = {
-            onEvent(AuthenticationEvent.OnLoginUser)
-        }) {
-            Text(text = "Login")
+        TabRow(selectedTabIndex = pagerState.currentPage) {
+            Tab(
+                selected = pagerState.currentPage == 0,
+                text = { Text(text = "Page1") },
+                onClick = { /*TODO*/ })
+            Tab(
+                selected = pagerState.currentPage == 1,
+                text = { Text(text = "Page2") },
+                onClick = { /*TODO*/ })
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text("Or register a new account if you want", style = TextStyle.Default)
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(text = "Type email here:")
-        Spacer(modifier = Modifier.height(24.dp))
-        TextField(value = state.email, onValueChange = {
-            onEvent(AuthenticationEvent.OnEmailChanged(it))
-        })
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Type password here:")
-        Spacer(modifier = Modifier.height(24.dp))
-
-        TextField(value = state.password, onValueChange = {
-            onEvent(AuthenticationEvent.OnPasswordChanged(it))
-        })
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = { onEvent(AuthenticationEvent.OnCreateNewUser) }
-        ) {
-            Text(text = "Register new user")
+        HorizontalPager(count = 2, state = pagerState) { page ->
+            Column(modifier = Modifier.fillMaxSize()) {
+                if (page == 0) {
+                    AuthenticationCreateUser(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        state = state,
+                        onEvent = onEvent
+                    )
+                } else if (page == 1) {
+                    AuthenticationLoginUser(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        state = state,
+                        onEvent = onEvent
+                    )
+                }
+            }
         }
     }
 }

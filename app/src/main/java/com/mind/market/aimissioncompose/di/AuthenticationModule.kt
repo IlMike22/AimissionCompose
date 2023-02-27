@@ -4,8 +4,8 @@ import com.mind.market.aimissioncompose.auth.data.AuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.auth.data.AuthenticationRepository
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRepository
-import com.mind.market.aimissioncompose.auth.domain.CreateUser
-import com.mind.market.aimissioncompose.auth.domain.LoginUser
+import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
+import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,13 +32,13 @@ object AuthenticationModule {
 
     @Provides
     @Singleton
-    fun provideCreateUserUseCase(repository: IAuthenticationRepository): CreateUser {
-        return CreateUser(repository)
+    fun provideCreateUserUseCase(repository: IAuthenticationRepository): CreateUserUseCase {
+        return CreateUserUseCase(repository)
     }
 
     @Provides
     @Singleton
-    fun provideLoginUseCase(repository: IAuthenticationRepository): LoginUser {
-        return LoginUser(repository)
+    fun provideLoginUseCase(repository: IAuthenticationRepository): LoginUserUseCase {
+        return LoginUserUseCase(repository)
     }
 }

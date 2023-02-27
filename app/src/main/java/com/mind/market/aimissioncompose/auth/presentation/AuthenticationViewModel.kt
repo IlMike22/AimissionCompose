@@ -3,8 +3,8 @@ package com.mind.market.aimissioncompose.auth.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mind.market.aimissioncompose.auth.domain.CreateUser
-import com.mind.market.aimissioncompose.auth.domain.LoginUser
+import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
+import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,12 +15,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val createUser: CreateUser,
-    private val loginUser: LoginUser
+    private val createUser: CreateUserUseCase,
+    private val loginUser: LoginUserUseCase
 ) : ViewModel() {
     private val TAG = "AuthenticationViewModel"
     private val _state = MutableStateFlow(AuthenticationState())
-    var state = _state.stateIn(
+    val state = _state.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000), AuthenticationState()
     )
