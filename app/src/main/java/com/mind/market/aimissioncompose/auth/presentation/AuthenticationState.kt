@@ -6,5 +6,6 @@ data class AuthenticationState(
     val email: String = "",
     val password: String = "",
     val user: User = User.EMPTY, // TODO MIC don`t use data model here! create domain model
-    val isUserAuthenticated: Boolean = false
+    val isUserAuthenticated: Boolean = false,
+    val errorMessage: String = ""
 )

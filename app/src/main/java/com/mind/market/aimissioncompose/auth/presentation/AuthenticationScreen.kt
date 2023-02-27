@@ -25,22 +25,25 @@ fun AuthenticationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
     ) {
         TabRow(selectedTabIndex = pagerState.currentPage) {
             Tab(
                 selected = pagerState.currentPage == 0,
-                text = { Text(text = "Page1") },
+                text = { Text(text = "Login") },
                 onClick = { /*TODO*/ })
             Tab(
                 selected = pagerState.currentPage == 1,
-                text = { Text(text = "Page2") },
+                text = { Text(text = "Register") },
                 onClick = { /*TODO*/ })
         }
         HorizontalPager(count = 2, state = pagerState) { page ->
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
                 if (page == 0) {
-                    AuthenticationCreateUser(
+                    AuthenticationLoginUser(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),
@@ -48,7 +51,7 @@ fun AuthenticationScreen(
                         onEvent = onEvent
                     )
                 } else if (page == 1) {
-                    AuthenticationLoginUser(
+                    AuthenticationCreateUser(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),

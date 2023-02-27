@@ -23,15 +23,24 @@ class AuthenticationRemoteDataSource : IAuthenticationRemoteDataSource {
         }
     }
 
-    override suspend fun loginUser(email: String, password: String) {
+    override suspend fun loginUser(
+        email: String,
+        password: String,
+        onLoginResult: (User?, Throwable?) -> Unit
+    ) {
         initFirebaseAuth()
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "Login was successfully. User is ${auth.currentUser}")
                     user = auth.currentUser?.mapFirebaseUserToUser()
+                    onLoginResult(user, null)
                 } else {
                     Log.e(TAG, "Login was not successful. Check your credentials")
+                    onLoginResult(
+                        null,
+                        Throwable("Login was not successful. Check your credentials")
+                    )
                 }
             }
     }
@@ -55,6 +64,7 @@ class AuthenticationRemoteDataSource : IAuthenticationRemoteDataSource {
             tenantId = tenantId ?: ""
         )
     }
+
     private fun initFirebaseAuth() {
         auth = Firebase.auth
     }

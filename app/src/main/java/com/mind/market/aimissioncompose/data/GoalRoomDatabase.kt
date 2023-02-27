@@ -3,6 +3,8 @@ package com.mind.market.aimissioncompose.data
 import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.mind.market.aimissioncompose.auth.data.IAuthenticationDao
+import com.mind.market.aimissioncompose.auth.data.model.UserDto
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.statistics.data.IStatisticsEntityDao
 import com.mind.market.aimissioncompose.statistics.data.dto.StatisticsEntityDto
@@ -10,14 +12,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [GoalDto::class, StatisticsEntityDto::class],
-    version = 4,
-    autoMigrations = [AutoMigration(from = 2, to = 3)]
+    entities = [GoalDto::class, StatisticsEntityDto::class, UserDto::class],
+    version = 5,
+    autoMigrations = [AutoMigration(from = 3, to = 4)]
 )
 @TypeConverters(Converters::class)
 abstract class GoalRoomDatabase : RoomDatabase() {
     abstract fun goalDao(): IGoalDao
-    abstract fun getStatisticsDao(): IStatisticsEntityDao
+    abstract fun statisticsDao(): IStatisticsEntityDao
+
+    abstract fun authenticationDao(): IAuthenticationDao
 
     private class GoalDatabaseCallback(
         private val scope: CoroutineScope
@@ -28,13 +32,13 @@ abstract class GoalRoomDatabase : RoomDatabase() {
                 scope.launch {
                     populateDatabase(
                         database.goalDao(),
-                        database.getStatisticsDao()
+                        database.statisticsDao()
                     )
                 }
             }
         }
 
-        suspend fun populateDatabase(goalDao: IGoalDao, statisticsDao:IStatisticsEntityDao) {
+        suspend fun populateDatabase(goalDao: IGoalDao, statisticsDao: IStatisticsEntityDao) {
             goalDao.deleteAll()
             statisticsDao.deleteAll()
         }

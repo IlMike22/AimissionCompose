@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
+import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
     private val createUser: CreateUserUseCase,
+    private val storeLocalUser: StoreLocalUserUseCase,
     private val loginUser: LoginUserUseCase
 ) : ViewModel() {
     private val TAG = "AuthenticationViewModel"
@@ -46,7 +48,26 @@ class AuthenticationViewModel @Inject constructor(
                 val resultCode = validateLogin()
                 if (resultCode == ValidationCode.OK) {
                     viewModelScope.launch {
-                        loginUser(_state.value.email, _state.value.password)
+                        loginUser(_state.value.email, _state.value.password) { user, error ->
+                            if (error == null && user != null) {
+                                // success case
+                                _state.update {
+                                    it.copy(user = user)
+                                }
+                            } else {
+                                // error case - show in ui
+                                _state.update {
+                                    it.copy(
+                                        errorMessage = error?.message
+                                            ?: "Unknown error while trying to login user."
+                                    )
+                                }
+                            }
+                        }
+
+                        if (_state.value.errorMessage.isBlank()) { // no error occurred
+                            storeLocalUser(_state.value.user)
+                        }
                     }
                 } else {
                     Log.e(TAG, "Cannot login user. Email or password are invalid or empty.")

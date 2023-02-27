@@ -18,7 +18,7 @@ object StatisticsModule {
     @Singleton
     fun provideStatisticsRepository(database: GoalRoomDatabase): IStatisticsRepository {
         return StatisticsRepository(
-            localDataSource = database.getStatisticsDao()
+            localDataSource = database.statisticsDao()
         )
     }
 

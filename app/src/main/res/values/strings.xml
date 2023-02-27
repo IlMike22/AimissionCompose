@@ -25,7 +25,7 @@
     <string name="hello_success">\"Hello Statistics Screen! We have succesfully loaded the data!\"</string>
     <string name="hello_error">Hello statistics world. We`ve got an error.</string>
     <string name="authentication_login_button_text">Login</string>
-    <string name="authentication_login_email_text">Your email:</string>
+    <string name="authentication_login_email_text">Your email address:</string>
     <string name="authentication_login_password_text">Your password:</string>
     <string name="authentication_login_header">Sign in with an existing account</string>
 

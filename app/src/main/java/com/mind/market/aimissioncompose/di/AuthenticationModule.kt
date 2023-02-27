@@ -1,11 +1,10 @@
 package com.mind.market.aimissioncompose.di
 
-import com.mind.market.aimissioncompose.auth.data.AuthenticationRemoteDataSource
-import com.mind.market.aimissioncompose.auth.data.AuthenticationRepository
-import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
-import com.mind.market.aimissioncompose.auth.data.IAuthenticationRepository
+import com.mind.market.aimissioncompose.auth.data.*
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
+import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
+import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,9 +23,19 @@ object AuthenticationModule {
 
     @Provides
     @Singleton
-    fun provideAuthenticationRepository(dataSource: IAuthenticationRemoteDataSource): IAuthenticationRepository {
+    fun provideAuthenticationLocalDataSource(database: GoalRoomDatabase): IAuthenticationLocalDataSource {
+        return AuthenticationLocalDataSource(database.authenticationDao())
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthenticationRepository(
+        remoteDataSource: IAuthenticationRemoteDataSource,
+        localDataSource: IAuthenticationLocalDataSource
+    ): IAuthenticationRepository {
         return AuthenticationRepository(
-            remoteDataSource = dataSource
+            remoteDataSource = remoteDataSource,
+            localDataSource = localDataSource
         )
     }
 
@@ -34,6 +43,12 @@ object AuthenticationModule {
     @Singleton
     fun provideCreateUserUseCase(repository: IAuthenticationRepository): CreateUserUseCase {
         return CreateUserUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStoreLocalUserUseCase(repository: IAuthenticationRepository): StoreLocalUserUseCase {
+        return StoreLocalUserUseCase(repository)
     }
 
     @Provides
