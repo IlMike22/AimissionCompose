@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,6 +22,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationScreen
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationViewModel
 import com.mind.market.aimissioncompose.navigation.Route
@@ -37,11 +39,15 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    lateinit var auth: FirebaseAuth
+
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         installSplashScreen()
+
+        initFirebaseAuth()
 
         setContent {
             AimissionComposeTheme {
@@ -106,7 +112,7 @@ class MainActivity : ComponentActivity() {
                     }, content = {
                         NavHost(
                             navController = navController,
-                            startDestination = Route.AUTHENTICATION//Route.LANDING_PAGE
+                            startDestination = if (auth.currentUser != null) Route.LANDING_PAGE else Route.AUTHENTICATION
                         ) {
                             composable(Route.LANDING_PAGE) {
                                 Surface(
@@ -163,7 +169,8 @@ class MainActivity : ComponentActivity() {
                                 val state by viewModel.state.collectAsState()
                                 AuthenticationScreen(
                                     state = state,
-                                    onEvent = viewModel::onEvent
+                                    viewModel = viewModel,
+                                    navController = navController
                                 )
                             }
                         }
@@ -172,4 +179,9 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun initFirebaseAuth() {
+        auth = Firebase.auth
+    }
+
 }

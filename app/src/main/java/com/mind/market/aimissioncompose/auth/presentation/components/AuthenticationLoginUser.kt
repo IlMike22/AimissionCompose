@@ -6,25 +6,28 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationEvent
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationState
+import com.mind.market.aimissioncompose.auth.presentation.AuthenticationUiEvent
+import com.mind.market.aimissioncompose.navigation.Route
+import kotlinx.coroutines.flow.collectLatest
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AuthenticationLoginUser(
     modifier: Modifier = Modifier,
     state: AuthenticationState,
+    navController: NavController,
     onEvent: (AuthenticationEvent) -> Unit
 ) {
+
     val scaffoldState = rememberScaffoldState()
 
     if (state.toastMessage != null) {

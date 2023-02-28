@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.di
 
+import com.google.firebase.auth.FirebaseAuth
 import com.mind.market.aimissioncompose.auth.data.*
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
@@ -17,8 +18,14 @@ object AuthenticationModule {
 
     @Provides
     @Singleton
-    fun provideAuthenticationRemoteDataSource(): IAuthenticationRemoteDataSource {
-        return AuthenticationRemoteDataSource()
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthenticationRemoteDataSource(auth: FirebaseAuth): IAuthenticationRemoteDataSource {
+        return AuthenticationRemoteDataSource(auth)
     }
 
     @Provides

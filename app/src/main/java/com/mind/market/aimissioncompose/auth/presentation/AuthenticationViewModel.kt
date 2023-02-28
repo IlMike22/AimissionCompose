@@ -3,14 +3,13 @@ package com.mind.market.aimissioncompose.auth.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,6 +25,9 @@ class AuthenticationViewModel @Inject constructor(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000), AuthenticationState()
     )
+
+    private val _uiEvent = Channel<AuthenticationUiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     fun onEvent(event: AuthenticationEvent) {
         when (event) {
@@ -54,15 +56,23 @@ class AuthenticationViewModel @Inject constructor(
                 val resultCode = validateLogin()
                 if (resultCode == ValidationCode.OK) {
                     viewModelScope.launch {
-                        loginUser(_state.value.email, _state.value.password) { user, error ->
-                            if (error == null && user != null) {
+                        loginUser(
+                            _state.value.email,
+                            _state.value.password
+                        ) { user, error ->
+                            if (error == null && user != null) { // SUCCESS CASE
                                 // success case
                                 _state.update {
                                     it.copy(
                                         user = user,
                                         toastMessage = "User ${user.id} successfully logged in.",
-                                        isLoading = false
+                                        isLoading = false,
+                                        isUserAuthenticated = true
                                     )
+                                }
+                                viewModelScope.launch {// TODO MIC nested coroutine bad. Look for solution to run coroutines sequentially
+                                    _uiEvent.send(AuthenticationUiEvent.NavigateToLandingPageAfterLogin)
+                                    storeLocalUser(_state.value.user)
                                 }
                             } else {
                                 // error case - show in ui
@@ -70,14 +80,11 @@ class AuthenticationViewModel @Inject constructor(
                                     it.copy(
                                         toastMessage = error?.message
                                             ?: "Unknown error while trying to login user.",
-                                        isLoading = false
+                                        isLoading = false,
+                                        isUserAuthenticated = false
                                     )
                                 }
                             }
-                        }
-
-                        if (_state.value.toastMessage == null) { // no error occurred
-                            storeLocalUser(_state.value.user)
                         }
                     }
                 } else {

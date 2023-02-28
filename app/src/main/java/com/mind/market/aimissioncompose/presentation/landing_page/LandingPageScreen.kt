@@ -33,8 +33,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LandingPageScreen(
-    viewModel: LandingPageViewModel = hiltViewModel(),
     modifier: Modifier = Modifier,
+    viewModel: LandingPageViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val state = viewModel.state
@@ -86,7 +86,6 @@ fun LandingPageScreen(
                     }
                 }
                 is LandingPageUiEvent.ShowGoalOverdueDialog -> {
-
                     alertDialogState.show()
                 }
             }
@@ -119,10 +118,13 @@ fun LandingPageScreen(
                         .height(250.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Bottom Sheet Content",
-                        fontSize = 16.sp,
-                    )
+                    Button(
+                        onClick = {
+                            viewModel.onEvent(LandingPageUiEvent.OnLogoutUserClicked)
+                        }
+                    ) {
+                        Text(text = "Logout user")
+                    }
                 }
             },
             sheetBackgroundColor = Color.Blue,
@@ -142,64 +144,64 @@ fun LandingPageScreen(
                     Text("Show/Hide Bottom Sheet")
                 }
             }
-        }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
-        ) {
-            FloatingActionButton(
-                onClick = { navController.navigate(Route.ADD) }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp)
             ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
-            }
+                FloatingActionButton(
+                    onClick = { navController.navigate(Route.ADD) }
+                ) {
+                    Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
+                }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                val goals = state.goals
-                items(goals.size) { index ->
-                    val goal = goals[index]
-                    Goal(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxSize()
-                            .clickable {
-                                navController.navigate(Route.ADD + "?goalId=${goal.id}")
-                            }
-                            .padding(8.dp),
-                        goal = goal,
-                        onDeleteClicked = { goalToDelete ->
-                            viewModel.onEvent(
-                                LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete)
-                            )
-                        },
-                        onStatusChangeClicked = { selectedGoal ->
-                            viewModel.onEvent(
-                                LandingPageUiEvent.OnStatusChangedClicked(selectedGoal)
-                            )
-                        },
-                        navController = navController
-                    )
-
-                    if (index < state.goals.size) {
-                        Divider(
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    val goals = state.goals
+                    items(goals.size) { index ->
+                        val goal = goals[index]
+                        Goal(
                             modifier = Modifier
-                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth()
+                                .fillMaxSize()
+                                .clickable {
+                                    navController.navigate(Route.ADD + "?goalId=${goal.id}")
+                                }
+                                .padding(8.dp),
+                            goal = goal,
+                            onDeleteClicked = { goalToDelete ->
+                                viewModel.onEvent(
+                                    LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete)
+                                )
+                            },
+                            onStatusChangeClicked = { selectedGoal ->
+                                viewModel.onEvent(
+                                    LandingPageUiEvent.OnStatusChangedClicked(selectedGoal)
+                                )
+                            },
+                            navController = navController
                         )
+
+                        if (index < state.goals.size) {
+                            Divider(
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+                            )
+                        }
                     }
                 }
-            }
 
-            MaterialDialog(
-                dialogState = alertDialogState,
-                buttons = {
-                    positiveButton("OK")
+                MaterialDialog(
+                    dialogState = alertDialogState,
+                    buttons = {
+                        positiveButton("OK")
+                    }
+                ) {
+                    title(text = "Goal(s) overdued")
+                    message(text = "At least one goal is overdued. Take care of your goals.")
                 }
-            ) {
-                title(text = "Goal(s) overdued")
-                message(text = "At least one goal is overdued. Take care of your goals.")
             }
         }
     }

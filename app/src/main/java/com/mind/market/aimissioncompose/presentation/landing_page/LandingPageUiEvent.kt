@@ -16,4 +16,5 @@ sealed class LandingPageUiEvent(val goal: Goal? = null) {
     class OnStatusChangedClicked(goal: Goal) : LandingPageUiEvent(goal = goal)
     object OnUndoDeleteGoalClicked : LandingPageUiEvent()
     data class ShowGoalOverdueDialog(val title: String, val message: String) : LandingPageUiEvent()
+    object OnLogoutUserClicked: LandingPageUiEvent()
 }

@@ -7,13 +7,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.data.model.User
 
-class AuthenticationRemoteDataSource : IAuthenticationRemoteDataSource {
+class AuthenticationRemoteDataSource(
+    private val auth: FirebaseAuth
+) : IAuthenticationRemoteDataSource {
     private val TAG = "AuthenticationRemoteDataSource"
-    private lateinit var auth: FirebaseAuth
     private var user: User? = null
 
     override suspend fun createUser(email: String, password: String) {
-        initFirebaseAuth()
         auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 Log.d(TAG, "User successfully created. User is ${auth.currentUser}")
@@ -28,7 +28,6 @@ class AuthenticationRemoteDataSource : IAuthenticationRemoteDataSource {
         password: String,
         onLoginResult: (User?, Throwable?) -> Unit
     ) {
-        initFirebaseAuth()
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -64,9 +63,5 @@ class AuthenticationRemoteDataSource : IAuthenticationRemoteDataSource {
             email = email ?: "",
             tenantId = tenantId ?: ""
         )
-    }
-
-    private fun initFirebaseAuth() {
-        auth = Firebase.auth
     }
 }

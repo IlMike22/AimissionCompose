@@ -5,21 +5,38 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.mind.market.aimissioncompose.auth.presentation.components.AuthenticationCreateUser
 import com.mind.market.aimissioncompose.auth.presentation.components.AuthenticationLoginUser
+import com.mind.market.aimissioncompose.navigation.Route
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun AuthenticationScreen(
     modifier: Modifier = Modifier,
+    viewModel: AuthenticationViewModel,
+    navController: NavController,
     state: AuthenticationState,
-    onEvent: (AuthenticationEvent) -> Unit
+
 ) {
+    LaunchedEffect("navigation") {
+        viewModel.uiEvent.collectLatest { uiEvent ->
+            when (uiEvent) {
+                AuthenticationUiEvent.NavigateToLandingPageAfterLogin -> {
+                    navController.navigate(Route.LANDING_PAGE)
+                }
+            }
+        }
+    }
+
     val pagerState = rememberPagerState()
 
     Column(
@@ -48,7 +65,8 @@ fun AuthenticationScreen(
                             .fillMaxSize()
                             .padding(16.dp),
                         state = state,
-                        onEvent = onEvent
+                        onEvent = viewModel::onEvent,
+                        navController = navController
                     )
                 } else if (page == 1) {
                     AuthenticationCreateUser(
@@ -56,7 +74,7 @@ fun AuthenticationScreen(
                             .fillMaxSize()
                             .padding(16.dp),
                         state = state,
-                        onEvent = onEvent
+                        onEvent = viewModel::onEvent
                     )
                 }
             }
