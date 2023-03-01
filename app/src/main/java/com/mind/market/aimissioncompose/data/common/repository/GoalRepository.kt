@@ -15,6 +15,7 @@ import com.mind.market.aimissioncompose.data.toStatusData
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
@@ -93,8 +94,8 @@ class GoalRepository(
 
     override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> {
         if (operation == GoalReadWriteOperation.FIREBASE_DATABASE) {
-            return flow {
-                emit(Resource.Loading(true))
+            return callbackFlow {
+                trySend(Resource.Loading(true))
                 val userId = getFirebaseUserId()
                 val goalDtos = mutableListOf<GoalDto>()
                 firebaseDatabase
@@ -104,27 +105,25 @@ class GoalRepository(
                     .addOnSuccessListener { data ->
                         // TODO MIC next time: try to emit success and error cases although you are
                         // on another coroutine when unsing it it success and error firebase listener
-                        callbackFlow<Resource<List<Goal>>> {
                             for (singleDataSet in data.children) {
                                 singleDataSet.getValue(GoalDto::class.java)?.apply {
                                     goalDtos.add(this)
                                 }
                             }
                             Log.i(TAG, "!! data fetched. data is $goalDtos")
-                            emit(Resource.Loading(false))
-                            emit(Resource.Success(
+                            trySend(Resource.Loading(false))
+                            trySend(Resource.Success(
                                 goalDtos.map { goalDto ->
                                     goalDto.toGoal()
                                 }
                             ))
-                        }
                     }.addOnFailureListener { error ->
-                        callbackFlow<Resource<List<Goal>>> {
-                            emit(Resource.Loading(false))
+                            trySend(Resource.Loading(false))
                             Log.i(TAG, "!! data fetched failed. error is ${error.message}")
-                            emit(Resource.Error(message = error.message ?: "Unknown error"))
-                        }
+                            trySend(Resource.Error(message = error.message ?: "Unknown error"))
                     }
+
+                awaitClose {  }
             }
         }
 
