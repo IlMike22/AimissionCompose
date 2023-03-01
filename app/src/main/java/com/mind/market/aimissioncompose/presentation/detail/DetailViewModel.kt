@@ -11,8 +11,9 @@ import com.example.aimissionlite.models.domain.GoalValidationStatusCode
 import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
-import com.mind.market.aimissioncompose.domain.detail.use_case.IDetailUseCase
+import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.implementation.UpdateStatisticsWithNewGoalCreatedUseCase
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
@@ -28,7 +29,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val repository: IGoalRepository,
+    private val repository: IGoalRepository, // TODO MIC remove repo and use usecase
+    private val insertGoal: InsertGoalUseCase,
     private val updateStatistic: UpdateStatisticsWithNewGoalCreatedUseCase,
     savedStateHandle: SavedStateHandle,
     app: Application
@@ -176,7 +178,11 @@ class DetailViewModel @Inject constructor(
 
         if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
-                repository.insert(newGoal)
+                insertGoal(
+                    goal = newGoal,
+                    operation = GoalReadWriteOperation.FIREBASE_DATABASE
+                )
+//                repository.insert(newGoal)
                 updateStatistic(StatisticsOperation.AddGoal(newGoal))
                 _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
             }

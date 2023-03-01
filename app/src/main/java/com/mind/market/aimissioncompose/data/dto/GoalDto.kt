@@ -9,17 +9,17 @@ import com.mind.market.aimissioncompose.domain.models.Status
 
 @Entity(tableName = "goal_table")
 data class GoalDto(
-    @PrimaryKey(autoGenerate = true) val id: Int,
-    val title: String,
-    val description: String,
-    val creationDate: String,
-    val changeDate: String,
-    val isRepeated: Boolean,
-    val genre: Genre,
-    val status: Status,
-    val priority: Priority,
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val title: String = "",
+    val description: String = "",
+    val creationDate: String = "",
+    val changeDate: String = "",
+    val isRepeated: Boolean = false,
+    val genre: Genre = Genre.UNKNOWN,
+    val status: Status = Status.UNKNOWN,
+    val priority: Priority = Priority.UNKNOWN,
     @ColumnInfo(name = "finishDate", defaultValue = "")
-    val finishDate: String
+    val finishDate: String = ""
 ) {
     override fun equals(other: Any?): Boolean {
         if (other is GoalDto) {

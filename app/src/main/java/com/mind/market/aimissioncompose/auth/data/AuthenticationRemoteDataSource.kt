@@ -3,8 +3,6 @@ package com.mind.market.aimissioncompose.auth.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.data.model.User
 
 class AuthenticationRemoteDataSource(
@@ -48,9 +46,16 @@ class AuthenticationRemoteDataSource(
         return auth.currentUser != null
     }
 
-    override fun getUserData(token: String): User {
+    override fun getUserData(): User {
         return if (isUserAuthenticated()) {
-            User(name = auth.currentUser?.displayName ?: "")
+            auth.currentUser?.let { user ->
+                User(
+                    id = user.uid,
+                    email = user.email ?: "",
+                    name = user.displayName ?: ""
+                )
+            } ?: User.EMPTY
+
         } else {
             User.EMPTY
         }

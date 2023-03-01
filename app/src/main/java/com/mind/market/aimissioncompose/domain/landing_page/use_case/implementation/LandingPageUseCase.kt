@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.domain.landing_page.use_case.implementation
 
+import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.GoalOperation
@@ -38,5 +39,5 @@ class LandingPageUseCase(
         }
     }
 
-    override fun getGoals(): Flow<Resource<List<Goal>>> = goalRepository.getGoals()
+    override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> = goalRepository.getGoals(operation)
 }

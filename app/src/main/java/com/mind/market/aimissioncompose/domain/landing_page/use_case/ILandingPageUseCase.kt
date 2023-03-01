@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.domain.landing_page.use_case
 
+import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
@@ -12,7 +13,7 @@ interface ILandingPageUseCase { // TODO MIC extract every single method in an ow
 
     suspend fun insertStatisticEntity(statistic: StatisticsEntity)
     suspend fun executeGoalOperation(operation: GoalOperation)
-    fun getGoals(): Flow<Resource<List<Goal>>>
+    fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>>
 }
 
 sealed class GoalOperation(val goal: Goal? = null) {

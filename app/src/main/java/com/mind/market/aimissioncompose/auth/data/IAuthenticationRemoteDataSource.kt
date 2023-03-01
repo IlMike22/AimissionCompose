@@ -11,5 +11,5 @@ interface IAuthenticationRemoteDataSource {
     )
 
     fun isUserAuthenticated(): Boolean
-    fun getUserData(token: String): User
+    fun getUserData(): User
 }

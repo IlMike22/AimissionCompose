@@ -24,6 +24,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationScreen
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationViewModel

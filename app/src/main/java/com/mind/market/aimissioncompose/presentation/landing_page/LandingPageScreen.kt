@@ -135,14 +135,14 @@ fun LandingPageScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(
-                    onClick = {
-                        scope.launch {
-                            if (sheetState.isCollapsed) sheetState.expand() else sheetState.collapse()
-                        }
-                    }) {
-                    Text("Show/Hide Bottom Sheet")
-                }
+//                Button(
+//                    onClick = {
+//                        scope.launch {
+//                            if (sheetState.isCollapsed) sheetState.expand() else sheetState.collapse()
+//                        }
+//                    }) {
+//                    Text("Show/Hide Bottom Sheet")
+//                }
             }
 
             Column(

@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "159187691800",
+    "firebase_url": "https://aimissioncompose-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "aimissioncompose",
     "storage_bucket": "aimissioncompose.appspot.com"
   },

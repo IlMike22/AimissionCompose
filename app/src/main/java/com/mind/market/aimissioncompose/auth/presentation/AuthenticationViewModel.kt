@@ -70,7 +70,8 @@ class AuthenticationViewModel @Inject constructor(
                                         isUserAuthenticated = true
                                     )
                                 }
-                                viewModelScope.launch {// TODO MIC nested coroutine bad. Look for solution to run coroutines sequentially
+                                // TODO MIC nested coroutine bad. Look for solution to run coroutines sequentially
+                                viewModelScope.launch {
                                     _uiEvent.send(AuthenticationUiEvent.NavigateToLandingPageAfterLogin)
                                     storeLocalUser(_state.value.user)
                                 }

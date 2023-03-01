@@ -1,12 +1,13 @@
 package com.mind.market.aimissioncompose.data.common.repository
 
+import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import kotlinx.coroutines.flow.Flow
 
 interface IGoalRepository {
-    suspend fun insert(goal: Goal)
+    suspend fun insert(goal: Goal, mode: GoalReadWriteOperation = GoalReadWriteOperation.LOCAL_DATABASE)
 
     suspend fun getGoal(id: Int): Goal
 
@@ -18,5 +19,5 @@ interface IGoalRepository {
 
     suspend fun updateGoal(goal: Goal): Boolean
 
-    fun getGoals(): Flow<Resource<List<Goal>>>
+    fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>>
 }

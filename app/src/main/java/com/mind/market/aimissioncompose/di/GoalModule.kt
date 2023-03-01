@@ -2,9 +2,14 @@ package com.mind.market.aimissioncompose.di
 
 import android.app.Application
 import androidx.room.Room
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
+import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.data.common.repository.GoalRepository
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,11 +19,24 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object GoalModule {
+
     @Provides
     @Singleton
-    fun provideGoalRepository(database: GoalRoomDatabase): IGoalRepository {
+    fun provideFirebaseDatabase(): DatabaseReference {
+        return Firebase.database.reference
+    }
+
+    @Provides
+    @Singleton
+    fun provideGoalRepository(
+        database: GoalRoomDatabase,
+        firebaseDatabaseReference: DatabaseReference,
+        authRemoteDataSource: IAuthenticationRemoteDataSource
+    ): IGoalRepository {
         return GoalRepository(
-            goalDao = database.goalDao()
+            goalDao = database.goalDao(),
+            firebaseDatabase = firebaseDatabaseReference,
+            authRemoteDatasource = authRemoteDataSource
         )
     }
 
@@ -31,4 +49,9 @@ object GoalModule {
             "goal_database"
         ).build()
     }
+
+    @Provides
+    @Singleton
+    fun provideInsertGoalUseCase(repo: IGoalRepository): InsertGoalUseCase =
+        InsertGoalUseCase(repo)
 }

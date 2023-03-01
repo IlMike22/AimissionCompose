@@ -108,7 +108,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth-ktx:21.1.0'
 
     // Firebase Realtime Database
-    implementation 'com.google.firebase:firebase-database:20.1.0'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.4'
 
     // Accompanist Pager
     implementation "com.google.accompanist:accompanist-pager:0.23.1"

@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.GoalOperation
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
@@ -172,7 +174,7 @@ class LandingPageViewModel @Inject constructor(
     }
 
     suspend fun getGoals() {
-        useCase.getGoals().collect { response ->
+        useCase.getGoals(GoalReadWriteOperation.FIREBASE_DATABASE).collect { response ->
             when (response) {
                 is Resource.Success -> {
                     val goals = response.data ?: emptyList()
