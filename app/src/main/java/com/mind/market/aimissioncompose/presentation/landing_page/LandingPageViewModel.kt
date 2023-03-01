@@ -1,15 +1,10 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
@@ -23,7 +18,7 @@ import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntit
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.Month
@@ -34,8 +29,15 @@ class LandingPageViewModel @Inject constructor(
     private val useCase: ILandingPageUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
-    var state by mutableStateOf(LandingPageState())
-        private set
+    private val _state = MutableStateFlow(LandingPageState())
+    val state = _state.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        LandingPageState()
+    )
+
+    //var state by mutableStateOf(LandingPageState())
+    //  private set
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
     private var isDoneGoalHidden = false
@@ -142,7 +144,7 @@ class LandingPageViewModel @Inject constructor(
 
     private fun deleteGoal(goal: Goal?) {
         deletedGoal = goal ?: Goal.EMPTY
-        deletedGoalIndex = state.goals.indexOf(deletedGoal)
+        deletedGoalIndex = state.value.goals.indexOf(deletedGoal)
         deletedGoal.apply {
             viewModelScope.launch {
                 try {
@@ -166,9 +168,11 @@ class LandingPageViewModel @Inject constructor(
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
                 useCase.executeGoalOperation(GoalOperation.Insert(deletedGoal))
-                state = state.copy(
-                    goals = state.goals + deletedGoal
-                )
+                _state.update {
+                    it.copy(
+                        goals = state.value.goals + deletedGoal
+                    )
+                }
             }
         }
     }
@@ -178,25 +182,31 @@ class LandingPageViewModel @Inject constructor(
             when (response) {
                 is Resource.Success -> {
                     val goals = response.data ?: emptyList()
-                    state = state.copy(
-                        goals = filterGoals(goals),
-                        isLoading = false,
-                        errorMessage = ""
-                    )
+                    _state.update {
+                        it.copy(
+                            goals = goals,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
                     showGoalOverdueDialogIfNeeded(goals)
                 }
 
                 is Resource.Loading -> {
-                    state = state.copy(
-                        isLoading = response.isLoading
-                    )
+                    _state.update {
+                        it.copy(
+                            isLoading = response.isLoading
+                        )
+                    }
                 }
                 is Resource.Error -> {
-                    state = state.copy(
-                        goals = emptyList(),
-                        isLoading = false,
-                        errorMessage = response.message ?: "Unknown error while loading data."
-                    )
+                    _state.update {
+                        it.copy(
+                            goals = emptyList(),
+                            isLoading = false,
+                            errorMessage = response.message ?: "Unknown error while loading data."
+                        )
+                    }
                 }
             }
         }

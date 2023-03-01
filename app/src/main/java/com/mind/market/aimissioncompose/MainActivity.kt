@@ -32,6 +32,7 @@ import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.information.InformationScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
+import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageViewModel
 import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsScreen
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsViewModel
@@ -120,8 +121,11 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier.fillMaxSize(),
                                     color = MaterialTheme.colors.background
                                 ) {
+                                    val viewModel = hiltViewModel<LandingPageViewModel>()
+                                    val state by viewModel.state.collectAsState()
                                     LandingPageScreen(
-                                        navController = navController
+                                        navController = navController,
+                                        state = state
                                     )
                                 }
                             }
