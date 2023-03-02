@@ -4,8 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
@@ -28,6 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
     private val useCase: ILandingPageUseCase,
+    private val logoutUser: LogoutUserUseCase,
     private val deleteGoal: DeleteGoalUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
@@ -110,10 +110,9 @@ class LandingPageViewModel @Inject constructor(
                 }
             }
             LandingPageUiEvent.OnLogoutUserClicked -> {
-                // TODO MIC just for testing logout user. Has to be set into remote ds and
-                // probably is not part of the landingpage but in the user settings.
-                val auth = Firebase.auth
-                auth.signOut()
+                viewModelScope.launch {
+                    logoutUser()
+                }
             }
         }
     }

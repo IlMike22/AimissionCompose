@@ -10,6 +10,8 @@ interface IAuthenticationRepository {
         onLoginResult: (User?, Throwable?) -> Unit
     )
 
+    suspend fun logoutUser()
+
     suspend fun saveFirebaseUser(user: User)
 
     suspend fun getFirebaseUser(id: String): User

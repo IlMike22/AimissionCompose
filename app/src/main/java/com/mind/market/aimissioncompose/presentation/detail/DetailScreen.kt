@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.domain.models.Priority
@@ -32,6 +31,7 @@ import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -40,10 +40,11 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DetailScreen(
     modifier: Modifier = Modifier,
-    viewModel: DetailViewModel = hiltViewModel(),
+    state: DetailState,
+    uiEvent: Flow<DetailUIEvent>,
+    onEvent: (DetailEvent) -> Unit,
     navController: NavController
 ) {
-    val state = viewModel.state // TODO MIC go on here next time passing state without vm to screen as well as onEvent function
     var pickedDate by remember {
         mutableStateOf(LocalDate.now())
     }
@@ -52,7 +53,7 @@ fun DetailScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     LaunchedEffect(key1 = keyboardController) {
-        viewModel.uiEvent.collect { uiEvent ->
+        uiEvent.collect { uiEvent ->
             when (uiEvent) {
                 is DetailUIEvent.NavigateToLandingPage -> {
                     navController.previousBackStackEntry
@@ -87,7 +88,7 @@ fun DetailScreen(
                         value = state.goal.title,
                         modifier = Modifier.fillMaxWidth(),
                         onValueChange = { newTitle ->
-                            viewModel.onEvent(DetailEvent.OnTitleChanged(newTitle))
+                            onEvent(DetailEvent.OnTitleChanged(newTitle))
                         }
                     )
                 }
@@ -109,7 +110,7 @@ fun DetailScreen(
                         value = state.goal.description,
                         modifier = Modifier.fillMaxWidth(),
                         onValueChange = { newDescription ->
-                            viewModel.onEvent(DetailEvent.OnDescriptionChanged(newDescription))
+                            onEvent(DetailEvent.OnDescriptionChanged(newDescription))
                         }
                     )
                 }
@@ -142,7 +143,7 @@ fun DetailScreen(
                             values = getPriorities(),
                             selectedValue = state.goal.priority,
                             onSelectedChanged = { newPriority ->
-                                viewModel.onEvent(DetailEvent.OnPriorityChanged(newPriority.toPriority()))
+                                onEvent(DetailEvent.OnPriorityChanged(newPriority.toPriority()))
                             }
                         )
                     }
@@ -175,7 +176,7 @@ fun DetailScreen(
                             values = getGenres(),
                             selectedValue = state.goal.genre,
                             onSelectedChanged = { newGenre ->
-                                viewModel.onEvent(DetailEvent.OnGenreChanged(newGenre.toGenre()))
+                                onEvent(DetailEvent.OnGenreChanged(newGenre.toGenre()))
                             }
                         )
                     }
@@ -214,7 +215,7 @@ fun DetailScreen(
                 MainButton(
                     text = state.ctaButtonText,
                     icon = 0,
-                    onClick = { viewModel.onEvent(DetailEvent.OnSaveButtonClicked) }
+                    onClick = { onEvent(DetailEvent.OnSaveButtonClicked) }
                 )
             }
         }
@@ -232,7 +233,7 @@ fun DetailScreen(
             title = "Pick a date"
         ) { picked ->
             pickedDate = picked
-            viewModel.onEvent(DetailEvent.OnFinishDateChanged(picked))
+            onEvent(DetailEvent.OnFinishDateChanged(picked))
         }
     }
 }

@@ -9,6 +9,7 @@ interface IAuthenticationRemoteDataSource {
         password: String,
         onLoginResult: (User?, Throwable?) -> Unit
     )
+    suspend fun logoutUser()
 
     fun isUserAuthenticated(): Boolean
     fun getUserData(): User

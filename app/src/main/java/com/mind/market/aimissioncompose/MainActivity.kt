@@ -29,6 +29,7 @@ import com.mind.market.aimissioncompose.auth.presentation.AuthenticationScreen
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationViewModel
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
+import com.mind.market.aimissioncompose.presentation.detail.DetailViewModel
 import com.mind.market.aimissioncompose.presentation.information.InformationScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageViewModel
@@ -140,8 +141,13 @@ class MainActivity : ComponentActivity() {
                                 }
                                 )
                             ) {
+                                val viewModel = hiltViewModel<DetailViewModel>()
+                                val state by viewModel.state.collectAsState()
                                 DetailScreen(
-                                    navController = navController
+                                    navController = navController,
+                                    state = state,
+                                    uiEvent = viewModel.uiEvent,
+                                    onEvent = viewModel::onEvent
                                 )
                             }
                             composable(

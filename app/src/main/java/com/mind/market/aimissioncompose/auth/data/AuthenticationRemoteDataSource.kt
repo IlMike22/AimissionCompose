@@ -3,6 +3,8 @@ package com.mind.market.aimissioncompose.auth.data
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.data.model.User
 
 class AuthenticationRemoteDataSource(
@@ -40,6 +42,10 @@ class AuthenticationRemoteDataSource(
                     )
                 }
             }
+    }
+
+    override suspend fun logoutUser() {
+        auth.signOut()
     }
 
     override fun isUserAuthenticated(): Boolean {

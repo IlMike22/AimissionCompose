@@ -43,10 +43,8 @@ class GoalRemoteDataSource(
             .get()
             .addOnSuccessListener { data ->
                 println("!! GET goal was successful. Data is $data")
-                for (singleData in data.children) {
-                    singleData.getValue(GoalDto::class.java)?.apply {
-                        onResult(null, this.toGoal())
-                    }
+                data.getValue(GoalDto::class.java)?.apply {
+                    onResult(null, this.toGoal())
                 }
             }
             .addOnFailureListener {

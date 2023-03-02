@@ -4,6 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.mind.market.aimissioncompose.auth.data.*
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
+import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import dagger.Module
@@ -62,5 +63,11 @@ object AuthenticationModule {
     @Singleton
     fun provideLoginUseCase(repository: IAuthenticationRepository): LoginUserUseCase {
         return LoginUserUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLogoutUseCase(repository: IAuthenticationRepository): LogoutUserUseCase {
+        return LogoutUserUseCase(repository)
     }
 }
