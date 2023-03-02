@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface IGoalRepository {
     suspend fun insert(goal: Goal, mode: GoalReadWriteOperation = GoalReadWriteOperation.LOCAL_DATABASE)
 
-    suspend fun getGoal(id: Int): Goal
+    suspend fun getGoal(id: Int, operation: GoalReadWriteOperation): Flow<Resource<Goal>>
 
     suspend fun deleteAll(): Boolean
 

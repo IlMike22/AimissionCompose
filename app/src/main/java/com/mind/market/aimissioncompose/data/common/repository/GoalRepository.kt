@@ -1,5 +1,3 @@
-package com.mind.market.aimissioncompose.data.common.repository
-
 import android.util.Log
 import androidx.annotation.CheckResult
 import androidx.annotation.WorkerThread
@@ -9,6 +7,7 @@ import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.IGoalDao
 import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
+import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.data.toGoal
 import com.mind.market.aimissioncompose.data.toGoalDto
@@ -23,9 +22,8 @@ import kotlinx.coroutines.flow.flow
 import java.io.IOException
 
 //TODO add GoalLocalDataSource because it`s not clear to go directly to Dao in Repo
-
 class GoalRepository(
-    private val goalDao: IGoalDao,
+    private val goalDao: IGoalDao, // TODO MIC add local ds or remove local data storage
     private val firebaseDatabase: DatabaseReference,
     private val goalRemoteDataSource: IGoalRemoteDataSource,
     private val authRemoteDataSource: IAuthenticationRemoteDataSource
@@ -44,7 +42,25 @@ class GoalRepository(
     }
 
     @WorkerThread
-    override suspend fun getGoal(id: Int): Goal = goalDao.getGoal(id).toGoal()
+    override suspend fun getGoal(id: Int, operation: GoalReadWriteOperation): Flow<Resource<Goal>> {
+//        if (operation == GoalReadWriteOperation.LOCAL_DATABASE) {
+//            goalDao.getGoal(id).toGoal()
+//        } else {
+        return callbackFlow {
+            trySend(Resource.Loading(true))
+            goalRemoteDataSource.getGoal(id, getFirebaseUserId()) { error, goal ->
+                trySend(Resource.Loading(false))
+                if (error != null) {
+                    trySend(Resource.Error(message = error.message ?: "Unknown error"))
+                } else {
+                    trySend(Resource.Success(data = goal ?: Goal.EMPTY))
+                }
+            }
+            awaitClose { }
+//            }
+        }
+    }
+
 
     @WorkerThread
     @CheckResult
@@ -70,10 +86,8 @@ class GoalRepository(
     @WorkerThread
     @CheckResult
     override suspend fun deleteGoal(goal: Goal, mode: GoalReadWriteOperation) {
-        goalRemoteDataSource.deleteGoal(goal, mode, getFirebaseUserId() )
+        goalRemoteDataSource.deleteGoal(goal, mode, getFirebaseUserId())
 //        goalDao.deleteGoal(goal.toGoalDto())
-
-
     }
 
     @WorkerThread
@@ -88,12 +102,12 @@ class GoalRepository(
     }
 
     override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> {
-        if (operation == GoalReadWriteOperation.FIREBASE_DATABASE) { // TODO MIC extract into remoteDS
+        if (operation == GoalReadWriteOperation.FIREBASE_DATABASE) {
             return callbackFlow {
                 trySend(Resource.Loading(true))
                 val userId = getFirebaseUserId()
                 val goalDtos = mutableListOf<GoalDto>()
-                firebaseDatabase
+                firebaseDatabase // TODO MIC extract in GoalRemoteDS
                     .child("users")
                     .child(userId)
                     .get()
@@ -141,6 +155,6 @@ class GoalRepository(
 
     private fun getFirebaseUserId(): String =
         authRemoteDataSource.getUserData().id
-
-
 }
+
+

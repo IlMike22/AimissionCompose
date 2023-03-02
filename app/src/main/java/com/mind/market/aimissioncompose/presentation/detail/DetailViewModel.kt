@@ -1,9 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -12,7 +9,9 @@ import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
+import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.detail.use_case.GetGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.implementation.UpdateStatisticsWithNewGoalCreatedUseCase
 import com.mind.market.aimissioncompose.domain.models.Genre
@@ -22,7 +21,7 @@ import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsOperation
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -31,6 +30,7 @@ import kotlin.random.Random
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val repository: IGoalRepository, // TODO MIC remove repo and use usecase
+    private val getGoal: GetGoalUseCase,
     private val insertGoal: InsertGoalUseCase,
     private val updateStatistic: UpdateStatisticsWithNewGoalCreatedUseCase,
     savedStateHandle: SavedStateHandle,
@@ -39,8 +39,12 @@ class DetailViewModel @Inject constructor(
     private val resourceProvider = getApplication<AimissionComposeApplication>()
     private val goalId: Int = checkNotNull(savedStateHandle[ARGUMENT_GOAL_ID])
 
-    var state by mutableStateOf(DetailState())
-        private set
+    private val _state = MutableStateFlow(DetailState())
+    val state = _state.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        DetailState()
+    )
 
     private val _uiEvent = Channel<DetailUIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -51,70 +55,84 @@ class DetailViewModel @Inject constructor(
         if (goalId != -1) {
             getAndShowGoal(goalId)
         } else {
-            state = state.copy(
-                ctaButtonText = resourceProvider.getString(R.string.button_text_add)
-            )
+            _state.update {
+                it.copy(
+                    ctaButtonText = resourceProvider.getString(R.string.button_text_add)
+                )
+            }
         }
     }
 
     fun onEvent(event: DetailEvent) {
         when (event) {
             is DetailEvent.OnTitleChanged -> {
-                state = state.copy(
-                    goal = state.goal.copy(
-                        title = event.title
+                _state.update {
+                    it.copy(
+                        goal = state.value.goal.copy(
+                            title = event.title
+                        )
                     )
-                )
+                }
             }
             is DetailEvent.OnDescriptionChanged -> {
-                state = state.copy(
-                    goal = state.goal.copy(
-                        description = event.description
+                _state.update {
+                    it.copy(
+                        goal = state.value.goal.copy(
+                            description = event.description
+                        )
                     )
-                )
+                }
             }
             is DetailEvent.OnPriorityChanged -> {
-                state = state.copy(
-                    goal = state.goal.copy(
-                        priority = event.priority
+                _state.update {
+                    it.copy(
+                        goal = state.value.goal.copy(
+                            priority = event.priority
+                        )
                     )
-                )
+                }
             }
             is DetailEvent.OnGenreChanged -> {
-                state = state.copy(
-                    goal = state.goal.copy(
-                        genre = event.genre
+                _state.update {
+                    it.copy(
+                        goal = state.value.goal.copy(
+                            genre = event.genre
+                        )
                     )
-                )
+                }
             }
             is DetailEvent.OnStatusChanged -> {
-                state = state.copy(
-                    goal = state.goal.copy(
-                        status = event.status
+                _state.update {
+                    it.copy(
+                        goal = state.value.goal.copy(
+                            status = event.status
+                        )
                     )
-                )
+                }
             }
             is DetailEvent.OnFinishDateChanged -> {
-                state = state.copy(
-                    goal = state.goal.copy(
-                        finishDate = event.finishDate
+                _state.update {
+                    it.copy(
+                        goal = state.value.goal.copy(
+                            finishDate = event.finishDate
+                        )
                     )
-                )
+                }
             }
             is DetailEvent.OnSaveButtonClicked -> {
                 if (goalId != -1) {
                     updateGoal(
                         Goal(
                             id = goalId,
-                            title = state.goal.title,
-                            description = state.goal.description,
-                            creationDate = state.goal.creationDate,
+                            title = state.value.goal.title,
+                            description = state.value.goal.description,
+                            creationDate = state.value.goal.creationDate,
                             changeDate = getCurrentDate(),
-                            isRepeated = state.goal.isRepeated,
-                            genre = state.goal.genre,
-                            status = state.goal.status,
-                            priority = state.goal.priority,
-                            finishDate = state.goal.finishDate
+                            isRepeated = state.value.goal.isRepeated,
+                            genre = state.value.goal.genre,
+                            status = state.value.goal.status,
+                            priority = state.value.goal.priority,
+                            finishDate = state.value.goal.finishDate
                         )
                     )
                     return
@@ -124,13 +142,37 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun getAndShowGoal(id: Int) = viewModelScope.launch {
-        currentGoal = repository.getGoal(id)
-        state = state.copy(
-            ctaButtonText = resourceProvider.getString(R.string.button_text_update)
-        )
-
-        showGoal(currentGoal)
+    private fun getAndShowGoal(id: Int) {
+        viewModelScope.launch {
+            getGoal(id).collect { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        currentGoal = response.data ?: Goal.EMPTY
+                        _state.update {
+                            it.copy(
+                                goal = currentGoal,
+                                ctaButtonText = resourceProvider.getString(R.string.button_text_update)
+                            )
+                        }
+//                    showGoal(currentGoal)
+                    }
+                    is Resource.Loading -> {
+                        _state.update {
+                            it.copy(
+                                // TODO MIC add loading spinner
+                            )
+                        }
+                    }
+                    is Resource.Error -> {
+                        _state.update {
+                            it.copy(
+                                // TODO MIC add error text
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun onInfoClicked() {
@@ -157,19 +199,19 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun createNewGoal(operation:GoalReadWriteOperation) {
+    private fun createNewGoal(operation: GoalReadWriteOperation) {
         val newGoal = Goal(
             id = if (operation == GoalReadWriteOperation.FIREBASE_DATABASE)
                 Random.nextInt(0, 10_000) else 0,
-            title = state.goal.title,
-            description = state.goal.description,
-            creationDate = state.goal.creationDate,
+            title = state.value.goal.title,
+            description = state.value.goal.description,
+            creationDate = state.value.goal.creationDate,
             changeDate = getCurrentDate(),
-            isRepeated = state.goal.isRepeated,
-            genre = state.goal.genre,
+            isRepeated = state.value.goal.isRepeated,
+            genre = state.value.goal.genre,
             status = Status.TODO,
-            priority = state.goal.priority,
-            finishDate = state.goal.finishDate
+            priority = state.value.goal.priority,
+            finishDate = state.value.goal.finishDate
         )
 
         val goalValidationStatusCode = GoalValidationStatusCode(
@@ -188,22 +230,6 @@ class DetailViewModel @Inject constructor(
                 updateStatistic(StatisticsOperation.AddGoal(newGoal))
                 _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
             }
-        }
-    }
-
-    private fun showGoal(goal: Goal) {
-        goal.apply {
-            state = state.copy(
-                goal = state.goal.copy(
-                    title = title,
-                    description = description,
-                    genre = genre,
-                    status = status,
-                    priority = priority,
-                    isRepeated = isRepeated,
-                    finishDate = finishDate
-                )
-            )
         }
     }
 

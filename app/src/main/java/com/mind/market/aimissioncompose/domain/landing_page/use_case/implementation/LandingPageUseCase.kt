@@ -28,9 +28,12 @@ class LandingPageUseCase(
 
     override suspend fun executeGoalOperation(operation: GoalOperation) {
         when (operation) {
-            is GoalOperation.Delete -> goalRepository.deleteGoal(operation.goalEntity, GoalReadWriteOperation.FIREBASE_DATABASE)
+            is GoalOperation.Delete -> goalRepository.deleteGoal(
+                operation.goalEntity,
+                GoalReadWriteOperation.FIREBASE_DATABASE
+            )
             GoalOperation.DeleteAll -> goalRepository.deleteAll()
-            is GoalOperation.Get -> goalRepository.getGoal(operation.id)
+            is GoalOperation.Get -> goalRepository.getGoal(operation.id, GoalReadWriteOperation.FIREBASE_DATABASE)
             is GoalOperation.Insert -> goalRepository.insert(operation.goalEntity)
             is GoalOperation.UpdateStatus -> goalRepository.updateStatus(
                 operation.id,
@@ -39,5 +42,6 @@ class LandingPageUseCase(
         }
     }
 
-    override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> = goalRepository.getGoals(operation)
+    override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> =
+        goalRepository.getGoals(operation)
 }

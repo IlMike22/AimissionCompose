@@ -43,7 +43,7 @@ fun DetailScreen(
     viewModel: DetailViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val state = viewModel.state
+    val state = viewModel.state // TODO MIC go on here next time passing state without vm to screen as well as onEvent function
     var pickedDate by remember {
         mutableStateOf(LocalDate.now())
     }

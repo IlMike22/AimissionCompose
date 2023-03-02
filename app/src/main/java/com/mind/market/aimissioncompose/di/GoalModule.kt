@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.di
 
+import GoalRepository
 import android.app.Application
 import androidx.room.Room
 import com.google.firebase.database.DatabaseReference
@@ -9,8 +10,8 @@ import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSourc
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.data.common.data_source.GoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
-import com.mind.market.aimissioncompose.data.common.repository.GoalRepository
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
+import com.mind.market.aimissioncompose.domain.detail.use_case.GetGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
 import dagger.Module
@@ -72,4 +73,10 @@ object GoalModule {
     fun provideDeleteGoalUseCase(
         repository: IGoalRepository
     ) = DeleteGoalUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetGoalUseCase(
+        repository: IGoalRepository
+    ) = GetGoalUseCase(repository)
 }

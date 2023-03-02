@@ -182,7 +182,7 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    suspend fun getGoals() {
+    private suspend fun getGoals() {
         useCase.getGoals(GoalReadWriteOperation.FIREBASE_DATABASE).collect { response ->
             when (response) {
                 is Resource.Success -> {

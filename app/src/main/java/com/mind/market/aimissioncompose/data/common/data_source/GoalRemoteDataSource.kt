@@ -3,6 +3,8 @@ package com.mind.market.aimissioncompose.data.common.data_source
 import com.google.firebase.database.DatabaseReference
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.data.IGoalDao
+import com.mind.market.aimissioncompose.data.dto.GoalDto
+import com.mind.market.aimissioncompose.data.toGoal
 import com.mind.market.aimissioncompose.data.toGoalDto
 import com.mind.market.aimissioncompose.domain.models.Goal
 
@@ -32,6 +34,25 @@ class GoalRemoteDataSource(
                 .child(goal.id.toString())
                 .setValue(goal.toGoalDto())
         }
+    }
+
+    override suspend fun getGoal(id: Int, userId: String, onResult: (Throwable?, Goal?) -> Unit) {
+        firebaseDatabase.child(FIREBASE_TABLE_USER)
+            .child(userId)
+            .child(id.toString())
+            .get()
+            .addOnSuccessListener { data ->
+                println("!! GET goal was successful. Data is $data")
+                for (singleData in data.children) {
+                    singleData.getValue(GoalDto::class.java)?.apply {
+                        onResult(null, this.toGoal())
+                    }
+                }
+            }
+            .addOnFailureListener {
+                println("!! GET goal failed. Error: ${it.message}")
+                onResult(it, null)
+            }
     }
 
     companion object {

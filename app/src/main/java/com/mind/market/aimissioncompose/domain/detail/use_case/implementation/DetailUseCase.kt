@@ -8,8 +8,8 @@ import java.time.LocalDate
 class DetailUseCase(
     private val repository: IGoalRepository
 ) : IDetailUseCase {
-    override suspend fun getGoal(id: Int): Goal =
-        repository.getGoal(id)
+//    override suspend fun getGoal(id: Int): Goal =
+//        repository.getGoal(id)
 
     override suspend fun updateGoal(goal: Goal): Boolean =
         repository.updateGoal(goal)
