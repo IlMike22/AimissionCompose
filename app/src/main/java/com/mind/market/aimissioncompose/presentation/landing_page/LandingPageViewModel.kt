@@ -8,6 +8,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.GoalOperation
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
 import com.mind.market.aimissioncompose.domain.models.Goal
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
     private val useCase: ILandingPageUseCase,
+    private val deleteGoal: DeleteGoalUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(LandingPageState())
@@ -43,7 +45,7 @@ class LandingPageViewModel @Inject constructor(
     private var isDoneGoalHidden = false
     private var showGoalOverdueDialog = false
     private lateinit var deletedGoal: Goal
-    private var deletedGoalIndex = -1
+    private var goalIndex = -1
     private var getGoalsJob: Job? = null
 
     private val _uiEvent = Channel<LandingPageUiEvent>()
@@ -94,7 +96,7 @@ class LandingPageViewModel @Inject constructor(
                 onGoalContainerClicked(event.goal)
             }
             is LandingPageUiEvent.OnDeleteGoalClicked -> {
-                deleteGoal(event.goal)
+                cacheAndDeleteGoal(event.goal ?: Goal.EMPTY)
             }
             is LandingPageUiEvent.OnStatusChangedClicked -> {
                 updateGoalStatus(event.goal)
@@ -102,8 +104,11 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnUndoDeleteGoalClicked -> {
                 restoreDeletedGoal()
             }
-            is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
-            is LandingPageUiEvent.ShowSnackbar -> TODO()
+            is LandingPageUiEvent.OnGoalUpdate -> {
+                viewModelScope.launch {
+                    getGoals()
+                }
+            }
             LandingPageUiEvent.OnLogoutUserClicked -> {
                 // TODO MIC just for testing logout user. Has to be set into remote ds and
                 // probably is not part of the landingpage but in the user settings.
@@ -142,13 +147,14 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private fun deleteGoal(goal: Goal?) {
-        deletedGoal = goal ?: Goal.EMPTY
-        deletedGoalIndex = state.value.goals.indexOf(deletedGoal)
-        deletedGoal.apply {
+    private fun cacheAndDeleteGoal(goal: Goal) {
+        deletedGoal = goal // TODO MIC maybe extract this logic into the usecase
+        goalIndex = state.value.goals.indexOf(goal)
+        goal.apply {
             viewModelScope.launch {
                 try {
-                    useCase.executeGoalOperation(GoalOperation.Delete(deletedGoal))
+                    deleteGoal(goal)
+                    deletedGoal = goal
                     getGoals()
                     _uiEvent.send(
                         LandingPageUiEvent.ShowSnackbar(
@@ -162,7 +168,6 @@ class LandingPageViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {

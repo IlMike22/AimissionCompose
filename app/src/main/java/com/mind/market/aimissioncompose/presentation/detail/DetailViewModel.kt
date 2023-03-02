@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
+import kotlin.random.Random
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
@@ -118,7 +119,7 @@ class DetailViewModel @Inject constructor(
                     )
                     return
                 }
-                createNewGoal()
+                createNewGoal(GoalReadWriteOperation.FIREBASE_DATABASE)
             }
         }
     }
@@ -156,9 +157,10 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun createNewGoal() {
+    private fun createNewGoal(operation:GoalReadWriteOperation) {
         val newGoal = Goal(
-            id = 0,
+            id = if (operation == GoalReadWriteOperation.FIREBASE_DATABASE)
+                Random.nextInt(0, 10_000) else 0,
             title = state.goal.title,
             description = state.goal.description,
             creationDate = state.goal.creationDate,
@@ -180,7 +182,7 @@ class DetailViewModel @Inject constructor(
             viewModelScope.launch {
                 insertGoal(
                     goal = newGoal,
-                    operation = GoalReadWriteOperation.FIREBASE_DATABASE
+                    operation = operation
                 )
 //                repository.insert(newGoal)
                 updateStatistic(StatisticsOperation.AddGoal(newGoal))

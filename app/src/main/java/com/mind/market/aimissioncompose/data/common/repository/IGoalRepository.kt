@@ -15,7 +15,7 @@ interface IGoalRepository {
 
     suspend fun updateStatus(id: Int, status: Status)
 
-    suspend fun deleteGoal(goal: Goal)
+    suspend fun deleteGoal(goal: Goal, mode: GoalReadWriteOperation)
 
     suspend fun updateGoal(goal: Goal): Boolean
 

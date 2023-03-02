@@ -28,7 +28,7 @@ class LandingPageUseCase(
 
     override suspend fun executeGoalOperation(operation: GoalOperation) {
         when (operation) {
-            is GoalOperation.Delete -> goalRepository.deleteGoal(operation.goalEntity)
+            is GoalOperation.Delete -> goalRepository.deleteGoal(operation.goalEntity, GoalReadWriteOperation.FIREBASE_DATABASE)
             GoalOperation.DeleteAll -> goalRepository.deleteAll()
             is GoalOperation.Get -> goalRepository.getGoal(operation.id)
             is GoalOperation.Insert -> goalRepository.insert(operation.goalEntity)

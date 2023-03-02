@@ -7,9 +7,12 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
+import com.mind.market.aimissioncompose.data.common.data_source.GoalRemoteDataSource
+import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.repository.GoalRepository
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
+import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,15 +31,24 @@ object GoalModule {
 
     @Provides
     @Singleton
+    fun provideGoalRemoteDataSource(
+        database: DatabaseReference,
+        roomDatabase: GoalRoomDatabase
+    ): IGoalRemoteDataSource = GoalRemoteDataSource(database, roomDatabase.goalDao())
+
+    @Provides
+    @Singleton
     fun provideGoalRepository(
         database: GoalRoomDatabase,
         firebaseDatabaseReference: DatabaseReference,
-        authRemoteDataSource: IAuthenticationRemoteDataSource
+        authRemoteDataSource: IAuthenticationRemoteDataSource,
+        remoteDataSource: IGoalRemoteDataSource
     ): IGoalRepository {
         return GoalRepository(
             goalDao = database.goalDao(),
             firebaseDatabase = firebaseDatabaseReference,
-            authRemoteDatasource = authRemoteDataSource
+            authRemoteDataSource = authRemoteDataSource,
+            goalRemoteDataSource = remoteDataSource
         )
     }
 
@@ -54,4 +66,10 @@ object GoalModule {
     @Singleton
     fun provideInsertGoalUseCase(repo: IGoalRepository): InsertGoalUseCase =
         InsertGoalUseCase(repo)
+
+    @Provides
+    @Singleton
+    fun provideDeleteGoalUseCase(
+        repository: IGoalRepository
+    ) = DeleteGoalUseCase(repository)
 }

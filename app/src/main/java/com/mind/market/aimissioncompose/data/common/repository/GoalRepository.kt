@@ -8,6 +8,7 @@ import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSourc
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.IGoalDao
+import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.data.toGoal
 import com.mind.market.aimissioncompose.data.toGoalDto
@@ -20,14 +21,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
-import kotlin.random.Random
 
 //TODO add GoalLocalDataSource because it`s not clear to go directly to Dao in Repo
 
 class GoalRepository(
     private val goalDao: IGoalDao,
     private val firebaseDatabase: DatabaseReference,
-    private val authRemoteDatasource: IAuthenticationRemoteDataSource
+    private val goalRemoteDataSource: IGoalRemoteDataSource,
+    private val authRemoteDataSource: IAuthenticationRemoteDataSource
 ) : IGoalRepository {
     val TAG = "GoalRepository"
 
@@ -37,17 +38,9 @@ class GoalRepository(
         /**
         First we map the domain model to data before we use the dao to write the new goal into db.
          */
-        if (mode == GoalReadWriteOperation.LOCAL_DATABASE) {
-            goalDao.insert(goal.toGoalDto())
-        } else {
-            // TODO MIC just for test, refactor later
-            val userId = getFirebaseUserId()
-            firebaseDatabase
-                .child(FIREBASE_TABLE_USER)
-                .child(userId)
-                .child(Random.nextInt(0, 10_000).toString())
-                .setValue(goal.toGoalDto())
-        }
+
+        goalRemoteDataSource.insertGoal(goal, mode, getFirebaseUserId())
+
     }
 
     @WorkerThread
@@ -76,8 +69,10 @@ class GoalRepository(
 
     @WorkerThread
     @CheckResult
-    override suspend fun deleteGoal(goal: Goal) {
-        goalDao.deleteGoal(goal.toGoalDto())
+    override suspend fun deleteGoal(goal: Goal, mode: GoalReadWriteOperation) {
+        goalRemoteDataSource.deleteGoal(goal, mode, getFirebaseUserId() )
+//        goalDao.deleteGoal(goal.toGoalDto())
+
 
     }
 
@@ -93,7 +88,7 @@ class GoalRepository(
     }
 
     override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> {
-        if (operation == GoalReadWriteOperation.FIREBASE_DATABASE) {
+        if (operation == GoalReadWriteOperation.FIREBASE_DATABASE) { // TODO MIC extract into remoteDS
             return callbackFlow {
                 trySend(Resource.Loading(true))
                 val userId = getFirebaseUserId()
@@ -103,27 +98,25 @@ class GoalRepository(
                     .child(userId)
                     .get()
                     .addOnSuccessListener { data ->
-                        // TODO MIC next time: try to emit success and error cases although you are
-                        // on another coroutine when unsing it it success and error firebase listener
-                            for (singleDataSet in data.children) {
-                                singleDataSet.getValue(GoalDto::class.java)?.apply {
-                                    goalDtos.add(this)
-                                }
+                        for (singleDataSet in data.children) {
+                            singleDataSet.getValue(GoalDto::class.java)?.apply {
+                                goalDtos.add(this)
                             }
-                            Log.i(TAG, "!! data fetched. data is $goalDtos")
-                            trySend(Resource.Loading(false))
-                            trySend(Resource.Success(
-                                goalDtos.map { goalDto ->
-                                    goalDto.toGoal()
-                                }
-                            ))
+                        }
+                        Log.i(TAG, "!! data fetched. data is $goalDtos")
+                        trySend(Resource.Loading(false))
+                        trySend(Resource.Success(
+                            goalDtos.map { goalDto ->
+                                goalDto.toGoal()
+                            }
+                        ))
                     }.addOnFailureListener { error ->
-                            trySend(Resource.Loading(false))
-                            Log.i(TAG, "!! data fetched failed. error is ${error.message}")
-                            trySend(Resource.Error(message = error.message ?: "Unknown error"))
+                        trySend(Resource.Loading(false))
+                        Log.i(TAG, "!! data fetched failed. error is ${error.message}")
+                        trySend(Resource.Error(message = error.message ?: "Unknown error"))
                     }
 
-                awaitClose {  }
+                awaitClose { }
             }
         }
 
@@ -147,9 +140,7 @@ class GoalRepository(
     }
 
     private fun getFirebaseUserId(): String =
-        authRemoteDatasource.getUserData().id
+        authRemoteDataSource.getUserData().id
 
-    companion object {
-        private const val FIREBASE_TABLE_USER = "users"
-    }
+
 }

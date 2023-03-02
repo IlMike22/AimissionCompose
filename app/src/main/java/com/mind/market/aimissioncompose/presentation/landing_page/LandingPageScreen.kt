@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
@@ -27,7 +26,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.vanpra.composematerialdialogs.title
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
@@ -35,10 +34,10 @@ import kotlinx.coroutines.launch
 fun LandingPageScreen(
     state: LandingPageState,
     modifier: Modifier = Modifier,
-    viewModel: LandingPageViewModel = hiltViewModel(),
+    uiEvent: Flow<LandingPageUiEvent>,
+    onEvent: (LandingPageUiEvent) -> Unit,
     navController: NavController
 ) {
-    val scope = rememberCoroutineScope()
     val scaffoldState = rememberScaffoldState()
     val alertDialogState = rememberMaterialDialogState()
 
@@ -47,9 +46,7 @@ fun LandingPageScreen(
         ?.getLiveData<Boolean>("invalidate")?.observeAsState()
     detailPageScreenResult?.value?.let { isUpdateList ->
         if (isUpdateList) {
-            scope.launch {
-                viewModel.getGoals()
-            }
+            onEvent(LandingPageUiEvent.OnGoalUpdate)
             navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
         }
     }
@@ -66,7 +63,7 @@ fun LandingPageScreen(
     )
 
     LaunchedEffect(key1 = true) {
-        viewModel.uiEvent.collect { event ->
+        uiEvent.collect { event ->
             when (event) {
                 is LandingPageUiEvent.ShowSnackbar -> {
                     val snackBarResult = scaffoldState.snackbarHostState.showSnackbar(
@@ -77,7 +74,7 @@ fun LandingPageScreen(
                         SnackbarResult.ActionPerformed -> {
                             when (event.snackbarAction) {
                                 SnackBarAction.UNDO -> {
-                                    viewModel.onEvent(LandingPageUiEvent.OnUndoDeleteGoalClicked)
+                                    onEvent(LandingPageUiEvent.OnUndoDeleteGoalClicked)
                                 }
                             }
                         }
@@ -106,7 +103,7 @@ fun LandingPageScreen(
                 ) {
                     Button(
                         onClick = {
-                            viewModel.onEvent(LandingPageUiEvent.OnLogoutUserClicked)
+                            onEvent(LandingPageUiEvent.OnLogoutUserClicked)
                         }
                     ) {
                         Text(text = "Logout user")
@@ -153,14 +150,10 @@ fun LandingPageScreen(
                                     .padding(8.dp),
                                 goal = goal,
                                 onDeleteClicked = { goalToDelete ->
-                                    viewModel.onEvent(
-                                        LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete)
-                                    )
+                                    onEvent(LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete))
                                 },
                                 onStatusChangeClicked = { selectedGoal ->
-                                    viewModel.onEvent(
-                                        LandingPageUiEvent.OnStatusChangedClicked(selectedGoal)
-                                    )
+                                    onEvent(LandingPageUiEvent.OnStatusChangedClicked(selectedGoal))
                                 },
                                 navController = navController
                             )
