@@ -37,8 +37,8 @@ class LandingPageUseCase(
             is GoalOperation.Insert -> goalRepository.insert(operation.goalEntity)
             is GoalOperation.UpdateStatus -> goalRepository.updateStatus(
                 operation.id,
-                operation.newStatus
-            )
+                operation.oldStatus
+            ) {}
         }
     }
 

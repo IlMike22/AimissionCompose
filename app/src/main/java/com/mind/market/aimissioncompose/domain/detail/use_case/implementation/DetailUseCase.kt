@@ -11,8 +11,8 @@ class DetailUseCase(
 //    override suspend fun getGoal(id: Int): Goal =
 //        repository.getGoal(id)
 
-    override suspend fun updateGoal(goal: Goal): Boolean =
-        repository.updateGoal(goal)
+//    override suspend fun updateGoal(goal: Goal): Boolean =
+//        repository.updateGoal(goal)
 
     override suspend fun insert(goal: Goal) =
         repository.insert(goal)

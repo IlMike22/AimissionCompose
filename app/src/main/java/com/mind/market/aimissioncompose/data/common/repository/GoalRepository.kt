@@ -6,6 +6,7 @@ import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSourc
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.IGoalDao
+import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_USER
 import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.data.dto.GoalDto
@@ -76,11 +77,28 @@ class GoalRepository(
     }
 
     @WorkerThread
-    override suspend fun updateStatus(id: Int, status: Status) {
-        goalDao.updateStatus(
-            id = id,
-            status = status.toStatusData()
-        )
+    override suspend fun updateStatus(
+        id: Int,
+        status: Status,
+        operation: GoalReadWriteOperation,
+        onResult: (Status) -> Unit
+    ) {
+        if (operation == GoalReadWriteOperation.LOCAL_DATABASE) {
+            goalDao.updateStatus(
+                id = id,
+                status = status.toStatusData()
+            )
+            onResult(status)
+        } else {
+            firebaseDatabase.child(FIREBASE_TABLE_USER)
+                .child(getFirebaseUserId())
+                .child(id.toString())
+                .child(FIREBASE_DATABASE_KEY_STATUS)
+                .setValue(status.toStatusData())
+                .addOnCompleteListener {
+                    onResult(status)
+                }
+        }
     }
 
     @WorkerThread
@@ -92,12 +110,29 @@ class GoalRepository(
 
     @WorkerThread
     @CheckResult
-    override suspend fun updateGoal(goal: Goal): Boolean {
-        return try {
-            goalDao.update(goal.toGoalDto())
-            true
-        } catch (exception: Exception) {
-            false
+    override suspend fun updateGoal(
+        goal: Goal,
+        operation: GoalReadWriteOperation,
+        onResult: (Boolean) -> Unit
+    ) {
+        if (operation == GoalReadWriteOperation.LOCAL_DATABASE) {
+            return try {
+                goalDao.update(goal.toGoalDto())
+                onResult(true)
+            } catch (exception: Exception) {
+                onResult(false)
+            }
+        } else {
+            firebaseDatabase
+                .child(FIREBASE_TABLE_USER)
+                .child(getFirebaseUserId())
+                .child(goal.id.toString())
+                .setValue(goal.toGoalDto())
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        onResult(true)
+                    } else onResult(false)
+                }
         }
     }
 
@@ -108,7 +143,7 @@ class GoalRepository(
                 val userId = getFirebaseUserId()
                 val goalDtos = mutableListOf<GoalDto>()
                 firebaseDatabase // TODO MIC extract in GoalRemoteDS
-                    .child("users")
+                    .child(FIREBASE_TABLE_USER)
                     .child(userId)
                     .get()
                     .addOnSuccessListener { data ->
@@ -155,6 +190,10 @@ class GoalRepository(
 
     private fun getFirebaseUserId(): String =
         authRemoteDataSource.getUserData().id
+
+    companion object {
+        private const val FIREBASE_DATABASE_KEY_STATUS = "status"
+    }
 }
 
 

@@ -4,7 +4,8 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 
 data class DetailState(
     val goal: Goal = Goal.EMPTY,
-    val ctaButtonText: String = ""
+    val ctaButtonText: String = "",
+    val errorMessage:String? = null
 )
 
 

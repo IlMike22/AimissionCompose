@@ -17,7 +17,7 @@ interface ILandingPageUseCase { // TODO MIC extract every single method in an ow
 }
 
 sealed class GoalOperation(val goal: Goal? = null) {
-    data class UpdateStatus(val id: Int, val newStatus: Status) : GoalOperation()
+    data class UpdateStatus(val id: Int, val oldStatus: Status) : GoalOperation()
     data class Delete(val goalEntity: Goal) : GoalOperation(goalEntity)
     object DeleteAll : GoalOperation()
     data class Insert(val goalEntity: Goal) : GoalOperation()

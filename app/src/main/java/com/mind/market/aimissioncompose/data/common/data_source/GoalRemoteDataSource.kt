@@ -3,6 +3,7 @@ package com.mind.market.aimissioncompose.data.common.data_source
 import com.google.firebase.database.DatabaseReference
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.data.IGoalDao
+import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_USER
 import com.mind.market.aimissioncompose.data.dto.GoalDto
 import com.mind.market.aimissioncompose.data.toGoal
 import com.mind.market.aimissioncompose.data.toGoalDto
@@ -51,9 +52,5 @@ class GoalRemoteDataSource(
                 println("!! GET goal failed. Error: ${it.message}")
                 onResult(it, null)
             }
-    }
-
-    companion object {
-        private const val FIREBASE_TABLE_USER = "users"
     }
 }

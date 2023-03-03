@@ -7,6 +7,7 @@ import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.domain.goal.UpdateGoalStatusUseCase
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.GoalOperation
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
@@ -29,6 +30,7 @@ class LandingPageViewModel @Inject constructor(
     private val useCase: ILandingPageUseCase,
     private val logoutUser: LogoutUserUseCase,
     private val deleteGoal: DeleteGoalUseCase,
+    private val updateGoalStatus: UpdateGoalStatusUseCase,
     private val settingsUseCase: ISettingsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(LandingPageState())
@@ -98,8 +100,42 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnDeleteGoalClicked -> {
                 cacheAndDeleteGoal(event.goal ?: Goal.EMPTY)
             }
+            /*
+             We want to avoid calling getGoals() again after status was updated. Therefore first
+             the old status is sent to UseCase where it will be transformed into new status. Then new
+             status will be stored in firebase and after that was successful we update also the state
+             so the ui will be updated as well.
+             */
             is LandingPageUiEvent.OnStatusChangedClicked -> {
-                updateGoalStatus(event.goal)
+                event.goal?.apply {
+                    viewModelScope.launch {
+                        val oldGoals = _state.value.goals
+                        val oldGoal = oldGoals.firstOrNull {
+                            it.id == this@apply.id
+                        }
+                        val newGoals = mutableListOf<Goal>()
+                        updateGoalStatus(GoalOperation.UpdateStatus(id, status)) { newStatus ->
+                            oldGoals.forEach {
+                                if (it.id == oldGoal?.id) {
+                                    newGoals.add(
+                                        it.copy(
+                                            status = newStatus
+                                        )
+                                    )
+                                } else {
+                                    newGoals.add(it)
+                                }
+                            }
+                            _state.update {
+                                it.copy(goals = newGoals)
+                            }
+                        }
+                    }
+                } ?: _state.update {
+                    it.copy(
+                        errorMessage = "Cannot update goal because it is invalid."
+                    )
+                }
             }
             is LandingPageUiEvent.OnUndoDeleteGoalClicked -> {
                 restoreDeletedGoal()
@@ -130,7 +166,7 @@ class LandingPageViewModel @Inject constructor(
                 useCase.executeGoalOperation(
                     GoalOperation.UpdateStatus(
                         id = id,
-                        newStatus = newStatus
+                        oldStatus = newStatus
                     )
                 )
                 getGoals()

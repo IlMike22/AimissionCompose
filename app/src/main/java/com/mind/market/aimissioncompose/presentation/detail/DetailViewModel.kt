@@ -14,6 +14,7 @@ import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.detail.use_case.GetGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.implementation.UpdateStatisticsWithNewGoalCreatedUseCase
+import com.mind.market.aimissioncompose.domain.goal.UpdateGoalUseCase
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
@@ -29,9 +30,9 @@ import kotlin.random.Random
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val repository: IGoalRepository, // TODO MIC remove repo and use usecase
     private val getGoal: GetGoalUseCase,
     private val insertGoal: InsertGoalUseCase,
+    private val updateGoal: UpdateGoalUseCase,
     private val updateStatistic: UpdateStatisticsWithNewGoalCreatedUseCase,
     savedStateHandle: SavedStateHandle,
     app: Application
@@ -193,8 +194,17 @@ class DetailViewModel @Inject constructor(
 
         if (validationStatusCode.statusCode == ValidationStatusCode.OK) {
             viewModelScope.launch {
-                repository.updateGoal(currentGoal)
-                navigateToLandingPage()
+                updateGoal(currentGoal) { isSuccess ->
+                    if (isSuccess) {
+                        navigateToLandingPage()
+                    } else {
+                        _state.update {
+                            it.copy(
+                                errorMessage = "Unable to update goal. An error occurred."
+                            )
+                        }
+                    }
+                }
             }
         }
     }
