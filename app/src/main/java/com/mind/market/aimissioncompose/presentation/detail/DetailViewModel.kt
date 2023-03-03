@@ -152,22 +152,22 @@ class DetailViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 goal = currentGoal,
-                                ctaButtonText = resourceProvider.getString(R.string.button_text_update)
+                                ctaButtonText = resourceProvider.getString(R.string.button_text_update),
+                                isLoading = false
                             )
                         }
 //                    showGoal(currentGoal)
                     }
                     is Resource.Loading -> {
                         _state.update {
-                            it.copy(
-                                // TODO MIC add loading spinner
-                            )
+                            it.copy(isLoading = true)
                         }
                     }
                     is Resource.Error -> {
                         _state.update {
                             it.copy(
-                                // TODO MIC add error text
+                                errorMessage = "Error fetching the goal details. Please try again.",
+                                isLoading = false
                             )
                         }
                     }
