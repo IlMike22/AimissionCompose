@@ -188,15 +188,43 @@ class LandingPageViewModel @Inject constructor(
         goal.apply {
             viewModelScope.launch {
                 try {
-                    deleteGoal(goal)
-                    deletedGoal = goal
-                    getGoals()
-                    _uiEvent.send(
-                        LandingPageUiEvent.ShowSnackbar(
-                            message = "The goal was successfully deleted.",
-                            snackbarAction = SnackBarAction.UNDO
-                        )
-                    )
+                    deleteGoal(
+                        goal
+                    ) { isGoalDeleted ->
+                        if (isGoalDeleted.not()) {
+                            _state.update {
+                                it.copy(
+                                    errorMessage = "Goal could not be deleted. Try again."
+                                )
+                            }
+                            return@deleteGoal
+                        }
+
+                        deletedGoal = goal
+                        val updatedGoals = mutableListOf<Goal>()
+                        _state.value.goals.forEach {
+                            if (it != deletedGoal) {
+                                updatedGoals.add(it)
+                            }
+                        }
+
+                        _state.update {
+                            it.copy(
+                                goals = updatedGoals
+                            )
+                        }
+                        viewModelScope.launch {
+                            _uiEvent.send(
+                                LandingPageUiEvent.ShowSnackbar(
+                                    message = "The goal was successfully deleted.",
+                                    snackbarAction = SnackBarAction.UNDO
+                                )
+                            )
+                        }
+                    }
+
+//                    getGoals()
+
                 } catch (exception: java.lang.Exception) {
                     _uiEvent.send(LandingPageUiEvent.ShowSnackbar(message = "The goal could not be deleted. Try again."))
                 }
@@ -207,7 +235,7 @@ class LandingPageViewModel @Inject constructor(
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                useCase.executeGoalOperation(GoalOperation.Insert(deletedGoal))
+                useCase.executeGoalOperation(GoalOperation.Insert(deletedGoal)) // TODO MIC create own usecase for insert goal
                 _state.update {
                     it.copy(
                         goals = state.value.goals + deletedGoal

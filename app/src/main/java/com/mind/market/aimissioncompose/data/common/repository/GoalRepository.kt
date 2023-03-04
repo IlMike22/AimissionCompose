@@ -103,8 +103,17 @@ class GoalRepository(
 
     @WorkerThread
     @CheckResult
-    override suspend fun deleteGoal(goal: Goal, mode: GoalReadWriteOperation) {
-        goalRemoteDataSource.deleteGoal(goal, mode, getFirebaseUserId())
+    override suspend fun deleteGoal(
+        goal: Goal,
+        onResult: (Boolean) -> Unit,
+        mode: GoalReadWriteOperation
+    ) {
+        goalRemoteDataSource.deleteGoal(
+            goal = goal,
+            onResult = onResult,
+            mode = mode,
+            userId = getFirebaseUserId()
+        )
 //        goalDao.deleteGoal(goal.toGoalDto())
     }
 

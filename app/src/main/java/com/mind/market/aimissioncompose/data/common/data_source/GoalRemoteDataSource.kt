@@ -13,7 +13,12 @@ class GoalRemoteDataSource(
     private val firebaseDatabase: DatabaseReference,
     private val goalDao: IGoalDao,
 ) : IGoalRemoteDataSource {
-    override suspend fun deleteGoal(goal: Goal, mode: GoalReadWriteOperation, userId: String) {
+    override suspend fun deleteGoal(
+        goal: Goal,
+        onResult: (Boolean) -> Unit,
+        mode: GoalReadWriteOperation,
+        userId: String
+    ) {
         if (mode == GoalReadWriteOperation.LOCAL_DATABASE) {
             goalDao.deleteGoal(goal.toGoalDto())
         } else {
@@ -22,6 +27,15 @@ class GoalRemoteDataSource(
                 .child(userId)
                 .child(goal.id.toString())
                 .removeValue()
+                .addOnCompleteListener {
+                    if (it.isComplete) {
+                        if (it.isSuccessful) {
+                            onResult(true)
+                        } else {
+                            onResult(false)
+                        }
+                    }
+                }
         }
     }
 

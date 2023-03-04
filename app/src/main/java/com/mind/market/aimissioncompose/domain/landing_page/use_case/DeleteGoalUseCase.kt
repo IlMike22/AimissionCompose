@@ -5,9 +5,16 @@ import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
 
 class DeleteGoalUseCase(
-    private val repository: IGoalRepository
+    private val repository: IGoalRepository,
 ) {
-    suspend operator fun invoke(goal: Goal) {
-        repository.deleteGoal(goal, mode = GoalReadWriteOperation.FIREBASE_DATABASE)
+    suspend operator fun invoke(
+        goal: Goal,
+        onResult: (Boolean) -> Unit
+    ) {
+        repository.deleteGoal(
+            goal = goal,
+            onResult = onResult,
+            mode = GoalReadWriteOperation.FIREBASE_DATABASE
+        )
     }
 }

@@ -4,6 +4,7 @@ import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 interface IGoalRepository {
@@ -23,7 +24,11 @@ interface IGoalRepository {
         onResult: (Status) -> Unit
     )
 
-    suspend fun deleteGoal(goal: Goal, mode: GoalReadWriteOperation)
+    suspend fun deleteGoal(
+        goal: Goal,
+        onResult: (Boolean) -> Unit,
+        mode: GoalReadWriteOperation
+    )
 
     suspend fun updateGoal(
         goal: Goal,
