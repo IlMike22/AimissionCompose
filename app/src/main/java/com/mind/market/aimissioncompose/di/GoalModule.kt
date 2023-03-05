@@ -11,11 +11,7 @@ import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.data.common.data_source.GoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
-import com.mind.market.aimissioncompose.domain.detail.use_case.GetGoalUseCase
-import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
-import com.mind.market.aimissioncompose.domain.goal.UpdateGoalStatusUseCase
-import com.mind.market.aimissioncompose.domain.goal.UpdateGoalUseCase
-import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
+import com.mind.market.aimissioncompose.domain.goal.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -93,4 +89,16 @@ object GoalModule {
     fun provideUpdateGoalUseCase(
         repository: IGoalRepository
     ) = UpdateGoalUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetGoalsUseCase(
+        repository: IGoalRepository
+    ) = GetGoalsUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideIsGoalOverdueUseCase(
+        repository: IGoalRepository
+    ) = IsGoalOverdueUseCase()
 }

@@ -10,9 +10,8 @@ import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
-import com.mind.market.aimissioncompose.domain.detail.use_case.GetGoalUseCase
-import com.mind.market.aimissioncompose.domain.detail.use_case.InsertGoalUseCase
+import com.mind.market.aimissioncompose.domain.goal.GetGoalUseCase
+import com.mind.market.aimissioncompose.domain.goal.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.detail.use_case.implementation.UpdateStatisticsWithNewGoalCreatedUseCase
 import com.mind.market.aimissioncompose.domain.goal.UpdateGoalUseCase
 import com.mind.market.aimissioncompose.domain.models.Genre

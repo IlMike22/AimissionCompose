@@ -1,4 +1,4 @@
-package com.mind.market.aimissioncompose.domain.landing_page.use_case
+package com.mind.market.aimissioncompose.domain.goal
 
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository

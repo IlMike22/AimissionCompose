@@ -4,6 +4,8 @@ import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.statistics.data.StatisticsRepository
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 import com.mind.market.aimissioncompose.statistics.domain.use_case.IStatisticsUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticEntityUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.StatisticsUseCase
 import dagger.Module
 import dagger.Provides
@@ -27,4 +29,16 @@ object StatisticsModule {
     fun provideStatisticsUseCase(repository: IStatisticsRepository): IStatisticsUseCase {
         return StatisticsUseCase(repository)
     }
+
+    @Provides
+    @Singleton
+    fun provideDoesStatisticExistsUseCase(
+        repository: IStatisticsRepository
+    ) = DoesStatisticExistsUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideInsertStatisticUseCase(
+        repository: IStatisticsRepository
+    ) = InsertStatisticEntityUseCase(repository)
 }

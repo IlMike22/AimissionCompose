@@ -25,7 +25,6 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import com.vanpra.composematerialdialogs.title
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -102,12 +101,22 @@ fun LandingPageScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(16.dp),
+                        onClick = {
+                            onEvent(LandingPageUiEvent.OnShowStatisticClicked)
+                        }
+                    ) { Text(text = "Show statistic") }
+
+                    Button(
+                        modifier = Modifier
+                            .align(Alignment.CenterStart)
+                            .padding(16.dp),
                         onClick = {
                             onEvent(LandingPageUiEvent.OnLogoutUserClicked)
                         }
-                    ) {
-                        Text(text = "Logout user")
-                    }
+                    ) { Text(text = "Logout user") }
                 }
             },
             sheetBackgroundColor = Color.Blue,

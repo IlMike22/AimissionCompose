@@ -5,19 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
-import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.domain.goal.UpdateGoalStatusUseCase
-import com.mind.market.aimissioncompose.domain.landing_page.use_case.DeleteGoalUseCase
-import com.mind.market.aimissioncompose.domain.landing_page.use_case.GoalOperation
-import com.mind.market.aimissioncompose.domain.landing_page.use_case.ILandingPageUseCase
+import com.mind.market.aimissioncompose.domain.goal.*
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticEntityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -27,11 +24,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LandingPageViewModel @Inject constructor(
-    private val useCase: ILandingPageUseCase,
     private val logoutUser: LogoutUserUseCase,
     private val deleteGoal: DeleteGoalUseCase,
+    private val insertGoal: InsertGoalUseCase,
+    private val getGoals: GetGoalsUseCase,
     private val updateGoalStatus: UpdateGoalStatusUseCase,
+    private val isGoalOverdue: IsGoalOverdueUseCase,
     private val settingsUseCase: ISettingsUseCase,
+    private val doesStatisticExist: DoesStatisticExistsUseCase,
+    private val insertStatisticEntity: InsertStatisticEntityUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(LandingPageState())
     val state = _state.stateIn(
@@ -48,7 +49,6 @@ class LandingPageViewModel @Inject constructor(
     private var showGoalOverdueDialog = false
     private lateinit var deletedGoal: Goal
     private var goalIndex = -1
-    private var getGoalsJob: Job? = null
 
     private val _uiEvent = Channel<LandingPageUiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -59,7 +59,7 @@ class LandingPageViewModel @Inject constructor(
                 settingsUseCase.getUserSettings().collect { userSettings ->
                     isDoneGoalHidden = userSettings.isHideDoneGoals
                     showGoalOverdueDialog = userSettings.showGoalOverdueDialog
-                    getGoals()
+                    getGoals().collect { handleGoalsResponse(it) }
                 }
             }
 
@@ -69,8 +69,8 @@ class LandingPageViewModel @Inject constructor(
                 val currentMonth = currentDate.month
                 val currentYear = currentDate.year
 
-                if (useCase.doesStatisticExist(currentMonthValue, currentYear)) {
-                    useCase.insertStatisticEntity(
+                if (doesStatisticExist(currentMonthValue, currentYear)) {
+                    insertStatisticEntity(
                         StatisticsEntity(
                             title = currentMonth.toMonthName(),
                             amountGoalsCompleted = 0,
@@ -114,7 +114,7 @@ class LandingPageViewModel @Inject constructor(
                             it.id == this@apply.id
                         }
                         val newGoals = mutableListOf<Goal>()
-                        updateGoalStatus(GoalOperation.UpdateStatus(id, status)) { newStatus ->
+                        updateGoalStatus(id, status) { newStatus ->
                             oldGoals.forEach {
                                 if (it.id == oldGoal?.id) {
                                     newGoals.add(
@@ -142,7 +142,7 @@ class LandingPageViewModel @Inject constructor(
             }
             is LandingPageUiEvent.OnGoalUpdate -> {
                 viewModelScope.launch {
-                    getGoals()
+                    getGoals().collect { handleGoalsResponse(it) }
                 }
             }
             LandingPageUiEvent.OnLogoutUserClicked -> {
@@ -159,21 +159,6 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private fun updateGoalStatus(goal: Goal?) {
-        goal?.apply {
-            viewModelScope.launch {
-                val newStatus = getNewGoalStatus(goal.status)
-                useCase.executeGoalOperation(
-                    GoalOperation.UpdateStatus(
-                        id = id,
-                        oldStatus = newStatus
-                    )
-                )
-                getGoals()
-            }
-        }
-    }
-
     private fun onGoalContainerClicked(goal: Goal?) {
         viewModelScope.launch {
             goal?.apply {
@@ -183,19 +168,15 @@ class LandingPageViewModel @Inject constructor(
     }
 
     private fun cacheAndDeleteGoal(goal: Goal) {
-        deletedGoal = goal // TODO MIC maybe extract this logic into the usecase
+        deletedGoal = goal
         goalIndex = state.value.goals.indexOf(goal)
         goal.apply {
             viewModelScope.launch {
                 try {
-                    deleteGoal(
-                        goal
-                    ) { isGoalDeleted ->
+                    deleteGoal(goal) { isGoalDeleted ->
                         if (isGoalDeleted.not()) {
                             _state.update {
-                                it.copy(
-                                    errorMessage = "Goal could not be deleted. Try again."
-                                )
+                                it.copy(errorMessage = "Goal could not be deleted. Try again.")
                             }
                             return@deleteGoal
                         }
@@ -222,9 +203,6 @@ class LandingPageViewModel @Inject constructor(
                             )
                         }
                     }
-
-//                    getGoals()
-
                 } catch (exception: java.lang.Exception) {
                     _uiEvent.send(LandingPageUiEvent.ShowSnackbar(message = "The goal could not be deleted. Try again."))
                 }
@@ -235,7 +213,7 @@ class LandingPageViewModel @Inject constructor(
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                useCase.executeGoalOperation(GoalOperation.Insert(deletedGoal)) // TODO MIC create own usecase for insert goal
+                insertGoal(deletedGoal)
                 _state.update {
                     it.copy(
                         goals = state.value.goals + deletedGoal
@@ -245,36 +223,35 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getGoals() {
-        useCase.getGoals(GoalReadWriteOperation.FIREBASE_DATABASE).collect { response ->
-            when (response) {
-                is Resource.Success -> {
-                    val goals = response.data ?: emptyList()
-                    _state.update {
-                        it.copy(
-                            goals = goals,
-                            isLoading = false,
-                            errorMessage = null
-                        )
-                    }
-                    showGoalOverdueDialogIfNeeded(goals)
-                }
+    private fun handleGoalsResponse(response: Resource<List<Goal>>) {
+        when (response) {
+            is Resource.Success -> {
+                val goals = response.data ?: emptyList()
 
-                is Resource.Loading -> {
-                    _state.update {
-                        it.copy(
-                            isLoading = response.isLoading
-                        )
-                    }
+                _state.update {
+                    it.copy(
+                        goals = if (isDoneGoalHidden) filterGoals(goals) else goals,
+                        isLoading = false,
+                        errorMessage = null
+                    )
                 }
-                is Resource.Error -> {
-                    _state.update {
-                        it.copy(
-                            goals = emptyList(),
-                            isLoading = false,
-                            errorMessage = response.message ?: "Unknown error while loading data."
-                        )
-                    }
+                showGoalOverdueDialogIfNeeded(goals)
+            }
+
+            is Resource.Loading -> {
+                _state.update {
+                    it.copy(
+                        isLoading = response.isLoading
+                    )
+                }
+            }
+            is Resource.Error -> {
+                _state.update {
+                    it.copy(
+                        goals = emptyList(),
+                        isLoading = false,
+                        errorMessage = response.message ?: "Unknown error while loading data."
+                    )
                 }
             }
         }
@@ -286,7 +263,7 @@ class LandingPageViewModel @Inject constructor(
         }
 
         goals.filter { goal ->
-            useCase.isGoalOverdue(goal)
+            isGoalOverdue(goal)
         }.apply {
             if (this.isNotEmpty()) {
                 viewModelScope.launch {
