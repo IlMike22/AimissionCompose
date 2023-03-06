@@ -6,6 +6,7 @@ import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSourc
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.IGoalDao
+import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_GOAL
 import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_USER
 import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
@@ -154,6 +155,7 @@ class GoalRepository(
                 firebaseDatabase // TODO MIC extract in GoalRemoteDS
                     .child(FIREBASE_TABLE_USER)
                     .child(userId)
+                    .child(FIREBASE_TABLE_GOAL)
                     .get()
                     .addOnSuccessListener { data ->
                         for (singleDataSet in data.children) {

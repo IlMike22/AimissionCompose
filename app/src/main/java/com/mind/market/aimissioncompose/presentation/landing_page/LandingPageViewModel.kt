@@ -72,6 +72,7 @@ class LandingPageViewModel @Inject constructor(
                 if (doesStatisticExist(currentMonthValue, currentYear)) {
                     insertStatisticEntity(
                         StatisticsEntity(
+                            id = "$currentMonth+${currentYear}",
                             title = currentMonth.toMonthName(),
                             amountGoalsCompleted = 0,
                             amountGoalsStarted = 0,
@@ -82,7 +83,18 @@ class LandingPageViewModel @Inject constructor(
                             year = currentYear,
                             created = currentDate,
                             lastUpdated = currentDate
-                        )
+                        ),
+                        onResult = { isSuccess ->
+                            if (isSuccess.not()) {
+                                viewModelScope.launch {// TODO MIC try to avoid opening a new coroutine here (?)
+                                    _uiEvent.send(
+                                        LandingPageUiEvent.ShowSnackbar(
+                                            message = "Unable to create statistics for current user."
+                                        )
+                                    )
+                                }
+                            }
+                        }
                     )
                 }
             }
@@ -145,7 +157,7 @@ class LandingPageViewModel @Inject constructor(
                     getGoals().collect { handleGoalsResponse(it) }
                 }
             }
-            LandingPageUiEvent.OnLogoutUserClicked -> {
+            is LandingPageUiEvent.OnLogoutUserClicked -> {
                 viewModelScope.launch {
                     logoutUser()
                 }

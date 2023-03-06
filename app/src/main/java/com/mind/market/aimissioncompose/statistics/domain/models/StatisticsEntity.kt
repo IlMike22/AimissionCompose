@@ -4,7 +4,7 @@ import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import java.time.LocalDateTime
 
 data class StatisticsEntity(
-    val id: Int? = null,
+    val id: String,
     val title: String,
     val amountGoalsCompleted: Int,
     val amountGoalsCreated: Int,
@@ -18,7 +18,7 @@ data class StatisticsEntity(
 ) {
     companion object {
         val EMPTY = StatisticsEntity(
-            id = -1,
+            id = "000000",
             title = "",
             amountGoalsCompleted = 0,
             amountGoalsCreated = 0,

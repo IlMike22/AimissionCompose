@@ -105,7 +105,7 @@ fun LandingPageScreen(
                             .align(Alignment.CenterEnd)
                             .padding(16.dp),
                         onClick = {
-                            onEvent(LandingPageUiEvent.OnShowStatisticClicked)
+                            navController.navigate(Route.STATISTICS)
                         }
                     ) { Text(text = "Show statistic") }
 

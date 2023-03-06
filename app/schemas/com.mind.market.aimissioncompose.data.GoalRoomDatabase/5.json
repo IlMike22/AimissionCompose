@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "49d0e36890513966ba3af536fb80bc4e",
+    "identityHash": "9c30206002490531a158245716546c2e",
     "entities": [
       {
         "tableName": "goal_table",
@@ -81,13 +81,13 @@
       },
       {
         "tableName": "statistics_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER, `title` TEXT NOT NULL, `amountGoalsCompleted` INTEGER NOT NULL, `amountGoalsCreated` INTEGER NOT NULL, `amountGoalsStarted` INTEGER NOT NULL, `amountGoalsNotCompleted` INTEGER NOT NULL, `grade` TEXT NOT NULL, `month` INTEGER NOT NULL, `year` INTEGER NOT NULL, `lastUpdated` TEXT NOT NULL, `created` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `amountGoalsCompleted` INTEGER NOT NULL, `amountGoalsCreated` INTEGER NOT NULL, `amountGoalsStarted` INTEGER NOT NULL, `amountGoalsNotCompleted` INTEGER NOT NULL, `grade` TEXT NOT NULL, `month` INTEGER NOT NULL, `year` INTEGER NOT NULL, `lastUpdated` TEXT NOT NULL, `created` TEXT NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "TEXT",
+            "notNull": true
           },
           {
             "fieldPath": "title",
@@ -201,7 +201,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49d0e36890513966ba3af536fb80bc4e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9c30206002490531a158245716546c2e')"
     ]
   }
 }

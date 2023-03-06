@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "statistics_table")
 data class StatisticsEntityDto(
-    @PrimaryKey val id: Int? = null, // room creates an id for us..
+    @PrimaryKey val id: String,
     val title: String,
     val amountGoalsCompleted: Int,
     val amountGoalsCreated: Int,

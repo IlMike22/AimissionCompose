@@ -26,6 +26,7 @@ fun StatisticsEntityDto?.toDomain(): StatisticsEntity {
 
 fun StatisticsEntity.toDto(): StatisticsEntityDto =
     StatisticsEntityDto(
+        id = this.id,
         title = this.title,
         amountGoalsCompleted = this.amountGoalsCompleted,
         amountGoalsCreated = this.amountGoalsCreated,

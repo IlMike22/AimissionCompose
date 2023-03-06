@@ -22,7 +22,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object GoalModule {
 
-    @Provides
+    @Provides // TODO MIC move out of goal module since it is also needed in statistics
     @Singleton
     fun provideFirebaseDatabase(): DatabaseReference {
         return Firebase.database.reference
