@@ -3,6 +3,7 @@ package com.mind.market.aimissioncompose.presentation.landing_page
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,10 +15,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
@@ -135,6 +140,40 @@ fun LandingPageScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CircularProgressIndicator()
+                    }
+                } else if (state.goals.isEmpty()) {
+                    // show empty screen
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .align(Center)
+                        ) {
+                            Text(
+                                text = "No goals yet",
+                                style = MaterialTheme.typography.h4
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(text = "It`s very empty here. Start to create some goals.")
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Column(modifier = Modifier.align(CenterHorizontally)) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                                    contentDescription = "empty screen image"
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Button(
+                                    onClick = { onEvent(LandingPageUiEvent.OnAddGoalClicked) },
+                                ) {
+                                    Text(text = "Create goal")
+                                }
+                            }
+                        }
                     }
                 } else {
                     FloatingActionButton(
