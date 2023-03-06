@@ -168,6 +168,7 @@ fun LandingPageScreen(
                                 Spacer(modifier = Modifier.height(16.dp))
 
                                 Button(
+                                    modifier = Modifier.fillMaxWidth(),
                                     onClick = { onEvent(LandingPageUiEvent.OnAddGoalClicked) },
                                 ) {
                                     Text(text = "Create goal")
