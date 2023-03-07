@@ -7,14 +7,15 @@ import com.mind.market.aimissioncompose.domain.models.Status
 class UpdateGoalStatusUseCase(
     private val repository: IGoalRepository
 ) {
-    suspend operator fun invoke(goalId:Int, oldStatus: Status, onResult: (Status) -> Unit) {
-                val newStatus = updateGoalStatus(oldStatus)
-                repository.updateStatus(
-                    id = goalId,
-                    status = newStatus,
-                    operation = GoalReadWriteOperation.FIREBASE_DATABASE,
-                    onResult = onResult
-                )
+    suspend operator fun invoke(goalId: Int, oldStatus: Status, onResult: (Status) -> Unit) {
+        val newStatus = updateGoalStatus(oldStatus)
+        repository.updateStatus(
+            id = goalId,
+            status = newStatus,
+            operation = GoalReadWriteOperation.FIREBASE_DATABASE,
+            onResult = onResult
+
+        )
     }
 
     private fun updateGoalStatus(oldStatus: Status): Status {

@@ -8,8 +8,8 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
-import com.mind.market.aimissioncompose.data.common.data_source.GoalRemoteDataSource
-import com.mind.market.aimissioncompose.data.common.data_source.IGoalRemoteDataSource
+import com.mind.market.aimissioncompose.data.common.data_source.local.implementation.GoalLocalDataSource
+import com.mind.market.aimissioncompose.data.common.data_source.remote.implementation.GoalRemoteDataSource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.goal.*
 import dagger.Module
@@ -30,24 +30,31 @@ object GoalModule {
 
     @Provides
     @Singleton
-    fun provideGoalRemoteDataSource(
-        database: DatabaseReference,
+    fun provideGoalLocalDataSource(
         roomDatabase: GoalRoomDatabase
-    ): IGoalRemoteDataSource = GoalRemoteDataSource(database, roomDatabase.goalDao())
+    ) = GoalLocalDataSource(
+        goalDao = roomDatabase.goalDao()
+    )
+
+    @Provides
+    @Singleton
+    fun provideGoalRemoteDataSource(
+        database: DatabaseReference
+    ) = GoalRemoteDataSource(
+        firebaseDatabase = database
+    )
 
     @Provides
     @Singleton
     fun provideGoalRepository(
-        database: GoalRoomDatabase,
-        firebaseDatabaseReference: DatabaseReference,
         authRemoteDataSource: IAuthenticationRemoteDataSource,
-        remoteDataSource: IGoalRemoteDataSource
+        localDataSource: GoalLocalDataSource,
+        remoteDataSource: GoalRemoteDataSource
     ): IGoalRepository {
         return GoalRepository(
-            goalDao = database.goalDao(),
-            firebaseDatabase = firebaseDatabaseReference,
             authRemoteDataSource = authRemoteDataSource,
-            goalRemoteDataSource = remoteDataSource
+            goalRemoteDataSource = remoteDataSource,
+            goalLocalDataSource = localDataSource
         )
     }
 

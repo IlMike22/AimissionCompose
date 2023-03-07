@@ -31,9 +31,8 @@ fun Goal(
     goal: Goal = Goal.EMPTY,
     onDeleteClicked: (goal: Goal) -> Unit,
     onStatusChangeClicked: (goal: Goal) -> Unit,
-    navController: NavController
 ) {
-    Card( // TODO add click listener to whole Card for detail view..
+    Card( // TODO MIC add click listener to whole Card for detail view..
         shape = RoundedCornerShape(8.dp),
         backgroundColor = Color.LightGray,
         modifier = Modifier.padding(4.dp)

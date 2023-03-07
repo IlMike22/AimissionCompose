@@ -203,8 +203,7 @@ fun LandingPageScreen(
                                 },
                                 onStatusChangeClicked = { selectedGoal ->
                                     onEvent(LandingPageUiEvent.OnStatusChangedClicked(selectedGoal))
-                                },
-                                navController = navController
+                                }
                             )
 
                             Divider(
