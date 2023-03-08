@@ -137,6 +137,7 @@ class DetailViewModel @Inject constructor(
                     )
                     return
                 }
+
                 createNewGoal(GoalReadWriteOperation.FIREBASE_DATABASE)
             }
         }

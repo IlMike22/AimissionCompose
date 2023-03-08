@@ -136,7 +136,10 @@ class GoalRepository(
                 onResult(false)
             }
         } else {
-            goalRemoteDataSource.update(goal) { isSuccess ->
+            goalRemoteDataSource.update(
+                goal = goal,
+                userId = getFirebaseUserId()
+            ) { isSuccess ->
                 onResult(isSuccess)
             }
         }

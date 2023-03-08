@@ -106,6 +106,5 @@ object GoalModule {
     @Provides
     @Singleton
     fun provideIsGoalOverdueUseCase(
-        repository: IGoalRepository
     ) = IsGoalOverdueUseCase()
 }

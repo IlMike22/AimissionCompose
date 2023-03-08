@@ -98,6 +98,7 @@ class GoalRemoteDataSource(
         firebaseDatabase
             .child(FIREBASE_TABLE_USER)
             .child(userId)
+            .child(FIREBASE_TABLE_GOAL)
             .child(goal.id.toString())
             .setValue(goal.toGoalDto())
             .addOnCompleteListener {

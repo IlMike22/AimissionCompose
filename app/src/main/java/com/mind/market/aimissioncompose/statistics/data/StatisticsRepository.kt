@@ -16,12 +16,17 @@ class StatisticsRepository(
     private val remoteDataSource: IStatisticsRemoteDataSource,
     private val authRemoteDataSource: IAuthenticationRemoteDataSource
 ) : IStatisticsRepository {
-    override suspend fun getStatisticsEntity(id: Int): StatisticsEntity {
-        return localDataSource.getStatisticsEntity(id).toDomain()
+    override suspend fun getStatisticsEntity(
+        id: String,
+        onResult: (Throwable?, StatisticsEntity?) -> Unit
+    ) {
+        remoteDataSource.get(id, getFirebaseUserId(), onResult)
+//        return localDataSource.getStatisticsEntity(id).toDomain()
     }
 
     override suspend fun getStatisticsEntityByDate(month: Int, year: Int): StatisticsEntity {
-        return localDataSource.getStatisticsEntityByDate(month, year).toDomain()
+        return remoteDataSource.getByDate(month, year, getFirebaseUserId())
+//        return localDataSource.getStatisticsEntityByDate(month, year).toDomain()
     }
 
     override suspend fun insertStatisticsEntity(
@@ -67,5 +72,5 @@ class StatisticsRepository(
         }
     }
 
-    private fun getFirebaseUserId():String = authRemoteDataSource.getUserData().id
+    private fun getFirebaseUserId(): String = authRemoteDataSource.getUserData().id
 }

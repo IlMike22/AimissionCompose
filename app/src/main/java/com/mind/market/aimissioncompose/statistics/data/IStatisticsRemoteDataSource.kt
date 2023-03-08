@@ -11,9 +11,9 @@ interface IStatisticsRemoteDataSource {
         onResult: (Boolean) -> Unit
     )
 
-    fun get(id: Int): Flow<Resource<StatisticsEntity>>
     fun getAll(): Flow<Resource<List<StatisticsEntity>>>
+    suspend fun get(id: String, userId: String, onResult: (Throwable?, StatisticsEntity?) -> Unit)
     suspend fun deleteAll(onResult: (Boolean) -> Unit)
-    fun getByDate(month: Int, year: Int): Flow<Resource<StatisticsEntity>>
-    fun update(entity: StatisticsEntity): Flow<Resource<StatisticsEntity>>
+    suspend fun getByDate(month: Int, year: Int, userId: String): StatisticsEntity
+    suspend fun update(entity: StatisticsEntity): StatisticsEntity
 }

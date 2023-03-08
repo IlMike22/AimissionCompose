@@ -62,17 +62,20 @@ class LandingPageViewModel @Inject constructor(
                     getGoals().collect { handleGoalsResponse(it) }
                 }
             }
+            val currentDate = LocalDateTime.now()
+            val currentMonthValue = currentDate.monthValue
+            val currentMonth = currentDate.month
+            val currentYear = currentDate.year
 
-            launch {
-                val currentDate = LocalDateTime.now()
-                val currentMonthValue = currentDate.monthValue
-                val currentMonth = currentDate.month
-                val currentYear = currentDate.year
+            doesStatisticExist(currentMonthValue, currentYear) { doesExist ->
+                if (doesExist) {
+                    return@doesStatisticExist
+                }
 
-                if (doesStatisticExist(currentMonthValue, currentYear)) {
+                launch {
                     insertStatisticEntity(
                         StatisticsEntity(
-                            id = "$currentMonth+${currentYear}",
+                            id = "$currentMonthValue${currentYear}",
                             title = currentMonth.toMonthName(),
                             amountGoalsCompleted = 0,
                             amountGoalsStarted = 0,
@@ -91,7 +94,7 @@ class LandingPageViewModel @Inject constructor(
                                         LandingPageUiEvent.ShowSnackbar(
                                             message = "Unable to create statistics for current user."
                                         )
-                                    )
+                                    ) // TODO MIC reduce callback hell
                                 }
                             }
                         }
@@ -247,6 +250,7 @@ class LandingPageViewModel @Inject constructor(
                         errorMessage = null
                     )
                 }
+
                 showGoalOverdueDialogIfNeeded(goals)
             }
 

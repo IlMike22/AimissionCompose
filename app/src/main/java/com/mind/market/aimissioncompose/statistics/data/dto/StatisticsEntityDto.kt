@@ -6,17 +6,17 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "statistics_table")
 data class StatisticsEntityDto(
-    @PrimaryKey val id: String,
-    val title: String,
-    val amountGoalsCompleted: Int,
-    val amountGoalsCreated: Int,
-    val amountGoalsStarted: Int,
-    val amountGoalsNotCompleted: Int,
-    val grade: Grade,
-    val month: Int,
-    val year: Int,
-    val lastUpdated: String,
-    val created: String
+    @PrimaryKey val id: String = "",
+    val title: String = "",
+    val amountGoalsCompleted: Int = -1,
+    val amountGoalsCreated: Int = -1,
+    val amountGoalsStarted: Int = -1,
+    val amountGoalsNotCompleted: Int = -1,
+    val grade: Grade = Grade.UNDEFINED,
+    val month: Int = -1,
+    val year: Int = -1,
+    val lastUpdated: String = "",
+    val created: String = ""
 ) {
 
     override fun equals(other: Any?): Boolean {

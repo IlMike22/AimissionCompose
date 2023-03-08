@@ -6,7 +6,7 @@ import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntit
 import kotlinx.coroutines.flow.Flow
 
 interface IStatisticsRepository {
-    suspend fun getStatisticsEntity(id: Int): StatisticsEntity
+    suspend fun getStatisticsEntity(id: String, onResult: (Throwable?, StatisticsEntity?) -> Unit)
     suspend fun getStatisticsEntityByDate(month: Int, year: Int): StatisticsEntity
     suspend fun insertStatisticsEntity(
         entity: StatisticsEntity,
