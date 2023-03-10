@@ -7,13 +7,18 @@ import kotlinx.coroutines.flow.Flow
 
 interface IStatisticsRepository {
     suspend fun getStatisticsEntity(id: String, onResult: (Throwable?, StatisticsEntity?) -> Unit)
-    suspend fun getStatisticsEntityByDate(month: Int, year: Int): StatisticsEntity
+    suspend fun getStatisticsEntityByDate(
+        month: Int,
+        year: Int,
+        onResult: (Throwable?, StatisticsEntity?) -> Unit
+    )
+
     suspend fun insertStatisticsEntity(
         entity: StatisticsEntity,
         onResult: (Boolean) -> Unit,
         operation: GoalReadWriteOperation
     )
 
-    suspend fun updateStatisticEntity(entity: StatisticsEntity, operation: GoalReadWriteOperation)
-    fun getStatisticsEntities(): Flow<Resource<Flow<List<StatisticsEntity>>>>
+    suspend fun updateStatisticEntity(entity: StatisticsEntity)
+    fun getStatisticsEntities(): Flow<Resource<List<StatisticsEntity>>>
 }

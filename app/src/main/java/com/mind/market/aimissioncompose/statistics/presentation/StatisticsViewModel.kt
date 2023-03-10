@@ -3,16 +3,19 @@ package com.mind.market.aimissioncompose.statistics.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.statistics.domain.use_case.IStatisticsUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    private val useCase: IStatisticsUseCase
+    private val getStatistics: GetStatisticsUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(StatisticsState())
     val state = _state.stateIn(
@@ -22,26 +25,22 @@ class StatisticsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            useCase.getStatistics().collect { response ->
+            getStatistics().collect { response ->
                 when (response) {
+                    is Resource.Loading -> {
+                        _state.update { it.copy(isLoading = true) }
+                        delay(500) // TODO MIC just test, remove later
+                    }
                     is Resource.Error -> _state.update {
                         it.copy(
                             isLoading = false,
                             errorMessage = response.message
                         )
                     }
-                    is Resource.Loading -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = true
-                            )
-                        }
-                        delay(500) // TODO MIC just test
-                    }
                     is Resource.Success -> _state.update {
                         it.copy(
                             isLoading = false,
-                            statisticsEntities = response.data?.first() ?: emptyList() // TODO atm only one element is observed
+                            statisticsEntities = response.data ?: emptyList()
                         )
                     }
                 }

@@ -7,10 +7,9 @@ import com.mind.market.aimissioncompose.statistics.data.IStatisticsRemoteDataSou
 import com.mind.market.aimissioncompose.statistics.data.StatisticsRepository
 import com.mind.market.aimissioncompose.statistics.data.implementation.StatisticsRemoteDataSource
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
-import com.mind.market.aimissioncompose.statistics.domain.use_case.IStatisticsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticEntityUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.StatisticsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,8 +41,8 @@ object StatisticsModule {
 
     @Provides
     @Singleton
-    fun provideStatisticsUseCase(repository: IStatisticsRepository): IStatisticsUseCase {
-        return StatisticsUseCase(repository)
+    fun provideGetStatisticsUseCase(repository: IStatisticsRepository): GetStatisticsUseCase {
+        return GetStatisticsUseCase(repository)
     }
 
     @Provides

@@ -3,13 +3,12 @@ package com.mind.market.aimissioncompose.statistics.data
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.statistics.data.mapper.toDomain
 import com.mind.market.aimissioncompose.statistics.data.mapper.toDto
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.callbackFlow
 
 class StatisticsRepository(
     private val localDataSource: IStatisticsEntityDao,
@@ -21,11 +20,10 @@ class StatisticsRepository(
         onResult: (Throwable?, StatisticsEntity?) -> Unit
     ) {
         remoteDataSource.get(id, getFirebaseUserId(), onResult)
-//        return localDataSource.getStatisticsEntity(id).toDomain()
     }
 
-    override suspend fun getStatisticsEntityByDate(month: Int, year: Int): StatisticsEntity {
-        return remoteDataSource.getByDate(month, year, getFirebaseUserId())
+    override suspend fun getStatisticsEntityByDate(month: Int, year: Int, onResult: (Throwable?, StatisticsEntity?) -> Unit) {
+        remoteDataSource.getByDate(month, year, getFirebaseUserId(), onResult)
 //        return localDataSource.getStatisticsEntityByDate(month, year).toDomain()
     }
 
@@ -44,31 +42,27 @@ class StatisticsRepository(
 
     override suspend fun updateStatisticEntity(
         entity: StatisticsEntity,
-        operation: GoalReadWriteOperation
     ) {
-        if (operation == GoalReadWriteOperation.LOCAL_DATABASE) {
-            return localDataSource.update(entity.toDto())
-        }
+        remoteDataSource.update(entity.toDto(), getFirebaseUserId())
     }
 
-    //TODO MIC do not use Flow two times. It is not needed?
-    override fun getStatisticsEntities(): Flow<Resource<Flow<List<StatisticsEntity>>>> {
-        return flow {
-            emit(Resource.Loading(true))
-            try {
-                val entities = localDataSource.getStatisticsEntities()
-                entities
-                    .map { entityDto ->
-                        entityDto.map { it.toDomain() }
-                    }
-                    .apply {
-                        emit(Resource.Loading(false))
-                        emit(Resource.Success(this))
-                    }
-            } catch (exception: Throwable) {
-                emit(Resource.Loading(false))
-                emit(Resource.Error(message = "An error occured while reading the database. Details: ${exception.message}"))
+
+    override fun getStatisticsEntities(): Flow<Resource<List<StatisticsEntity>>> {
+        return callbackFlow {
+            trySend(Resource.Loading(true))
+            remoteDataSource.getAll(getFirebaseUserId()) { error, entities ->
+                if (error != null) {
+                    trySend(Resource.Loading(false))
+                    trySend(Resource.Error(message = "An error occurred while reading the database. Details: ${error.message}"))
+                    return@getAll
+                }
+
+                entities.apply {
+                    trySend(Resource.Loading(false))
+                    trySend(Resource.Success(this ?: emptyList()))
+                }
             }
+            awaitClose {}
         }
     }
 

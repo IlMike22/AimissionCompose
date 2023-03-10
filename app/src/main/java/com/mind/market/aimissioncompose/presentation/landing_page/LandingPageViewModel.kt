@@ -41,9 +41,6 @@ class LandingPageViewModel @Inject constructor(
         LandingPageState()
     )
 
-    //var state by mutableStateOf(LandingPageState())
-    //  private set
-
     var isDeleteAllGoals: LiveData<Boolean>? = null
     private var isDoneGoalHidden = false
     private var showGoalOverdueDialog = false
@@ -62,44 +59,50 @@ class LandingPageViewModel @Inject constructor(
                     getGoals().collect { handleGoalsResponse(it) }
                 }
             }
-            val currentDate = LocalDateTime.now()
-            val currentMonthValue = currentDate.monthValue
-            val currentMonth = currentDate.month
-            val currentYear = currentDate.year
+            launch {
+                createStatisticsIfNeeded()
+            }
+        }
+    }
 
-            doesStatisticExist(currentMonthValue, currentYear) { doesExist ->
-                if (doesExist) {
-                    return@doesStatisticExist
-                }
+    private suspend fun createStatisticsIfNeeded() {
+        val currentDate = LocalDateTime.now()
+        val currentMonthValue = currentDate.monthValue
+        val currentMonth = currentDate.month
+        val currentYear = currentDate.year
 
-                launch {
-                    insertStatisticEntity(
-                        StatisticsEntity(
-                            id = "$currentMonthValue${currentYear}",
-                            title = currentMonth.toMonthName(),
-                            amountGoalsCompleted = 0,
-                            amountGoalsStarted = 0,
-                            amountGoalsNotCompleted = 0,
-                            amountGoalsCreated = 0,
-                            grade = Grade.NO_GOALS_COMPLEDTED,
-                            month = currentMonthValue,
-                            year = currentYear,
-                            created = currentDate,
-                            lastUpdated = currentDate
-                        ),
-                        onResult = { isSuccess ->
-                            if (isSuccess.not()) {
-                                viewModelScope.launch {// TODO MIC try to avoid opening a new coroutine here (?)
-                                    _uiEvent.send(
-                                        LandingPageUiEvent.ShowSnackbar(
-                                            message = "Unable to create statistics for current user."
-                                        )
-                                    ) // TODO MIC reduce callback hell
-                                }
+        doesStatisticExist(currentMonthValue, currentYear) { doesExist ->
+            if (doesExist) {
+                return@doesStatisticExist
+            }
+
+            viewModelScope.launch {
+                insertStatisticEntity(
+                    StatisticsEntity(
+                        id = "$currentMonthValue${currentYear}",
+                        title = currentMonth.toMonthName(),
+                        amountGoalsCompleted = 0,
+                        amountGoalsStarted = 0,
+                        amountGoalsNotCompleted = 0,
+                        amountGoalsCreated = 0,
+                        grade = Grade.NO_GOALS_COMPLEDTED,
+                        month = currentMonthValue,
+                        year = currentYear,
+                        created = currentDate,
+                        lastUpdated = currentDate
+                    ),
+                    onResult = { isSuccess ->
+                        if (isSuccess.not()) {
+                            viewModelScope.launch {// TODO MIC try to avoid opening a new coroutine here (?)
+                                _uiEvent.send(
+                                    LandingPageUiEvent.ShowSnackbar(
+                                        message = "Unable to create statistics for current user."
+                                    )
+                                ) // TODO MIC reduce callback hell
                             }
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     }
