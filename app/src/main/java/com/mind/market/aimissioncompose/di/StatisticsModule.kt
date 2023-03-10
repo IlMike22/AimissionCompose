@@ -9,7 +9,7 @@ import com.mind.market.aimissioncompose.statistics.data.implementation.Statistic
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticEntityUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,5 +55,5 @@ object StatisticsModule {
     @Singleton
     fun provideInsertStatisticUseCase(
         repository: IStatisticsRepository,
-    ) = InsertStatisticEntityUseCase(repository)
+    ) = InsertStatisticUseCase(repository)
 }

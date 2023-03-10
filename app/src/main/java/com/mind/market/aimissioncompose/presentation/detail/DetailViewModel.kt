@@ -12,7 +12,7 @@ import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.GetGoalUseCase
 import com.mind.market.aimissioncompose.domain.goal.InsertGoalUseCase
-import com.mind.market.aimissioncompose.domain.detail.use_case.implementation.UpdateStatisticsUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.UpdateStatisticUseCase
 import com.mind.market.aimissioncompose.domain.goal.UpdateGoalUseCase
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
@@ -32,7 +32,7 @@ class DetailViewModel @Inject constructor(
     private val getGoal: GetGoalUseCase,
     private val insertGoal: InsertGoalUseCase,
     private val updateGoal: UpdateGoalUseCase,
-    private val updateStatistic: UpdateStatisticsUseCase,
+    private val updateStatistic: UpdateStatisticUseCase,
     savedStateHandle: SavedStateHandle,
     app: Application
 ) : AndroidViewModel(app) {

@@ -11,7 +11,7 @@ class DoesStatisticExistsUseCase(
         onResult: (Boolean) -> Unit
     ) {
         val id = "$month$year"
-        repository.getStatisticsEntity(id) { _, entity ->
+        repository.getEntity(id) { _, entity ->
             onResult(entity != null)
         }
     }

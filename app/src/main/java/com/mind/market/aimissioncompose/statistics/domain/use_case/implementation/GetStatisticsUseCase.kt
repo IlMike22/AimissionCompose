@@ -9,6 +9,6 @@ class GetStatisticsUseCase(
     private val repository: IStatisticsRepository
 ) {
     operator fun invoke(): Flow<Resource<List<StatisticsEntity>>> {
-        return repository.getStatisticsEntities()
+        return repository.getEntities()
     }
 }

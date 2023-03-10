@@ -12,8 +12,10 @@ import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsOperation
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticEntityUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.UpdateStatisticUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -32,7 +34,8 @@ class LandingPageViewModel @Inject constructor(
     private val isGoalOverdue: IsGoalOverdueUseCase,
     private val settingsUseCase: ISettingsUseCase,
     private val doesStatisticExist: DoesStatisticExistsUseCase,
-    private val insertStatisticEntity: InsertStatisticEntityUseCase
+    private val insertStatisticEntity: InsertStatisticUseCase,
+    private val updateStatistic: UpdateStatisticUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(LandingPageState())
     val state = _state.stateIn(
@@ -85,7 +88,7 @@ class LandingPageViewModel @Inject constructor(
                         amountGoalsStarted = 0,
                         amountGoalsNotCompleted = 0,
                         amountGoalsCreated = 0,
-                        grade = Grade.NO_GOALS_COMPLEDTED,
+                        grade = Grade.NO_GOALS_COMPLETED_YET,
                         month = currentMonthValue,
                         year = currentYear,
                         created = currentDate,
@@ -132,16 +135,20 @@ class LandingPageViewModel @Inject constructor(
                             it.id == this@apply.id
                         }
                         val newGoals = mutableListOf<Goal>()
+                        var newGoal: Goal? = null
                         updateGoalStatus(id, status) { newStatus ->
                             oldGoals.forEach {
                                 if (it.id == oldGoal?.id) {
-                                    newGoals.add(
-                                        it.copy(
-                                            status = newStatus
-                                        )
+                                    newGoal = it.copy(
+                                        status = newStatus
                                     )
+                                    newGoals.add(newGoal as Goal)
                                 } else {
                                     newGoals.add(it)
+                                }
+
+                                viewModelScope.launch {
+                                    updateStatistic(StatisticsOperation.Update(oldGoal, newGoal))
                                 }
                             }
                             _state.update {

@@ -35,22 +35,6 @@ data class StatisticsEntityDto(
         }
         return super.equals(other)
     }
-
-//    override fun hashCode(): Int {
-//        var result = id
-//        result = 31 * result + title.hashCode()
-//        result = 31 * result + amountGoalsCreated.hashCode()
-//        result = 31 * result + amountGoalsCompleted.hashCode()
-//        result = 31 * result + amountGoalsStarted.hashCode()
-//        result = 31 * result + amountGoalsNotCompleted.hashCode()
-//        result = 31 * result + grade.hashCode()
-//        result = 31 * result + month.hashCode()
-//        result = 31 * result + year.hashCode()
-//        result = 31 * result + lastUpdated.hashCode()
-//        result = 31 * result + created.hashCode()
-//
-//        return result
-//    }
 }
 
 enum class Grade {
@@ -58,6 +42,6 @@ enum class Grade {
     NEARLY_ALL_GOALS_COMPLETED,
     SOME_GOALS_COMPLETED,
     FEW_GOALS_COMPLETED,
-    NO_GOALS_COMPLEDTED,
+    NO_GOALS_COMPLETED_YET,
     UNDEFINED
 }

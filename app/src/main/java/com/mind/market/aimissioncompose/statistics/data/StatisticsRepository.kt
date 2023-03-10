@@ -15,19 +15,18 @@ class StatisticsRepository(
     private val remoteDataSource: IStatisticsRemoteDataSource,
     private val authRemoteDataSource: IAuthenticationRemoteDataSource
 ) : IStatisticsRepository {
-    override suspend fun getStatisticsEntity(
+    override suspend fun getEntity(
         id: String,
         onResult: (Throwable?, StatisticsEntity?) -> Unit
     ) {
         remoteDataSource.get(id, getFirebaseUserId(), onResult)
     }
 
-    override suspend fun getStatisticsEntityByDate(month: Int, year: Int, onResult: (Throwable?, StatisticsEntity?) -> Unit) {
+    override suspend fun getEntityByDate(month: Int, year: Int, onResult: (Throwable?, StatisticsEntity?) -> Unit) {
         remoteDataSource.getByDate(month, year, getFirebaseUserId(), onResult)
-//        return localDataSource.getStatisticsEntityByDate(month, year).toDomain()
     }
 
-    override suspend fun insertStatisticsEntity(
+    override suspend fun insertEntity(
         entity: StatisticsEntity,
         onResult: (Boolean) -> Unit,
         operation: GoalReadWriteOperation
@@ -40,14 +39,14 @@ class StatisticsRepository(
 
     }
 
-    override suspend fun updateStatisticEntity(
+    override suspend fun updateEntity(
         entity: StatisticsEntity,
     ) {
         remoteDataSource.update(entity.toDto(), getFirebaseUserId())
     }
 
 
-    override fun getStatisticsEntities(): Flow<Resource<List<StatisticsEntity>>> {
+    override fun getEntities(): Flow<Resource<List<StatisticsEntity>>> {
         return callbackFlow {
             trySend(Resource.Loading(true))
             remoteDataSource.getAll(getFirebaseUserId()) { error, entities ->

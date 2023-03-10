@@ -4,11 +4,11 @@ import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 
-class InsertStatisticEntityUseCase(
+class InsertStatisticUseCase(
     private val repository: IStatisticsRepository
 ) {
     suspend operator fun invoke(entity: StatisticsEntity, onResult: (Boolean) -> Unit) {
-        repository.insertStatisticsEntity(
+        repository.insertEntity(
             entity = entity,
             onResult = onResult,
             operation = GoalReadWriteOperation.FIREBASE_DATABASE
