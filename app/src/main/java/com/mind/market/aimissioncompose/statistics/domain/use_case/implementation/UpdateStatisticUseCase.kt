@@ -61,6 +61,7 @@ class UpdateStatisticUseCase(
                         onResult(false)
                     }
                 }
+                is StatisticsOperation.Delete -> TODO()
             }
         }
     }

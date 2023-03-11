@@ -3,6 +3,7 @@ package com.mind.market.aimissioncompose.statistics.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.core.Resource
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.CreateStatisticsGradeUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
-    private val getStatistics: GetStatisticsUseCase
+    private val getStatistics: GetStatisticsUseCase,
+    private val createStatisticsGrade: CreateStatisticsGradeUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(StatisticsState())
     val state = _state.stateIn(
@@ -37,11 +39,21 @@ class StatisticsViewModel @Inject constructor(
                             errorMessage = response.message
                         )
                     }
-                    is Resource.Success -> _state.update {
-                        it.copy(
-                            isLoading = false,
-                            statisticsEntities = response.data ?: emptyList()
-                        )
+                    is Resource.Success -> {
+                        response.data?.apply {
+                            val grades = createStatisticsGrade(this)
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    statisticsEntities = this,
+                                    grades = grades
+                                )
+                            }
+                        } ?: _state.update {
+                            it.copy(
+                                errorMessage = "Error. Response is null. No data."
+                            )
+                        }
                     }
                 }
             }

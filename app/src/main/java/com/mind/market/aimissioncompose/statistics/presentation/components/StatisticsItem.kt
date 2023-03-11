@@ -10,11 +10,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 
 @Composable
 fun StatisticsItem(
     item: StatisticsEntity,
+    grade: Grade,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -84,14 +86,14 @@ fun StatisticsItem(
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
-                    text = "${item.amountGoalsNotCompleted}",
+                    text = "${item.amountGoalsCompleted}",
                     fontSize = 24.sp,
                     fontStyle = FontStyle.Normal
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Your grade: ${item.grade}",
+                text = "Your grade: $grade",
                 textAlign = TextAlign.Center,
                 fontSize = 24.sp,
                 fontStyle = FontStyle.Normal

@@ -7,6 +7,7 @@ import com.mind.market.aimissioncompose.statistics.data.IStatisticsRemoteDataSou
 import com.mind.market.aimissioncompose.statistics.data.StatisticsRepository
 import com.mind.market.aimissioncompose.statistics.data.implementation.StatisticsRemoteDataSource
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.CreateStatisticsGradeUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticUseCase
@@ -56,4 +57,8 @@ object StatisticsModule {
     fun provideInsertStatisticUseCase(
         repository: IStatisticsRepository,
     ) = InsertStatisticUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideCreateStatisticsGradeUseCase() = CreateStatisticsGradeUseCase()
 }

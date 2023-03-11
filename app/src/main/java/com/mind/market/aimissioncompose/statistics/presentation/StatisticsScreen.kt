@@ -2,7 +2,7 @@ package com.mind.market.aimissioncompose.statistics.presentation
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -48,8 +48,8 @@ fun StatisticsScreen(
                     Spacer(modifier = Modifier.height(24.dp))
                 }
 
-                items(state.statisticsEntities) { entity ->
-                    StatisticsItem(item = entity)
+                itemsIndexed(state.statisticsEntities) { index, entity ->
+                    StatisticsItem(item = entity, grade = state.grades[index])
                 }
             }
         } else {
