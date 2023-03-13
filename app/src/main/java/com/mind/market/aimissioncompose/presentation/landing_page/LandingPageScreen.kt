@@ -40,6 +40,7 @@ fun LandingPageScreen(
     modifier: Modifier = Modifier,
     uiEvent: Flow<LandingPageUiEvent>,
     onEvent: (LandingPageUiEvent) -> Unit,
+    onShowFeedbackDialog: () -> Unit,
     navController: NavController
 ) {
     val scaffoldState = rememberScaffoldState()
@@ -102,27 +103,33 @@ fun LandingPageScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(24.dp)
                         .height(250.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Center
                 ) {
                     Button(
                         modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(16.dp),
+                            .align(Alignment.CenterEnd),
                         onClick = {
                             navController.navigate(Route.STATISTICS)
                         }
-                    ) { Text(text = "Show statistic") }
+                    ) { Text(text = "Statistic") }
+
+                        Button(
+                            modifier = Modifier.align(Center),
+                            onClick = { onShowFeedbackDialog() }
+                        ) { Text(text = "Review") }
 
                     Button(
                         modifier = Modifier
-                            .align(Alignment.CenterStart)
-                            .padding(16.dp),
-                        onClick = {
-                            onEvent(LandingPageUiEvent.OnLogoutUserClicked)
-                        }
-                    ) { Text(text = "Logout user") }
+                            .align(Alignment.CenterStart),
+                        onClick = { onEvent(LandingPageUiEvent.OnLogoutUserClicked) }
+                    ) { Text(text = "Logout") }
                 }
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = "Review dialog only works when app is in Google Play.",
+                    color = Color.White)
             },
             sheetBackgroundColor = Color.Blue,
             sheetPeekHeight = 36.dp,

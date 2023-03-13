@@ -2,16 +2,11 @@ package com.mind.market.aimissioncompose.statistics.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.CreateStatisticsGradeUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GenerateStatisticsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +24,17 @@ class StatisticsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-        generateStatistics()
+            generateStatistics()
+                .collectLatest { entities ->
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            statisticsEntities = entities,
+                        )
+                    }
+                }
+        }
 
 //            getStatistics().collect { response ->
 //                when (response) {
@@ -61,7 +66,6 @@ class StatisticsViewModel @Inject constructor(
 //                    }
 //                }
 //            }
-        }
     }
 
     fun onEvent(event: StatisticsEvent) {

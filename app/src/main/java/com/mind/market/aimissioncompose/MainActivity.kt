@@ -22,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -127,7 +128,8 @@ class MainActivity : ComponentActivity() {
                                         navController = navController,
                                         state = state,
                                         uiEvent = viewModel.uiEvent,
-                                        onEvent = viewModel::onEvent
+                                        onEvent = viewModel::onEvent,
+                                        onShowFeedbackDialog = ::showFeedbackDialog
                                     )
                                 }
                             }
@@ -196,4 +198,12 @@ class MainActivity : ComponentActivity() {
         auth = Firebase.auth
     }
 
+    private fun showFeedbackDialog() {
+        val reviewManager = ReviewManagerFactory.create(applicationContext)
+        reviewManager.requestReviewFlow().addOnCompleteListener {
+            if (it.isSuccessful) {
+                reviewManager.launchReviewFlow(this, it.result)
+            }
+        }
+    }
 }

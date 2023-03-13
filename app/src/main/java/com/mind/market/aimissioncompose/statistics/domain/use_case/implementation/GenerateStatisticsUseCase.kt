@@ -6,8 +6,11 @@ import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.statistics.data.dto.Grade
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticData
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDateTime
 import java.time.Month
@@ -16,26 +19,25 @@ class GenerateStatisticsUseCase(
     private val repository: IStatisticsRepository,
     private val goalRepository: IGoalRepository
 ) {
-    suspend operator fun invoke(): List<StatisticsEntity> {
+    operator fun invoke(): Flow<List<StatisticsEntity>> {
         val entities = mutableListOf<StatisticsEntity>()
         val goalsResult = goalRepository.getGoals(GoalReadWriteOperation.FIREBASE_DATABASE)
         val createdDates = mutableListOf<LocalDateTime>()
-
-        goalsResult.apply {
-            goalsResult.collectLatest { result ->
-                if (result is Resource.Success) {
-                    val goals = result.data ?: emptyList()
-                    goals.forEach { goal ->
-                        createdDates.add(goal.creationDate)
+        return channelFlow {
+            goalsResult.apply {
+                goalsResult.collectLatest { result ->
+                    if (result is Resource.Success) {
+                        val goals = result.data ?: emptyList()
+                        goals.forEach { goal ->
+                            createdDates.add(goal.creationDate)
+                        }
+                        val tempEntities = generateStatisticsEntitiesContent(createdDates)
+                        entities += generateStatisticEntityData(goals, tempEntities)
                     }
-                    val entities = generateStatisticsEntitiesContent(createdDates)
-                    generateStatisticEntityData(goals, entities)
+                    send(entities)
                 }
-                println("!! entities are $entities")
             }
         }
-
-        return entities
     }
 
     private fun generateStatisticsEntitiesContent(
@@ -64,7 +66,7 @@ class GenerateStatisticsUseCase(
         val statisticEntities = mutableListOf<StatisticsEntity>()
         entities.forEach { entity ->
             val entityId = entity.key
-            goalsPerEntityId.set(entityId, mutableListOf())
+            goalsPerEntityId[entityId] = mutableListOf()
 
             goals.forEach { goal ->
                 if (createStatisticsEntityId(goal.creationDate) == entityId) {
@@ -78,31 +80,30 @@ class GenerateStatisticsUseCase(
             var totalAmountGoalsCompleted = 0
             var totalAmountGoalsInProgress = 0
             var totalAmountGoalsToDo = 0
+            var totalAmountGoalsDeprecated = 0
             it.value.forEach { goal ->
                 when (goal.status) {
-                    Status.DONE -> {
-                        totalAmountGoalsCompleted++
-                    }
-                    Status.IN_PROGRESS -> {
-                        totalAmountGoalsInProgress++
-                    }
-                    Status.TODO -> {
-                        totalAmountGoalsToDo++
-                    }
-                    Status.DEPRECATED -> {}
+                    Status.DONE -> totalAmountGoalsCompleted++
+                    Status.IN_PROGRESS -> totalAmountGoalsInProgress++
+                    Status.TODO -> totalAmountGoalsToDo++
+                    Status.DEPRECATED -> totalAmountGoalsDeprecated++
                     Status.UNKNOWN -> {}
                 }
             }
+            val data = StatisticData(
+                totalAmount = totalAmount,
+                totalGoalsCompleted = totalAmountGoalsCompleted,
+                totalGoalsInProgress = totalAmountGoalsInProgress,
+                totalGoalsToDo = totalAmountGoalsToDo,
+                totalGoalsDeprecated = totalAmountGoalsDeprecated
+            )
             statisticEntities.add(
                 StatisticsEntity(
                     id = it.key,
                     title = entities[it.key] ?: "",
-                    amountGoalsCompleted = totalAmountGoalsCompleted,
-                    amountGoalsCreated = totalAmount,
-                    amountGoalsStarted = totalAmountGoalsInProgress,
-                    amountGoalsNotCompleted = totalAmount - totalAmountGoalsCompleted,
+                    data = data,
                     created = LocalDateTime.now(),
-                    grade = Grade.UNDEFINED, // TODO MIC create later
+                    grade = generateStatisticEntityGrade(data),
                     month = 0,
                     year = 0,
                     lastUpdated = LocalDateTime.now() // TODO MIC check if needed
@@ -111,6 +112,31 @@ class GenerateStatisticsUseCase(
         }
 
         return statisticEntities
+    }
+
+    private fun generateStatisticEntityGrade(data: StatisticData): Grade { // TODO MIC not done yet
+        if (data.totalAmount == 0) {
+            return Grade.NO_GOALS_ADDED_YET
+        }
+        if (data.totalGoalsDeprecated > 0) {
+            return Grade.DEPRECATED_GOALS_EXIST
+        }
+
+        if (data.totalGoalsCompleted == data.totalAmount) {
+            return Grade.ALL_GOALS_COMPLETED
+        }
+        if (data.totalGoalsInProgress + 2 >= data.totalAmount) {
+            return Grade.NEARLY_ALL_GOALS_COMPLETED
+        } else if (data.totalGoalsInProgress + 4 >= data.totalAmount) {
+            return Grade.SOME_GOALS_COMPLETED
+        } else if (data.totalGoalsInProgress + 6 >= data.totalAmount) {
+            return Grade.FEW_GOALS_COMPLETED
+        }
+        if (data.totalGoalsCompleted == 0) {
+            return Grade.NO_GOALS_COMPLETED_YET
+        }
+
+        return Grade.UNDEFINED
     }
 
     private fun createStatisticsEntityId(createdDate: LocalDateTime) =

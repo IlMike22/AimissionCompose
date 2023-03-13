@@ -114,5 +114,9 @@ dependencies {
     // Accompanist Pager
     implementation "com.google.accompanist:accompanist-pager:0.23.1"
     implementation "com.google.accompanist:accompanist-pager-indicators:0.23.1"
+
+    // Google Play Review
+    implementation "com.google.android.play:review-ktx:2.0.1"
+    implementation "com.google.android.play:review:2.0.1"
 }
 

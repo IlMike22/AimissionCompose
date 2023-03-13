@@ -6,10 +6,7 @@ import java.time.LocalDateTime
 data class StatisticsEntity(
     val id: String,
     val title: String,
-    val amountGoalsCompleted: Int,
-    val amountGoalsCreated: Int,
-    val amountGoalsStarted: Int,
-    val amountGoalsNotCompleted: Int,
+    val data: StatisticData,
     val grade: Grade,
     val month: Int,
     val year: Int,
@@ -20,15 +17,30 @@ data class StatisticsEntity(
         val EMPTY = StatisticsEntity(
             id = "000000",
             title = "",
-            amountGoalsCompleted = 0,
-            amountGoalsCreated = 0,
-            amountGoalsStarted = 0,
-            amountGoalsNotCompleted = 0,
+            data = StatisticData.EMPTY,
             grade = Grade.UNDEFINED,
             month = -1,
             year = -1,
             lastUpdated = LocalDateTime.now(),
             created = LocalDateTime.now()
+        )
+    }
+}
+
+data class StatisticData(
+    val totalAmount: Int,
+    val totalGoalsToDo: Int,
+    val totalGoalsInProgress: Int,
+    val totalGoalsCompleted: Int,
+    val totalGoalsDeprecated: Int
+) {
+    companion object {
+        val EMPTY = StatisticData(
+            totalAmount = 0,
+            totalGoalsCompleted = 0,
+            totalGoalsDeprecated = 0,
+            totalGoalsInProgress = 0,
+            totalGoalsToDo = 0
         )
     }
 }

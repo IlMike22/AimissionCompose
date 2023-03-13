@@ -18,8 +18,8 @@ class CreateStatisticsGradeUseCase {
     }
 
     private fun generateGradeForCurrentEntity(entity: StatisticsEntity): Grade {
-        val amountGoalsCompleted = entity.amountGoalsCompleted
-        val amountGoalsCreated = entity.amountGoalsCreated
+        val amountGoalsCompleted = entity.data.totalGoalsCompleted
+        val amountGoalsCreated = entity.data.totalAmount
         return when {
             amountGoalsCompleted == amountGoalsCreated -> Grade.ALL_GOALS_COMPLETED
             amountGoalsCompleted == 0 -> Grade.NO_GOALS_COMPLETED_YET

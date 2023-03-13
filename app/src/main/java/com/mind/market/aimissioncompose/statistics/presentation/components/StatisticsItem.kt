@@ -16,7 +16,6 @@ import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntit
 @Composable
 fun StatisticsItem(
     item: StatisticsEntity,
-    grade: Grade,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -50,7 +49,7 @@ fun StatisticsItem(
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
-                    text = "${item.amountGoalsCreated}",
+                    text = "${item.data.totalAmount}",
                     fontSize = 24.sp,
                     fontStyle = FontStyle.Normal
                 )
@@ -68,7 +67,7 @@ fun StatisticsItem(
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
-                    text = "${item.amountGoalsStarted}",
+                    text = "${item.data.totalGoalsInProgress}",
                     fontSize = 24.sp,
                     fontStyle = FontStyle.Normal
                 )
@@ -86,14 +85,14 @@ fun StatisticsItem(
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
-                    text = "${item.amountGoalsCompleted}",
+                    text = "${item.data.totalGoalsCompleted}",
                     fontSize = 24.sp,
                     fontStyle = FontStyle.Normal
                 )
             }
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "Your grade: $grade",
+                text = "Your grade: ${item.grade}",
                 textAlign = TextAlign.Center,
                 fontSize = 24.sp,
                 fontStyle = FontStyle.Normal

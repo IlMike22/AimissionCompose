@@ -1,9 +1,12 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
@@ -11,11 +14,13 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.statistics.data.dto.Grade
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticData
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsOperation
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticUseCase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.UpdateStatisticUseCase
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -84,10 +89,13 @@ class LandingPageViewModel @Inject constructor(
                     StatisticsEntity(
                         id = "$currentMonthValue${currentYear}",
                         title = currentMonth.toMonthName(),
-                        amountGoalsCompleted = 0,
-                        amountGoalsStarted = 0,
-                        amountGoalsNotCompleted = 0,
-                        amountGoalsCreated = 0,
+                        data = StatisticData(
+                            totalAmount = 0,
+                            totalGoalsToDo = 0,
+                            totalGoalsDeprecated = 0,
+                            totalGoalsInProgress = 0,
+                            totalGoalsCompleted = 0
+                        ),
                         grade = Grade.NO_GOALS_COMPLETED_YET,
                         month = currentMonthValue,
                         year = currentYear,
@@ -175,6 +183,8 @@ class LandingPageViewModel @Inject constructor(
                     logoutUser()
                 }
             }
+            is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
+            is LandingPageUiEvent.ShowSnackbar -> TODO()
         }
     }
 
