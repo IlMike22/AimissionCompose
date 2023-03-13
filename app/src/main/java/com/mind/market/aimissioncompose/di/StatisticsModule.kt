@@ -3,14 +3,12 @@ package com.mind.market.aimissioncompose.di
 import com.google.firebase.database.DatabaseReference
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
+import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.statistics.data.IStatisticsRemoteDataSource
 import com.mind.market.aimissioncompose.statistics.data.StatisticsRepository
 import com.mind.market.aimissioncompose.statistics.data.implementation.StatisticsRemoteDataSource
 import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.CreateStatisticsGradeUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GetStatisticsUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticUseCase
+import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,4 +59,13 @@ object StatisticsModule {
     @Provides
     @Singleton
     fun provideCreateStatisticsGradeUseCase() = CreateStatisticsGradeUseCase()
+
+    @Provides
+    @Singleton
+    fun provideGenerateStatisticsUseCase(
+        repository: IStatisticsRepository, goalRepository: IGoalRepository
+    ) = GenerateStatisticsUseCase(
+        repository = repository,
+        goalRepository = goalRepository
+    )
 }
