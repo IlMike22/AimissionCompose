@@ -1,13 +1,12 @@
 package com.mind.market.aimissioncompose.statistics.domain.models
 
-import com.mind.market.aimissioncompose.statistics.data.dto.Grade
 import java.time.LocalDateTime
 
 data class StatisticsEntity(
     val id: String,
     val title: String,
     val data: StatisticData,
-    val grade: Grade,
+    val grade: StatisticsGrade,
     val month: Int,
     val year: Int,
     val lastUpdated: LocalDateTime,
@@ -18,7 +17,7 @@ data class StatisticsEntity(
             id = "000000",
             title = "",
             data = StatisticData.EMPTY,
-            grade = Grade.UNDEFINED,
+            grade = StatisticsGrade.UNDEFINED,
             month = -1,
             year = -1,
             lastUpdated = LocalDateTime.now(),

@@ -6,20 +6,17 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationDao
 import com.mind.market.aimissioncompose.auth.data.model.UserDto
 import com.mind.market.aimissioncompose.data.dto.GoalDto
-import com.mind.market.aimissioncompose.statistics.data.IStatisticsEntityDao
-import com.mind.market.aimissioncompose.statistics.data.dto.StatisticsEntityDto
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Database(
-    entities = [GoalDto::class, StatisticsEntityDto::class, UserDto::class],
+    entities = [GoalDto::class, UserDto::class],
     version = 5,
     autoMigrations = [AutoMigration(from = 3, to = 4)]
 )
 @TypeConverters(Converters::class)
 abstract class GoalRoomDatabase : RoomDatabase() {
     abstract fun goalDao(): IGoalDao
-    abstract fun statisticsDao(): IStatisticsEntityDao
 
     abstract fun authenticationDao(): IAuthenticationDao
 
@@ -31,16 +28,14 @@ abstract class GoalRoomDatabase : RoomDatabase() {
             INSTANCE?.let { database ->
                 scope.launch {
                     populateDatabase(
-                        database.goalDao(),
-                        database.statisticsDao()
+                        database.goalDao()
                     )
                 }
             }
         }
 
-        suspend fun populateDatabase(goalDao: IGoalDao, statisticsDao: IStatisticsEntityDao) {
+        suspend fun populateDatabase(goalDao: IGoalDao) {
             goalDao.deleteAll()
-            statisticsDao.deleteAll()
         }
     }
 

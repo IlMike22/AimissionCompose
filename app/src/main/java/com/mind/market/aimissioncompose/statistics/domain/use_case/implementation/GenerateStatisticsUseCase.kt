@@ -5,10 +5,9 @@ import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
-import com.mind.market.aimissioncompose.statistics.data.dto.Grade
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsGrade
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticData
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
-import com.mind.market.aimissioncompose.statistics.domain.repository.IStatisticsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -16,7 +15,6 @@ import java.time.LocalDateTime
 import java.time.Month
 
 class GenerateStatisticsUseCase(
-    private val repository: IStatisticsRepository,
     private val goalRepository: IGoalRepository
 ) {
     operator fun invoke(): Flow<List<StatisticsEntity>> {
@@ -114,29 +112,24 @@ class GenerateStatisticsUseCase(
         return statisticEntities
     }
 
-    private fun generateStatisticEntityGrade(data: StatisticData): Grade { // TODO MIC not done yet
+    private fun generateStatisticEntityGrade(data: StatisticData): StatisticsGrade {
         if (data.totalAmount == 0) {
-            return Grade.NO_GOALS_ADDED_YET
+            return StatisticsGrade.NO_GOALS_ADDED
         }
         if (data.totalGoalsDeprecated > 0) {
-            return Grade.DEPRECATED_GOALS_EXIST
+            return StatisticsGrade.DEPRECATED_GOAL_EXIST
         }
 
-        if (data.totalGoalsCompleted == data.totalAmount) {
-            return Grade.ALL_GOALS_COMPLETED
+        val allGoalsCompleted = data.totalAmount / data.totalGoalsInProgress == 1
+        val noGoalsCompleted = data.totalAmount / data.totalGoalsInProgress == data.totalAmount
+        val someGoalsCompleted = data.totalAmount / data.totalGoalsInProgress > 1 &&
+                data.totalAmount / data.totalGoalsInProgress < data.totalAmount
+        return when {
+            noGoalsCompleted -> StatisticsGrade.NO_GOALS_COMPLETED
+            allGoalsCompleted -> StatisticsGrade.ALL_GOALS_COMPLETED
+            someGoalsCompleted -> StatisticsGrade.SOME_GOALS_COMPLETED
+            else -> StatisticsGrade.UNDEFINED
         }
-        if (data.totalGoalsInProgress + 2 >= data.totalAmount) {
-            return Grade.NEARLY_ALL_GOALS_COMPLETED
-        } else if (data.totalGoalsInProgress + 4 >= data.totalAmount) {
-            return Grade.SOME_GOALS_COMPLETED
-        } else if (data.totalGoalsInProgress + 6 >= data.totalAmount) {
-            return Grade.FEW_GOALS_COMPLETED
-        }
-        if (data.totalGoalsCompleted == 0) {
-            return Grade.NO_GOALS_COMPLETED_YET
-        }
-
-        return Grade.UNDEFINED
     }
 
     private fun createStatisticsEntityId(createdDate: LocalDateTime) =

@@ -1,31 +1,19 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
-import com.google.android.play.core.review.ReviewManagerFactory
-import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
-import com.mind.market.aimissioncompose.statistics.data.dto.Grade
-import com.mind.market.aimissioncompose.statistics.domain.models.StatisticData
-import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
-import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsOperation
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.DoesStatisticExistsUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.InsertStatisticUseCase
-import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.UpdateStatisticUseCase
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import java.time.Month
 import javax.inject.Inject
 
@@ -37,10 +25,7 @@ class LandingPageViewModel @Inject constructor(
     private val getGoals: GetGoalsUseCase,
     private val updateGoalStatus: UpdateGoalStatusUseCase,
     private val isGoalOverdue: IsGoalOverdueUseCase,
-    private val settingsUseCase: ISettingsUseCase,
-    private val doesStatisticExist: DoesStatisticExistsUseCase,
-    private val insertStatisticEntity: InsertStatisticUseCase,
-    private val updateStatistic: UpdateStatisticUseCase
+    private val settingsUseCase: ISettingsUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(LandingPageState())
     val state = _state.stateIn(
@@ -66,54 +51,6 @@ class LandingPageViewModel @Inject constructor(
                     showGoalOverdueDialog = userSettings.showGoalOverdueDialog
                     getGoals().collect { handleGoalsResponse(it) }
                 }
-            }
-            launch {
-                createStatisticsIfNeeded()
-            }
-        }
-    }
-
-    private suspend fun createStatisticsIfNeeded() {
-        val currentDate = LocalDateTime.now()
-        val currentMonthValue = currentDate.monthValue
-        val currentMonth = currentDate.month
-        val currentYear = currentDate.year
-
-        doesStatisticExist(currentMonthValue, currentYear) { doesExist ->
-            if (doesExist) {
-                return@doesStatisticExist
-            }
-
-            viewModelScope.launch {
-                insertStatisticEntity(
-                    StatisticsEntity(
-                        id = "$currentMonthValue${currentYear}",
-                        title = currentMonth.toMonthName(),
-                        data = StatisticData(
-                            totalAmount = 0,
-                            totalGoalsToDo = 0,
-                            totalGoalsDeprecated = 0,
-                            totalGoalsInProgress = 0,
-                            totalGoalsCompleted = 0
-                        ),
-                        grade = Grade.NO_GOALS_COMPLETED_YET,
-                        month = currentMonthValue,
-                        year = currentYear,
-                        created = currentDate,
-                        lastUpdated = currentDate
-                    ),
-                    onResult = { isSuccess ->
-                        if (isSuccess.not()) {
-                            viewModelScope.launch {// TODO MIC try to avoid opening a new coroutine here (?)
-                                _uiEvent.send(
-                                    LandingPageUiEvent.ShowSnackbar(
-                                        message = "Unable to create statistics for current user."
-                                    )
-                                ) // TODO MIC reduce callback hell
-                            }
-                        }
-                    }
-                )
             }
         }
     }
@@ -153,10 +90,6 @@ class LandingPageViewModel @Inject constructor(
                                     newGoals.add(newGoal as Goal)
                                 } else {
                                     newGoals.add(it)
-                                }
-
-                                viewModelScope.launch {
-                                    updateStatistic(StatisticsOperation.Update(oldGoal, newGoal))
                                 }
                             }
                             _state.update {

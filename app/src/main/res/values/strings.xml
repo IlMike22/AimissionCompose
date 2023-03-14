@@ -28,5 +28,19 @@
     <string name="authentication_login_email_text">Your email address:</string>
     <string name="authentication_login_password_text">Your password:</string>
     <string name="authentication_login_header">Sign in with an existing account</string>
+    <string name="statistics_item_grade_text_all_goals_completed">Congratulations! You have completed all your goals for this month!</string>
+    <string name="statistics_item_grade_text_some_goals_completed">You are on a good way for this month. Continue like that!</string>
+    <string name="statistics_item_grade_text_no_goals_completed">No goal is done yet. Try to finish one!</string>
+    <string name="statistics_item_grade_text_no_goals_added">There are no goals for this month yet.</string>
+    <string name="statistics_item_grade_text_deprecated_goal">There is at least one goal deprecated. Try to make it better!</string>
+    <string name="statistics_item_grade_text_unknown_state">Somehow you managed to create an undefined state for your month grade.</string>
+    <string name="statistics_item_text_goals_created">Goals created:</string>
+    <string name="statistics_item_text_goals_completed">Goals completed:</string>
+    <string name="statistics_item_text_goals_deprecated">Goals deprecated:</string>
+    <string name="statistics_item_text_goals_started">Goals started:</string>
+    <string name="goal_text_delete_goal">Delete goal</string>
+    <string name="goal_text_genre">Genre</string>
+    <string name="goal_text_priority">Priority</string>
+    <string name="goal_text_status">Status</string>
 
 </resources>

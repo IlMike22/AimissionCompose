@@ -14,11 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getGenreIcon
@@ -47,37 +48,39 @@ fun Goal(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = goal.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    overflow = TextOverflow.Ellipsis
-                )
-
+                Column {
+                    Text(
+                        text = goal.title,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "${goal.creationDate}",
+                        fontSize = 12.sp
+                    )
+                }
                 Spacer(modifier = Modifier.weight(1f))
-
                 IconButton(
                     onClick = { onDeleteClicked(goal) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete goal"
+                        contentDescription = stringResource(R.string.goal_text_delete_goal)
                     )
 
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Image(
                     painter = painterResource(id = getGenreIcon(goal.genre)),
-                    contentDescription = "Genre",
+                    contentDescription = stringResource(R.string.goal_text_genre),
                     modifier = Modifier
                         .padding(top = 10.dp)
                         .height(24.dp)
                         .width(24.dp)
                 )
             }
-
             Spacer(modifier = Modifier.height(4.dp))
-
             Row(
                 modifier = modifier
                     .fillMaxWidth()
@@ -86,7 +89,7 @@ fun Goal(
             ) {
                 Text(
                     text = goal.description,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     overflow = TextOverflow.Ellipsis
                 )
             }
@@ -99,7 +102,7 @@ fun Goal(
                 if (goal.priority != Priority.MEDIUM && goal.priority != Priority.UNKNOWN) {
                     Image(
                         painter = painterResource(id = getPriorityIcon(goal.priority)),
-                        contentDescription = "Priority",
+                        contentDescription = stringResource(R.string.goal_text_priority),
                         modifier = Modifier
                             .padding(top = 10.dp)
                             .height(36.dp)
@@ -113,7 +116,7 @@ fun Goal(
                 ) {
                     Image(
                         painter = painterResource(id = getStatusIcon(goal.status)),
-                        contentDescription = "Status",
+                        contentDescription = stringResource(R.string.goal_text_status),
                         modifier = Modifier
                             .padding(top = 10.dp)
                             .height(36.dp)
