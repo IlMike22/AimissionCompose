@@ -135,7 +135,7 @@ class MainActivity : ComponentActivity() {
                                         onShowFeedbackDialog = ::showFeedbackDialog,
                                         searchText = searchText,
                                         isSearching = isSearching,
-                                        searchGoalResult = goals
+                                        goals = goals
                                     )
                                 }
                             }

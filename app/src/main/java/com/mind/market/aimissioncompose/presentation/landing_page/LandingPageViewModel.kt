@@ -47,12 +47,10 @@ class LandingPageViewModel @Inject constructor(
         .onEach {
             _isSearching.update { true } }
         .combine(_goals) { text, goals ->
-            println("!! value changed! $text")
             if (text.isBlank()) goals
             else {
                 delay(1000L)
                 goals.filter { goal ->
-                    println("!! does match ${goal.doesMatchSearchQuery(text)}  ")
                     goal.doesMatchSearchQuery(text)
                 }
             }

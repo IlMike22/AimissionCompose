@@ -46,7 +46,7 @@ fun LandingPageScreen(
     navController: NavController,
     searchText: String,
     isSearching: Boolean,
-    searchGoalResult: List<Goal>
+    goals: List<Goal>
 ) {
     val scaffoldState = rememberScaffoldState()
     val alertDialogState = rememberMaterialDialogState()
@@ -146,7 +146,7 @@ fun LandingPageScreen(
                     .fillMaxSize()
                     .padding(24.dp)
             ) {
-                if (state.isLoading) {
+                if (state.isLoading || isSearching) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
@@ -207,10 +207,6 @@ fun LandingPageScreen(
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize()
                             ) {
-                                val goals = searchGoalResult
-                                // TODO MIC currently empty list because changing search text value
-                                // does not trigger query check and therefore result list is always empty..
-
                                 items(goals) { goal ->
                                     Goal(
                                         modifier = Modifier
