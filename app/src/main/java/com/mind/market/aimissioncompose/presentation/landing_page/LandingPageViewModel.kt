@@ -12,6 +12,7 @@ import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Month
@@ -34,6 +35,37 @@ class LandingPageViewModel @Inject constructor(
         LandingPageState()
     )
 
+    // Searching for goals
+    private val _searchText = MutableStateFlow("")
+    val searchText = _searchText.asStateFlow()
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
+
+    private val _goals = MutableStateFlow(getGoals())
+    val goals = searchText
+        .debounce(1000L)
+        .onEach { _isSearching.update { true } }
+        .combine(_goals) { text, goals ->
+            if (text.isBlank()) goals
+            else {
+                delay(1000L)
+                goals.collectLatest { result ->
+                    if (result is Resource.Success) {
+                        result.data?.filter { goal ->
+                            goal.doesMatchSearchQuery(text)
+                        }
+                    }
+                }
+            }
+        }
+        .onEach { _isSearching.update { false } }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            _goals.value
+        )
+
+
     var isDeleteAllGoals: LiveData<Boolean>? = null
     private var isDoneGoalHidden = false
     private var showGoalOverdueDialog = false
@@ -42,6 +74,13 @@ class LandingPageViewModel @Inject constructor(
 
     private val _uiEvent = Channel<LandingPageUiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
+
+    val searchResult = state
+        .debounce(1000L)
+        .onEach { _state.value.copy(isLoading = true) }
+        .combine(_state) {
+
+        }
 
     init {
         viewModelScope.launch {
@@ -118,6 +157,9 @@ class LandingPageViewModel @Inject constructor(
             }
             is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
             is LandingPageUiEvent.ShowSnackbar -> TODO()
+            is LandingPageUiEvent.OnSearchTextUpdate -> {
+                _state.update { it.copy(searchText = event.newText) }
+            }
         }
     }
 
@@ -264,6 +306,18 @@ class LandingPageViewModel @Inject constructor(
             Status.IN_PROGRESS -> Status.DONE
             else -> Status.UNKNOWN
         }
+
+    private fun Goal.doesMatchSearchQuery(query: String): Boolean {
+        val matchingCombinations = listOf(
+            "${title.first()}",
+            "${description.first()}",
+            "${title.substring(0, 2)}",
+        )
+
+        return matchingCombinations.any {
+            it.contains(query, ignoreCase = true)
+        }
+    }
 
     companion object {
 

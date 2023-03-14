@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun AuthenticationScreen(
-    modifier: Modifier = Modifier,
     viewModel: AuthenticationViewModel,
     navController: NavController,
     state: AuthenticationState,

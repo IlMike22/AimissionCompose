@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
@@ -115,10 +116,10 @@ fun LandingPageScreen(
                         }
                     ) { Text(text = "Statistic") }
 
-                        Button(
-                            modifier = Modifier.align(Center),
-                            onClick = { onShowFeedbackDialog() }
-                        ) { Text(text = "Review") }
+                    Button(
+                        modifier = Modifier.align(Center),
+                        onClick = { onShowFeedbackDialog() }
+                    ) { Text(text = "Review") }
 
                     Button(
                         modifier = Modifier
@@ -129,7 +130,8 @@ fun LandingPageScreen(
                 Text(
                     modifier = Modifier.padding(16.dp),
                     text = "Review dialog only works when app is in Google Play.",
-                    color = Color.White)
+                    color = Color.White
+                )
             },
             sheetBackgroundColor = Color.Blue,
             sheetPeekHeight = 36.dp,
@@ -184,39 +186,65 @@ fun LandingPageScreen(
                         }
                     }
                 } else {
-                    FloatingActionButton(
-                        onClick = { navController.navigate(Route.ADD) }
-                    ) {
-                        Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
-                    }
-
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        val goals = state.goals
-
-                        items(goals) { goal ->
-                            Goal(
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column {
+                            OutlinedTextField(
+                                value = state.searchText,
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .fillMaxSize()
-                                    .clickable {
-                                        navController.navigate(Route.ADD + "?goalId=${goal.id}")
-                                    }
-                                    .padding(8.dp),
-                                goal = goal,
-                                onDeleteClicked = { goalToDelete ->
-                                    onEvent(LandingPageUiEvent.OnDeleteGoalClicked(goalToDelete))
+                                    .padding(bottom = 8.dp),
+                                onValueChange = {
+                                    onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
                                 },
-                                onStatusChangeClicked = { selectedGoal ->
-                                    onEvent(LandingPageUiEvent.OnStatusChangedClicked(selectedGoal))
+                                placeholder = {
+                                    if (state.searchText.isBlank()) Text(text = "Search for a goal")
                                 }
                             )
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                val goals = state.goals
 
-                            Divider(
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-                            )
+                                items(goals) { goal ->
+                                    Goal(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .fillMaxSize()
+                                            .clickable {
+                                                navController.navigate(Route.ADD + "?goalId=${goal.id}")
+                                            }
+                                            .padding(8.dp),
+                                        goal = goal,
+                                        onDeleteClicked = { goalToDelete ->
+                                            onEvent(
+                                                LandingPageUiEvent.OnDeleteGoalClicked(
+                                                    goalToDelete
+                                                )
+                                            )
+                                        },
+                                        onStatusChangeClicked = { selectedGoal ->
+                                            onEvent(
+                                                LandingPageUiEvent.OnStatusChangedClicked(
+                                                    selectedGoal
+                                                )
+                                            )
+                                        }
+                                    )
+
+                                    Divider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                    )
+                                }
+                            }
+                        }
+                        FloatingActionButton(
+                            modifier = Modifier
+                                .align(BottomEnd)
+                                .padding(bottom = 24.dp),
+                            onClick = { navController.navigate(Route.ADD) }
+                        ) {
+                            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
                         }
                     }
                 }
