@@ -24,6 +24,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
+import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
@@ -42,7 +43,10 @@ fun LandingPageScreen(
     uiEvent: Flow<LandingPageUiEvent>,
     onEvent: (LandingPageUiEvent) -> Unit,
     onShowFeedbackDialog: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    searchText: String,
+    isSearching: Boolean,
+    searchGoalResult: List<Goal>
 ) {
     val scaffoldState = rememberScaffoldState()
     val alertDialogState = rememberMaterialDialogState()
@@ -189,7 +193,7 @@ fun LandingPageScreen(
                     Box(modifier = Modifier.fillMaxSize()) {
                         Column {
                             OutlinedTextField(
-                                value = state.searchText,
+                                value = searchText,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(bottom = 8.dp),
@@ -203,7 +207,9 @@ fun LandingPageScreen(
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize()
                             ) {
-                                val goals = state.goals
+                                val goals = searchGoalResult
+                                // TODO MIC currently empty list because changing search text value
+                                // does not trigger query check and therefore result list is always empty..
 
                                 items(goals) { goal ->
                                     Goal(

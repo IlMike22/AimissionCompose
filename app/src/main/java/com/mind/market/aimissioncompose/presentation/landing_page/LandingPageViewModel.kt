@@ -41,7 +41,7 @@ class LandingPageViewModel @Inject constructor(
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
-    private val _goals = MutableStateFlow(getGoals())
+    private var _goals = MutableStateFlow(emptyList<Goal>())
     val goals = searchText
         .debounce(1000L)
         .onEach { _isSearching.update { true } }
@@ -49,14 +49,11 @@ class LandingPageViewModel @Inject constructor(
             if (text.isBlank()) goals
             else {
                 delay(1000L)
-                goals.collectLatest { result ->
-                    if (result is Resource.Success) {
-                        result.data?.filter { goal ->
-                            goal.doesMatchSearchQuery(text)
-                        }
-                    }
+                goals.filter { goal ->
+                    goal.doesMatchSearchQuery(text)
                 }
             }
+
         }
         .onEach { _isSearching.update { false } }
         .stateIn(
@@ -64,7 +61,6 @@ class LandingPageViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5_000),
             _goals.value
         )
-
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
     private var isDoneGoalHidden = false
@@ -75,20 +71,15 @@ class LandingPageViewModel @Inject constructor(
     private val _uiEvent = Channel<LandingPageUiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    val searchResult = state
-        .debounce(1000L)
-        .onEach { _state.value.copy(isLoading = true) }
-        .combine(_state) {
-
-        }
-
     init {
         viewModelScope.launch {
+            getGoals().collect {
+                handleGoalsResponse(it)
+            }
             launch {
                 settingsUseCase.getUserSettings().collect { userSettings ->
                     isDoneGoalHidden = userSettings.isHideDoneGoals
                     showGoalOverdueDialog = userSettings.showGoalOverdueDialog
-                    getGoals().collect { handleGoalsResponse(it) }
                 }
             }
         }
@@ -158,7 +149,7 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
             is LandingPageUiEvent.ShowSnackbar -> TODO()
             is LandingPageUiEvent.OnSearchTextUpdate -> {
-                _state.update { it.copy(searchText = event.newText) }
+                _searchText.value = event.newText
             }
         }
     }
@@ -236,17 +227,17 @@ class LandingPageViewModel @Inject constructor(
     private fun handleGoalsResponse(response: Resource<List<Goal>>) {
         when (response) {
             is Resource.Success -> {
-                val goals = response.data ?: emptyList()
-
+                val goalResult = response.data ?: emptyList()
+                _goals = MutableStateFlow(response.data ?: emptyList())
                 _state.update {
                     it.copy(
-                        goals = if (isDoneGoalHidden) filterGoals(goals) else goals,
+                        goals = if (isDoneGoalHidden) filterGoals(goalResult) else goalResult,
                         isLoading = false,
                         errorMessage = null
                     )
                 }
 
-                showGoalOverdueDialogIfNeeded(goals)
+                showGoalOverdueDialogIfNeeded(goalResult)
             }
 
             is Resource.Loading -> {
@@ -308,14 +299,21 @@ class LandingPageViewModel @Inject constructor(
         }
 
     private fun Goal.doesMatchSearchQuery(query: String): Boolean {
-        val matchingCombinations = listOf(
-            "${title.first()}",
-            "${description.first()}",
-            "${title.substring(0, 2)}",
-        )
+        return try {
+            val matchingCombinations = listOf(
+                "${title.first()}",
+                "${title.first()}${title[1]}",
+                "${title.first()}${title[1]}${title[2]}",
+                "${description.first()}",
+                "${description.first()}${description[1]}",
+                "${description.first()}${description[1]}${description[2]}",
+            )
 
-        return matchingCombinations.any {
-            it.contains(query, ignoreCase = true)
+            matchingCombinations.any {
+                it.contains(query, ignoreCase = true)
+            }
+        } catch (exception: MatchSearchQueryException) {
+            false
         }
     }
 

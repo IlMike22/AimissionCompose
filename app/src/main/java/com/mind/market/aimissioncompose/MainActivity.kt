@@ -124,12 +124,18 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     val viewModel = hiltViewModel<LandingPageViewModel>()
                                     val state by viewModel.state.collectAsState()
+                                    val searchText by viewModel.searchText.collectAsState()
+                                    val isSearching by viewModel.isSearching.collectAsState()
+                                    val goals by viewModel.goals.collectAsState()
                                     LandingPageScreen(
                                         navController = navController,
                                         state = state,
                                         uiEvent = viewModel.uiEvent,
                                         onEvent = viewModel::onEvent,
-                                        onShowFeedbackDialog = ::showFeedbackDialog
+                                        onShowFeedbackDialog = ::showFeedbackDialog,
+                                        searchText = searchText,
+                                        isSearching = isSearching,
+                                        searchGoalResult = goals
                                     )
                                 }
                             }
