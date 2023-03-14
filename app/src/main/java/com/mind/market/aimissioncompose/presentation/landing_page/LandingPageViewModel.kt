@@ -44,16 +44,18 @@ class LandingPageViewModel @Inject constructor(
     private var _goals = MutableStateFlow(emptyList<Goal>())
     val goals = searchText
         .debounce(1000L)
-        .onEach { _isSearching.update { true } }
+        .onEach {
+            _isSearching.update { true } }
         .combine(_goals) { text, goals ->
+            println("!! value changed! $text")
             if (text.isBlank()) goals
             else {
                 delay(1000L)
                 goals.filter { goal ->
+                    println("!! does match ${goal.doesMatchSearchQuery(text)}  ")
                     goal.doesMatchSearchQuery(text)
                 }
             }
-
         }
         .onEach { _isSearching.update { false } }
         .stateIn(
@@ -228,7 +230,7 @@ class LandingPageViewModel @Inject constructor(
         when (response) {
             is Resource.Success -> {
                 val goalResult = response.data ?: emptyList()
-                _goals = MutableStateFlow(response.data ?: emptyList())
+                _goals.value = response.data ?: emptyList()
                 _state.update {
                     it.copy(
                         goals = if (isDoneGoalHidden) filterGoals(goalResult) else goalResult,
@@ -299,7 +301,7 @@ class LandingPageViewModel @Inject constructor(
         }
 
     private fun Goal.doesMatchSearchQuery(query: String): Boolean {
-        return try {
+        return try { // TODO MIC optimize filtering e.g. query as substring in title or description..
             val matchingCombinations = listOf(
                 "${title.first()}",
                 "${title.first()}${title[1]}",
