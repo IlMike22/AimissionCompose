@@ -14,11 +14,15 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -38,18 +42,18 @@ import kotlinx.coroutines.flow.Flow
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun LandingPageScreen(
-    state: LandingPageState,
+    state: LandingPageUiState,
     modifier: Modifier = Modifier,
     uiEvent: Flow<LandingPageUiEvent>,
     onEvent: (LandingPageUiEvent) -> Unit,
     onShowFeedbackDialog: () -> Unit,
     navController: NavController,
     searchText: String,
-    isSearching: Boolean,
     goals: List<Goal>
 ) {
     val scaffoldState = rememberScaffoldState()
     val alertDialogState = rememberMaterialDialogState()
+    val focusRequester = remember { FocusRequester() }
 
     val detailPageScreenResult = navController.currentBackStackEntry
         ?.savedStateHandle
@@ -86,6 +90,7 @@ fun LandingPageScreen(
                                 SnackBarAction.UNDO -> {
                                     onEvent(LandingPageUiEvent.OnUndoDeleteGoalClicked)
                                 }
+                                else -> {}
                             }
                         }
                         SnackbarResult.Dismissed -> Unit
@@ -94,6 +99,7 @@ fun LandingPageScreen(
                 is LandingPageUiEvent.ShowGoalOverdueDialog -> {
                     alertDialogState.show()
                 }
+                else -> {}
             }
         }
     }
@@ -146,16 +152,7 @@ fun LandingPageScreen(
                     .fillMaxSize()
                     .padding(24.dp)
             ) {
-                if (state.isLoading || isSearching) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else if (state.goals.isEmpty()) {
-                    // show empty screen
+                if (state.hasResults.not() && state.isLoading.not()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -165,7 +162,7 @@ fun LandingPageScreen(
                             modifier = Modifier
                                 .padding(16.dp)
                                 .align(Center)
-                        ) {
+                        ) {// EMPTY SCREEN
                             Text(
                                 text = "No goals yet",
                                 style = MaterialTheme.typography.h4
@@ -189,64 +186,87 @@ fun LandingPageScreen(
                             }
                         }
                     }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Column {
-                            OutlinedTextField(
-                                value = searchText,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 8.dp),
-                                onValueChange = {
-                                    onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
-                                },
-                                placeholder = {
-                                    if (state.searchText.isBlank()) Text(text = "Search for a goal")
-                                }
-                            )
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                items(goals) { goal ->
-                                    Goal(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxSize()
-                                            .clickable {
-                                                navController.navigate(Route.ADD + "?goalId=${goal.id}")
-                                            }
-                                            .padding(8.dp),
-                                        goal = goal,
-                                        onDeleteClicked = { goalToDelete ->
-                                            onEvent(
-                                                LandingPageUiEvent.OnDeleteGoalClicked(
-                                                    goalToDelete
-                                                )
-                                            )
-                                        },
-                                        onStatusChangeClicked = { selectedGoal ->
-                                            onEvent(
-                                                LandingPageUiEvent.OnStatusChangedClicked(
-                                                    selectedGoal
-                                                )
-                                            )
-                                        }
-                                    )
+                } else if (state.errorMessage != null) { // ERROR CASE
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        Text(
+                            modifier = Modifier.align(Center),
+                            text = "An error occured! Please try again. Details: ${state.errorMessage}"
+                        )
+                    }
 
-                                    Divider(
-                                        modifier = Modifier
-                                            .padding(horizontal = 16.dp)
-                                    )
+                } else {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        value = searchText,
+                        onValueChange = {
+                            onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
+                        },
+                        placeholder = {
+                            if (state.searchText.isBlank()) Text(text = "Search for a goal")
+                        }
+                    )
+
+                    if (state.isLoading) {
+                        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+                            CircularProgressIndicator(modifier = Modifier.align(TopCenter))
+                        }
+                    } else {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            Column {
+                                LazyColumn(
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    items(goals) { goal ->
+                                        Goal(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .fillMaxSize()
+                                                .clickable {
+                                                    navController.navigate(Route.ADD + "?goalId=${goal.id}")
+                                                }
+                                                .padding(8.dp),
+                                            goal = goal,
+                                            onDeleteClicked = { goalToDelete ->
+                                                onEvent(
+                                                    LandingPageUiEvent.OnDeleteGoalClicked(
+                                                        goalToDelete
+                                                    )
+                                                )
+                                            },
+                                            onStatusChangeClicked = { selectedGoal ->
+                                                onEvent(
+                                                    LandingPageUiEvent.OnStatusChangedClicked(
+                                                        selectedGoal
+                                                    )
+                                                )
+                                            }
+                                        )
+
+                                        Divider(
+                                            modifier = Modifier
+                                                .padding(horizontal = 16.dp)
+                                        )
+                                    }
                                 }
                             }
-                        }
-                        FloatingActionButton(
-                            modifier = Modifier
-                                .align(BottomEnd)
-                                .padding(bottom = 24.dp),
-                            onClick = { navController.navigate(Route.ADD) }
-                        ) {
-                            Icon(imageVector = Icons.Filled.Add, contentDescription = "Add goal")
+                            FloatingActionButton(
+                                modifier = Modifier
+                                    .align(BottomEnd)
+                                    .padding(bottom = 24.dp),
+                                onClick = { navController.navigate(Route.ADD) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = "Add goal"
+                                )
+                            }
                         }
                     }
                 }

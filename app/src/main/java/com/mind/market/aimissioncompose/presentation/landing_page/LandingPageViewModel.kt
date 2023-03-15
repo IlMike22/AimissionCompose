@@ -28,24 +28,23 @@ class LandingPageViewModel @Inject constructor(
     private val isGoalOverdue: IsGoalOverdueUseCase,
     private val settingsUseCase: ISettingsUseCase
 ) : ViewModel() {
-    private val _state = MutableStateFlow(LandingPageState())
-    val state = _state.stateIn(
+    private val _uiState = MutableStateFlow(LandingPageUiState())
+    val state = _uiState.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        LandingPageState()
+        LandingPageUiState()
     )
 
     // Searching for goals
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching = _isSearching.asStateFlow()
 
     private var _goals = MutableStateFlow(emptyList<Goal>())
     val goals = searchText
         .debounce(1000L)
         .onEach {
-            _isSearching.update { true } }
+            _uiState.update { it.copy(isLoading = true, requestSearchTextFocus = true) }
+        }
         .combine(_goals) { text, goals ->
             if (text.isBlank()) goals
             else {
@@ -55,7 +54,7 @@ class LandingPageViewModel @Inject constructor(
                 }
             }
         }
-        .onEach { _isSearching.update { false } }
+        .onEach { _uiState.update { it.copy(isLoading = false, requestSearchTextFocus = true) } }
         .stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5_000),
@@ -105,7 +104,7 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnStatusChangedClicked -> {
                 event.goal?.apply {
                     viewModelScope.launch {
-                        val oldGoals = _state.value.goals
+                        val oldGoals = _goals.value
                         val oldGoal = oldGoals.firstOrNull {
                             it.id == this@apply.id
                         }
@@ -122,12 +121,10 @@ class LandingPageViewModel @Inject constructor(
                                     newGoals.add(it)
                                 }
                             }
-                            _state.update {
-                                it.copy(goals = newGoals)
-                            }
+                            _goals.value = newGoals
                         }
                     }
-                } ?: _state.update {
+                } ?: _uiState.update {
                     it.copy(
                         errorMessage = "Cannot update goal because it is invalid."
                     )
@@ -170,13 +167,13 @@ class LandingPageViewModel @Inject constructor(
 
     private fun cacheAndDeleteGoal(goal: Goal) {
         deletedGoal = goal
-        goalIndex = state.value.goals.indexOf(goal)
+        goalIndex = _goals.value.indexOf(goal)
         goal.apply {
             viewModelScope.launch {
                 try {
                     deleteGoal(goal) { isGoalDeleted ->
                         if (isGoalDeleted.not()) {
-                            _state.update {
+                            _uiState.update {
                                 it.copy(errorMessage = "Goal could not be deleted. Try again.")
                             }
                             return@deleteGoal
@@ -184,17 +181,12 @@ class LandingPageViewModel @Inject constructor(
 
                         deletedGoal = goal
                         val updatedGoals = mutableListOf<Goal>()
-                        _state.value.goals.forEach {
+                        _goals.value.forEach {
                             if (it != deletedGoal) {
                                 updatedGoals.add(it)
                             }
                         }
-
-                        _state.update {
-                            it.copy(
-                                goals = updatedGoals
-                            )
-                        }
+                        _goals.value = updatedGoals
                         viewModelScope.launch {
                             _uiEvent.send(
                                 LandingPageUiEvent.ShowSnackbar(
@@ -215,11 +207,7 @@ class LandingPageViewModel @Inject constructor(
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
                 insertGoal(deletedGoal)
-                _state.update {
-                    it.copy(
-                        goals = state.value.goals + deletedGoal
-                    )
-                }
+                _goals.value + deletedGoal
             }
         }
     }
@@ -227,31 +215,34 @@ class LandingPageViewModel @Inject constructor(
     private fun handleGoalsResponse(response: Resource<List<Goal>>) {
         when (response) {
             is Resource.Success -> {
-                val goalResult = response.data ?: emptyList()
-                _goals.value = response.data ?: emptyList()
-                _state.update {
+                _goals.value = filterGoals(response.data ?: emptyList())
+                _uiState.update {
                     it.copy(
-                        goals = if (isDoneGoalHidden) filterGoals(goalResult) else goalResult,
+                        hasResults = response.data?.isNotEmpty() ?: false,
                         isLoading = false,
-                        errorMessage = null
+                        errorMessage = null,
+                        requestSearchTextFocus = true
                     )
                 }
 
-                showGoalOverdueDialogIfNeeded(goalResult)
+                showGoalOverdueDialogIfNeeded(_goals.value)
             }
 
             is Resource.Loading -> {
-                _state.update {
+                _uiState.update {
                     it.copy(
-                        isLoading = response.isLoading
+                        isLoading = response.isLoading,
+                        requestSearchTextFocus = false
                     )
                 }
             }
             is Resource.Error -> {
-                _state.update {
+                _uiState.update {
+                    _goals.value = emptyList()
                     it.copy(
-                        goals = emptyList(),
                         isLoading = false,
+                        hasResults = false,
+                        requestSearchTextFocus = false,
                         errorMessage = response.message ?: "Unknown error while loading data."
                     )
                 }
@@ -299,9 +290,10 @@ class LandingPageViewModel @Inject constructor(
         }
 
     private fun Goal.doesMatchSearchQuery(query: String): Boolean {
-        return try { // TODO MIC optimize filtering e.g. query as substring in title or description..
+        return try {
             val matchingCombinations = listOf(
-                "${title.first()}",
+                title,
+                description,
                 "${title.first()}${title[1]}",
                 "${title.first()}${title[1]}${title[2]}",
                 "${description.first()}",
@@ -318,7 +310,6 @@ class LandingPageViewModel @Inject constructor(
     }
 
     companion object {
-
         private fun Month.toMonthName(): String =
             when (this) {
                 Month.JANUARY -> "January"
