@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -66,7 +67,6 @@ class MainActivity : ComponentActivity() {
                                 Text(text = "AimissionCompose")
                             },
                             actions = {
-                                // RowScope here, so these icons will be placed horizontally
                                 IconButton(
                                     onClick = {
                                         navController.navigate(Route.ADD)
@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     Icon(
                                         Icons.Filled.Create,
-                                        contentDescription = "Open Statistics"
+                                        contentDescription = "Add new goal"
                                     )
                                 }
                                 IconButton(
@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 ) {
                                     Icon(
-                                        Icons.Filled.Create,
+                                        Icons.Filled.Star,
                                         contentDescription = "Open statistics"
                                     )
                                 }

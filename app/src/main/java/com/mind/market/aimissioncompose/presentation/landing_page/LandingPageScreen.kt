@@ -11,10 +11,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
@@ -23,9 +22,13 @@ import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.domain.models.Goal
@@ -75,6 +78,10 @@ fun LandingPageScreen(
     val bottomSheetScaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = sheetState
     )
+
+    var dropDownPosition by remember {
+        mutableStateOf(Size.Zero)
+    }
 
     LaunchedEffect(key1 = true) {
         uiEvent.collect { event ->
@@ -199,87 +206,138 @@ fun LandingPageScreen(
                     }
 
                 } else {
-                    OutlinedTextField(
+                    Row(
                         modifier = Modifier
-                            .focusRequester(focusRequester)
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        value = searchText,
-                        onValueChange = {
-                            onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
-                        },
-                        placeholder = {
-                            if (state.searchText.isBlank()) Text(text = "Search for a goal")
-                        }
-                    )
-
-                    if (state.isLoading) {
-                        Box(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-                            CircularProgressIndicator(modifier = Modifier.align(TopCenter))
-                        }
-                    } else {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Column {
-                                LazyColumn(
-                                    modifier = Modifier.fillMaxSize()
-                                ) {
-                                    items(goals) { goal ->
-                                        Goal(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .fillMaxSize()
-                                                .clickable {
-                                                    navController.navigate(Route.ADD + "?goalId=${goal.id}")
-                                                }
-                                                .padding(8.dp),
-                                            goal = goal,
-                                            onDeleteClicked = { goalToDelete ->
-                                                onEvent(
-                                                    LandingPageUiEvent.OnDeleteGoalClicked(
-                                                        goalToDelete
-                                                    )
-                                                )
-                                            },
-                                            onStatusChangeClicked = { selectedGoal ->
-                                                onEvent(
-                                                    LandingPageUiEvent.OnStatusChangedClicked(
-                                                        selectedGoal
-                                                    )
-                                                )
-                                            }
-                                        )
-
-                                        Divider(
-                                            modifier = Modifier
-                                                .padding(horizontal = 16.dp)
-                                        )
-                                    }
-                                }
+                    ) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .weight(1f)
+                                .focusRequester(focusRequester)
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            value = searchText,
+                            onValueChange = {
+                                onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
+                            },
+                            placeholder = {
+                                if (state.searchText.isBlank()) Text(text = "Search for a goal")
                             }
-                            FloatingActionButton(
-                                modifier = Modifier
-                                    .align(BottomEnd)
-                                    .padding(bottom = 24.dp),
-                                onClick = { navController.navigate(Route.ADD) }
-                            ) {
+                        )
+                        IconButton(
+                            onClick = { onEvent(LandingPageUiEvent.OnDropDownStateChanged(true)) },
+                            modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
+                                dropDownPosition = layoutCoordinates.size.toSize()
+                            },
+                            content = {
                                 Icon(
-                                    imageVector = Icons.Filled.Add,
-                                    contentDescription = "Add goal"
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "sort"
                                 )
                             }
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = state.isDropDownExpanded,
+                        onDismissRequest = { onEvent(LandingPageUiEvent.OnDropDownStateChanged(false)) },
+//                        modifier = Modifier
+//                            .width(with(LocalDensity.current) { dropDownPosition.width.toDp() })
+//                            .height(with(LocalDensity.current) { dropDownPosition.height.toDp() })
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            onEvent(LandingPageUiEvent.OnSortingChanged(SortingMode.SORT_BY_GENRE))
+                        }) {
+                            Text(text = "Sort by Genre")
+
+                        }
+                        DropdownMenuItem(onClick = {
+                            onEvent(LandingPageUiEvent.OnDropDownStateChanged(false))
+                        }) {
+                            Text(text = "Sort by Status")
+
+                        }
+                        DropdownMenuItem(onClick = {
+                            onEvent(LandingPageUiEvent.OnDropDownStateChanged(false))
+                        }) {
+                            Text(text = "Sort by completed goals")
                         }
                     }
                 }
-
-                MaterialDialog(
-                    dialogState = alertDialogState,
-                    buttons = {
-                        positiveButton("OK")
+                if (state.isLoading) { // LOADING SCREEN
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .align(TopCenter)
+                                .padding(top = 24.dp)
+                        )
                     }
-                ) {
-                    title(text = "Goal(s) overdued")
-                    message(text = "At least one goal is overdued. Take care of your goals.")
+                } else {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Column {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(goals) { goal ->
+                                    Goal(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .fillMaxSize()
+                                            .clickable {
+                                                navController.navigate(Route.ADD + "?goalId=${goal.id}")
+                                            }
+                                            .padding(8.dp),
+                                        goal = goal,
+                                        onDeleteClicked = { goalToDelete ->
+                                            onEvent(
+                                                LandingPageUiEvent.OnDeleteGoalClicked(
+                                                    goalToDelete
+                                                )
+                                            )
+                                        },
+                                        onStatusChangeClicked = { selectedGoal ->
+                                            onEvent(
+                                                LandingPageUiEvent.OnStatusChangedClicked(
+                                                    selectedGoal
+                                                )
+                                            )
+                                        }
+                                    )
+
+                                    Divider(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                    )
+                                }
+                            }
+                        }
+                        FloatingActionButton(
+                            modifier = Modifier
+                                .align(BottomEnd)
+                                .padding(bottom = 24.dp),
+                            onClick = { navController.navigate(Route.ADD) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Add goal"
+                            )
+                        }
+                    }
                 }
+            }
+
+            MaterialDialog(
+                dialogState = alertDialogState,
+                buttons = {
+                    positiveButton("OK")
+                }
+            ) {
+                title(text = "Goal(s) overdued")
+                message(text = "At least one goal is overdued. Take care of your goals.")
             }
         }
     }

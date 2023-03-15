@@ -7,6 +7,7 @@ import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
+import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
@@ -147,6 +148,23 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.ShowSnackbar -> TODO()
             is LandingPageUiEvent.OnSearchTextUpdate -> {
                 _searchText.value = event.newText
+            }
+            is LandingPageUiEvent.OnDropDownStateChanged -> {
+                _uiState.update { it.copy(isDropDownExpanded = event.isVisible) }
+            }
+            is LandingPageUiEvent.OnSortingChanged -> {
+                _uiState.update { it.copy(isDropDownExpanded = false) }
+                when (event.sortMode) {
+                    SortingMode.SORT_BY_GENRE -> {
+                        _goals.update { goals ->
+                            goals.filter { goal ->
+                                goal.genre == Genre.BUSINESS // TODO MIC go on next time
+                            }
+                        }
+                    }
+                    SortingMode.SORT_BY_STATUS -> TODO()
+                    SortingMode.SORT_BY_GOALS_COMPLETED -> TODO()
+                }
             }
         }
     }
