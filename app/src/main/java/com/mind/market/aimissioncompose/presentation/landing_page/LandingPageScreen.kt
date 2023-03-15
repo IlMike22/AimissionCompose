@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
@@ -252,7 +253,12 @@ fun LandingPageScreen(
                                 SortingMode.values().forEach {
                                     DropdownMenuItem(onClick = {
                                         onEvent(LandingPageUiEvent.OnSortingChanged(it))
-                                    }) { Text(text = it.name) }
+                                    }) {
+                                        Text(
+                                            text = it.name,
+                                            fontWeight = if (state.selectedSortMode == it) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    }
                                 }
                             }
                         }

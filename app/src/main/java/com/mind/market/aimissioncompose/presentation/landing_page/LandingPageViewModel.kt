@@ -159,21 +159,25 @@ class LandingPageViewModel @Inject constructor(
                         _goals.update { goals ->
                             goals.sortedByDescending { it.status == Status.IN_PROGRESS }
                         }
+                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_PROGRESS) }
                     }
                     SortingMode.SORT_BY_GOALS_IN_TODO -> {
                         _goals.update { goals ->
                             goals.sortedByDescending { it.status == Status.TODO }
                         }
+                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_TODO) }
                     }
                     SortingMode.SORT_BY_GOALS_COMPLETED -> {
                         _goals.update { goals ->
                             goals.sortedByDescending { it.status == Status.DONE }
                         }
+                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_COMPLETED) }
                     }
                     SortingMode.SORT_BY_GOALS_DEPRECATED -> {
                         _goals.update { goals ->
                             goals.sortedByDescending { it.status == Status.DEPRECATED }
                         }
+                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_DEPRECATED) }
                     }
                 }
             }
