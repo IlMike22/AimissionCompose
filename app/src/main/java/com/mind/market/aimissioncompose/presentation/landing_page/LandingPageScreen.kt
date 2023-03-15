@@ -25,7 +25,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -35,6 +34,7 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
+import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -224,43 +224,35 @@ fun LandingPageScreen(
                                 if (state.searchText.isBlank()) Text(text = "Search for a goal")
                             }
                         )
-                        IconButton(
-                            onClick = { onEvent(LandingPageUiEvent.OnDropDownStateChanged(true)) },
-                            modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
-                                dropDownPosition = layoutCoordinates.size.toSize()
-                            },
-                            content = {
-                                Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "sort"
-                                )
+                        Box {
+                            IconButton(
+                                onClick = { onEvent(LandingPageUiEvent.OnDropDownStateChanged(true)) },
+                                modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
+                                    dropDownPosition = layoutCoordinates.size.toSize()
+                                },
+                                content = {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowDropDown,
+                                        contentDescription = "sort"
+                                    )
+                                }
+                            )
+                            DropdownMenu(
+                                expanded = state.isDropDownExpanded,
+                                onDismissRequest = {
+                                    onEvent(
+                                        LandingPageUiEvent.OnDropDownStateChanged(
+                                            false
+                                        )
+                                    )
+                                }
+                            ) {
+                                SortingMode.values().forEach {
+                                    DropdownMenuItem(onClick = {
+                                        onEvent(LandingPageUiEvent.OnSortingChanged(it))
+                                    }) { Text(text = it.name) }
+                                }
                             }
-                        )
-                    }
-
-                    DropdownMenu(
-                        expanded = state.isDropDownExpanded,
-                        onDismissRequest = { onEvent(LandingPageUiEvent.OnDropDownStateChanged(false)) },
-//                        modifier = Modifier
-//                            .width(with(LocalDensity.current) { dropDownPosition.width.toDp() })
-//                            .height(with(LocalDensity.current) { dropDownPosition.height.toDp() })
-                    ) {
-                        DropdownMenuItem(onClick = {
-                            onEvent(LandingPageUiEvent.OnSortingChanged(SortingMode.SORT_BY_GENRE))
-                        }) {
-                            Text(text = "Sort by Genre")
-
-                        }
-                        DropdownMenuItem(onClick = {
-                            onEvent(LandingPageUiEvent.OnDropDownStateChanged(false))
-                        }) {
-                            Text(text = "Sort by Status")
-
-                        }
-                        DropdownMenuItem(onClick = {
-                            onEvent(LandingPageUiEvent.OnDropDownStateChanged(false))
-                        }) {
-                            Text(text = "Sort by completed goals")
                         }
                     }
                 }

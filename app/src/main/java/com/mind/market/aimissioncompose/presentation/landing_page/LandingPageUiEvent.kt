@@ -2,6 +2,7 @@ package com.mind.market.aimissioncompose.presentation.landing_page
 
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
+import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 
 sealed class LandingPageUiEvent(val goal: Goal? = null) {
     data class ShowSnackbar(
@@ -20,10 +21,4 @@ sealed class LandingPageUiEvent(val goal: Goal? = null) {
     data class OnSearchTextUpdate(val newText: String) : LandingPageUiEvent()
     class OnDropDownStateChanged(val isVisible: Boolean = false) : LandingPageUiEvent()
     class OnSortingChanged(val sortMode: SortingMode): LandingPageUiEvent()
-}
-
-enum class SortingMode {
-    SORT_BY_GENRE,
-    SORT_BY_STATUS,
-    SORT_BY_GOALS_COMPLETED,
 }

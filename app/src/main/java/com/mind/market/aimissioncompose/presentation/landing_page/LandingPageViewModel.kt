@@ -7,10 +7,10 @@ import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
-import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
+import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -155,15 +155,26 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnSortingChanged -> {
                 _uiState.update { it.copy(isDropDownExpanded = false) }
                 when (event.sortMode) {
-                    SortingMode.SORT_BY_GENRE -> {
+                    SortingMode.SORT_BY_GOALS_IN_PROGRESS -> {
                         _goals.update { goals ->
-                            goals.filter { goal ->
-                                goal.genre == Genre.BUSINESS // TODO MIC go on next time
-                            }
+                            goals.sortedByDescending { it.status == Status.IN_PROGRESS }
                         }
                     }
-                    SortingMode.SORT_BY_STATUS -> TODO()
-                    SortingMode.SORT_BY_GOALS_COMPLETED -> TODO()
+                    SortingMode.SORT_BY_GOALS_IN_TODO -> {
+                        _goals.update { goals ->
+                            goals.sortedByDescending { it.status == Status.TODO }
+                        }
+                    }
+                    SortingMode.SORT_BY_GOALS_COMPLETED -> {
+                        _goals.update { goals ->
+                            goals.sortedByDescending { it.status == Status.DONE }
+                        }
+                    }
+                    SortingMode.SORT_BY_GOALS_DEPRECATED -> {
+                        _goals.update { goals ->
+                            goals.sortedByDescending { it.status == Status.DEPRECATED }
+                        }
+                    }
                 }
             }
         }
