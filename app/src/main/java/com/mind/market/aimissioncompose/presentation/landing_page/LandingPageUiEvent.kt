@@ -21,4 +21,5 @@ sealed class LandingPageUiEvent(val goal: Goal? = null) {
     data class OnSearchTextUpdate(val newText: String) : LandingPageUiEvent()
     class OnDropDownStateChanged(val isVisible: Boolean = false) : LandingPageUiEvent()
     class OnSortingChanged(val sortMode: SortingMode): LandingPageUiEvent()
+    object OnClearSearchText: LandingPageUiEvent()
 }

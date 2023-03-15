@@ -177,6 +177,9 @@ class LandingPageViewModel @Inject constructor(
                     }
                 }
             }
+            LandingPageUiEvent.OnClearSearchText -> {
+                _searchText.value = ""
+            }
         }
     }
 

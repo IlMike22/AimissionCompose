@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -217,6 +218,7 @@ fun LandingPageScreen(
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp),
                             value = searchText,
+                            trailingIcon = { if (searchText.isNotBlank()) ClearIcon(onEvent) },
                             onValueChange = {
                                 onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
                             },
@@ -333,4 +335,15 @@ fun LandingPageScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ClearIcon(onEvent: (LandingPageUiEvent) -> Unit) {
+    Icon(
+        imageVector = Icons.Default.Clear,
+        contentDescription = "clear text",
+        modifier = Modifier
+            .clickable { onEvent(LandingPageUiEvent.OnClearSearchText) }
+            .padding(8.dp)
+    )
 }
