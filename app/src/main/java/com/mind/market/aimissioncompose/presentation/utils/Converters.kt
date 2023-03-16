@@ -1,13 +1,14 @@
 package com.mind.market.aimissioncompose.presentation.utils
 
+import android.content.Context
 import androidx.room.TypeConverter
 import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
+import com.mind.market.aimissioncompose.domain.models.Status
+import com.mind.market.aimissioncompose.domain.models.ValidationStatusCode
 
 object Converters {
-
     fun String.toGenre(): Genre =
         when (this) {
             "PARTNERSHIP" -> Genre.PARTNERSHIP
@@ -58,8 +59,6 @@ object Converters {
         }
     }
 
-
-
     fun getPriorityIcon(priority: Priority): Int {
         return when (priority) {
             Priority.LOW -> R.drawable.priority_low
@@ -68,4 +67,22 @@ object Converters {
             Priority.UNKNOWN -> R.drawable.unknown
         }
     }
+
+    fun SortingMode.toText(context: Context): String =
+        when (this) {
+            SortingMode.SORT_BY_GOALS_IN_PROGRESS -> context.getString(R.string.sort_mode_by_goals_in_progress)
+            SortingMode.SORT_BY_GOALS_IN_TODO -> context.getString(R.string.sort_mode_by_goals_in_todo)
+            SortingMode.SORT_BY_GOALS_COMPLETED -> context.getString(R.string.sort_mode_by_goals_completed)
+            SortingMode.SORT_BY_GOALS_DEPRECATED -> context.getString(R.string.sort_mode_by_goals_deprecated)
+        }
+
+    fun ValidationStatusCode.toText(context: Context) =
+        when (this) {
+            ValidationStatusCode.NO_TITLE -> context.getString(R.string.detail_validation_error_message_no_title)
+            ValidationStatusCode.NO_DESCRIPTION -> context.getString(R.string.detail_validation_error_message_no_description)
+            ValidationStatusCode.NO_GENRE -> context.getString(R.string.detail_validation_error_message_no_genre)
+            ValidationStatusCode.NO_PRIORITY -> context.getString(R.string.detail_validation_error_message_no_priority)
+            ValidationStatusCode.DUE_DATE_IS_IN_PAST -> context.getString(R.string.detail_validation_error_message_goal_date_invalid)
+            else -> context.getString(R.string.detail_validation_error_message_unknown)
+        }
 }

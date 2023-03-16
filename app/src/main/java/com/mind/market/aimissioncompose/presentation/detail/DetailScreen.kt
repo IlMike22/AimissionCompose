@@ -1,17 +1,16 @@
 package com.mind.market.aimissioncompose.presentation.detail
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,6 +29,7 @@ import com.mind.market.aimissioncompose.presentation.utils.Converters.getGenreIc
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getPriorityIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toGenre
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
+import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -42,11 +42,12 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun DetailScreen(
     modifier: Modifier = Modifier,
-    state: DetailState,
+    state: DetailUiState,
     uiEvent: Flow<DetailUIEvent>,
     onEvent: (DetailEvent) -> Unit,
     navController: NavController
 ) {
+    val context = LocalContext.current
     var pickedDate by remember {
         mutableStateOf(LocalDate.now())
     }
@@ -225,6 +226,21 @@ fun DetailScreen(
                                     .format(state.goal.finishDate)
                             )
                         }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    AnimatedVisibility(visible = state.hasValidationErrors) {
+                        Text(
+                            text = state.validationCode?.toText(context)
+                                ?: context.getString(R.string.detail_validation_error_message_unknown),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            style = LocalTextStyle.current.copy(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colors.error
+                            )
+                        )
                     }
 
                     MainButton(

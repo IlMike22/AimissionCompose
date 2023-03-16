@@ -4,20 +4,13 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.aimissionlite.models.domain.GoalValidationStatusCode
-import com.example.aimissionlite.models.domain.ValidationStatusCode
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.core.GoalReadWriteOperation
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.GetGoalUseCase
 import com.mind.market.aimissioncompose.domain.goal.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.goal.UpdateGoalUseCase
-import com.mind.market.aimissioncompose.domain.models.Genre
-import com.mind.market.aimissioncompose.domain.models.Goal
-import com.mind.market.aimissioncompose.domain.models.Priority
-import com.mind.market.aimissioncompose.domain.models.Status
-import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsOperation
+import com.mind.market.aimissioncompose.domain.models.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -37,11 +30,11 @@ class DetailViewModel @Inject constructor(
     private val resourceProvider = getApplication<AimissionComposeApplication>()
     private val goalId: Int = checkNotNull(savedStateHandle[ARGUMENT_GOAL_ID])
 
-    private val _state = MutableStateFlow(DetailState())
+    private val _state = MutableStateFlow(DetailUiState())
     val state = _state.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5_000),
-        DetailState()
+        DetailUiState()
     )
 
     private val _uiEvent = Channel<DetailUIEvent>()
@@ -135,8 +128,7 @@ class DetailViewModel @Inject constructor(
                     )
                     return
                 }
-
-                createNewGoal(GoalReadWriteOperation.FIREBASE_DATABASE)
+                createGoal()
             }
         }
     }
@@ -183,34 +175,48 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun updateGoal(newGoal: Goal) {
-        currentGoal = newGoal
+        val validationCode = isGoalValid(newGoal)
+        if (validationCode != ValidationStatusCode.OK) {
+            updateValidationErrorUi(validationCode)
+            return
+        }
+        _state.update {
+            it.copy(
+                hasValidationErrors = false,
+                validationCode = null
+            )
+        }
+        updateGoalAndNavigateBack()
+    }
 
-        val validationStatusCode = GoalValidationStatusCode(
-            statusCode = isGoalValid(currentGoal),
-            isGoalUpdated = true
-        )
+    private fun updateValidationErrorUi(code: ValidationStatusCode) {
+        _state.update {
+            it.copy(
+                hasValidationErrors = true,
+                validationCode = code
+            )
+        }
+    }
 
-        if (validationStatusCode.statusCode == ValidationStatusCode.OK) {
-            viewModelScope.launch {
-                updateGoal(currentGoal) { isSuccess ->
-                    if (isSuccess) {
-                        navigateToLandingPage()
-                    } else {
-                        _state.update {
-                            it.copy(
-                                errorMessage = "Unable to update goal. An error occurred."
-                            )
-                        }
+    private fun updateGoalAndNavigateBack() {
+        viewModelScope.launch {
+            updateGoal(currentGoal) { isSuccess ->
+                if (isSuccess) {
+                    navigateToLandingPage()
+                } else {
+                    _state.update {
+                        it.copy(
+                            errorMessage = "Unable to update goal. An error occurred."
+                        )
                     }
                 }
             }
         }
     }
 
-    private fun createNewGoal(operation: GoalReadWriteOperation) {
+    private fun createGoal() {
         val newGoal = Goal(
-            id = if (operation == GoalReadWriteOperation.FIREBASE_DATABASE)
-                Random.nextInt(0, 10_000) else 0,
+            id = Random.nextInt(0, 10_000),
             title = state.value.goal.title,
             description = state.value.goal.description,
             creationDate = state.value.goal.creationDate,
@@ -222,21 +228,14 @@ class DetailViewModel @Inject constructor(
             finishDate = state.value.goal.finishDate
         )
 
-        val goalValidationStatusCode = GoalValidationStatusCode(
-            statusCode = isGoalValid(newGoal),
-            isGoalUpdated = false
-        )
-
-
-        if (goalValidationStatusCode.statusCode == ValidationStatusCode.OK) {
-            viewModelScope.launch {
-                insertGoal(
-                    goal = newGoal,
-                    operation = operation
-                )
-//                repository.insert(newGoal)
-                _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
-            }
+        val validationCode = isGoalValid(newGoal)
+        if (validationCode != ValidationStatusCode.OK) {
+            updateValidationErrorUi(validationCode)
+            return
+        }
+        viewModelScope.launch {
+            insertGoal(newGoal)
+            _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
         }
     }
 

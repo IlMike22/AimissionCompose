@@ -43,4 +43,18 @@
     <string name="goal_text_priority">Priority</string>
     <string name="goal_text_status">Status</string>
 
+    <!--Validation Error Strings-->
+    <string name="detail_validation_error_message_no_title">Please add a title for your goal and try again.</string>
+    <string name="detail_validation_error_message_no_genre">Please set a genre for your goal and try again.</string>
+    <string name="detail_validation_error_message_no_description">Please add a description for your goal and try again.</string>
+    <string name="detail_validation_error_message_no_priority">Please set a priority for your goal and try again.</string>
+    <string name="detail_validation_error_message_goal_date_invalid">Goal`s finishing date is in the past. Please add a valid date.</string>
+    <string name="detail_validation_error_message_unknown">There was an unknown validation error. Please try again.</string>
+
+    <!--Sort Mode Strings-->
+    <string name="sort_mode_by_goals_in_progress">Sort by goals in progress</string>
+    <string name="sort_mode_by_goals_in_todo">Sort by goals in ToDo</string>
+    <string name="sort_mode_by_goals_completed">Sort by completed goals</string>
+    <string name="sort_mode_by_goals_deprecated">Sort by deprecated goals</string>
+
 </resources>

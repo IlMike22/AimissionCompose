@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
+import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
@@ -56,6 +58,7 @@ fun LandingPageScreen(
     searchText: String,
     goals: List<Goal>
 ) {
+    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
     val alertDialogState = rememberMaterialDialogState()
     val focusRequester = remember { FocusRequester() }
@@ -255,7 +258,7 @@ fun LandingPageScreen(
                                         onEvent(LandingPageUiEvent.OnSortingChanged(it))
                                     }) {
                                         Text(
-                                            text = it.name,
+                                            text = it.toText(context),
                                             fontWeight = if (state.selectedSortMode == it) FontWeight.Bold else FontWeight.Normal
                                         )
                                     }

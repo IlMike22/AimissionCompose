@@ -1,8 +1,8 @@
-package com.example.aimissionlite.models.domain
+package com.mind.market.aimissioncompose.domain.models
 
 data class GoalValidationStatusCode(
     val statusCode: ValidationStatusCode = ValidationStatusCode.UNKNOWN,
-    val isGoalUpdated:Boolean = false
+    val isGoalUpdated: Boolean = false
 ) {
     companion object {
         val EMPTY = GoalValidationStatusCode(
@@ -18,6 +18,7 @@ enum class ValidationStatusCode {
     NO_DESCRIPTION,
     NO_GENRE,
     NO_PRIORITY,
+    DUE_DATE_IS_IN_PAST,
     OK,
     UNKNOWN
 }
