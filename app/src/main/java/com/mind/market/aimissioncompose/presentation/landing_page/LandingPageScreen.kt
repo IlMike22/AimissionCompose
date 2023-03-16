@@ -280,7 +280,7 @@ fun LandingPageScreen(
                         )
                     }
                 } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxSize()) {// SUCCESS SCREEN
                         Column {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize()

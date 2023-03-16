@@ -27,7 +27,7 @@ fun GoalDto.toGoal(): Goal {
         genre = this.genre,
         status = this.status,
         priority = this.priority,
-        finishDate = if (this.finishDate.isNotBlank()) LocalDate.parse(this.finishDate) else LocalDate.now()
+        finishDate = LocalDateTime.now() // TODO MIC finish date in Room will no longer be mapped since Room is no longer used
     )
 }
 

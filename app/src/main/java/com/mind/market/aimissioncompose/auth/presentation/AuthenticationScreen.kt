@@ -26,7 +26,7 @@ fun AuthenticationScreen(
     state: AuthenticationState,
 
 ) {
-    LaunchedEffect("navigation") {
+    LaunchedEffect(null) {
         viewModel.uiEvent.collectLatest { uiEvent ->
             when (uiEvent) {
                 AuthenticationUiEvent.NavigateToLandingPageAfterLogin -> {

@@ -25,6 +25,7 @@ import com.mind.market.aimissioncompose.domain.models.Priority
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getGenreIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getPriorityIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getStatusIcon
+import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 
 @Composable
 fun Goal(
@@ -55,8 +56,14 @@ fun Goal(
                         fontWeight = FontWeight.Bold,
                         overflow = TextOverflow.Ellipsis
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "${goal.creationDate}",
+                        text = "Created date: ${goal.creationDate.toText()}",
+                        fontSize = 12.sp
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Finish date: ${goal.finishDate.toText()}",
                         fontSize = 12.sp
                     )
                 }
@@ -93,7 +100,6 @@ fun Goal(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-
             Row(
                 modifier = modifier
                     .fillMaxWidth(),

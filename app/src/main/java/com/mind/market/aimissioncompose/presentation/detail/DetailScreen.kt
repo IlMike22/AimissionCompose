@@ -35,6 +35,7 @@ import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @SuppressLint("UnrememberedMutableState")
@@ -265,7 +266,17 @@ fun DetailScreen(
             title = "Pick a date"
         ) { picked ->
             pickedDate = picked
-            onEvent(DetailEvent.OnFinishDateChanged(picked))
+            onEvent(
+                DetailEvent.OnFinishDateChanged(
+                    LocalDateTime.of(
+                        picked.year,
+                        picked.month,
+                        picked.dayOfMonth,
+                        LocalDateTime.now().hour,
+                        LocalDateTime.now().minute,
+                    )
+                )
+            )
         }
     }
 }

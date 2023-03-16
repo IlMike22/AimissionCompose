@@ -7,6 +7,8 @@ import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.models.ValidationStatusCode
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object Converters {
     fun String.toGenre(): Genre =
@@ -85,4 +87,10 @@ object Converters {
             ValidationStatusCode.DUE_DATE_IS_IN_PAST -> context.getString(R.string.detail_validation_error_message_goal_date_invalid)
             else -> context.getString(R.string.detail_validation_error_message_unknown)
         }
+
+    fun LocalDateTime.toText():String {
+        val pattern = "dd.MM.yyyy"
+        val formatter = DateTimeFormatter.ofPattern(pattern)
+        return this.format(formatter)
+    }
 }

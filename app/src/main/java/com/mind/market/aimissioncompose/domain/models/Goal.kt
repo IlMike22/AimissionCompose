@@ -13,7 +13,7 @@ data class Goal(
     val genre: Genre,
     val status: Status,
     val priority: Priority,
-    val finishDate: LocalDate
+    val finishDate: LocalDateTime
 ) {
     companion object {
         val EMPTY = Goal(
@@ -26,7 +26,7 @@ data class Goal(
             genre = Genre.UNKNOWN,
             status = Status.UNKNOWN,
             priority = Priority.UNKNOWN,
-            finishDate = LocalDate.now()
+            finishDate = LocalDateTime.now()
         )
     }
 }
