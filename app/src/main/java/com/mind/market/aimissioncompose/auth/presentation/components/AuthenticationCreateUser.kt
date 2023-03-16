@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationEvent
-import com.mind.market.aimissioncompose.auth.presentation.AuthenticationState
+import com.mind.market.aimissioncompose.auth.presentation.AuthenticationUiState
 
 @Composable
 fun AuthenticationCreateUser(
     modifier: Modifier = Modifier,
-    state: AuthenticationState,
+    state: AuthenticationUiState,
     onEvent: (AuthenticationEvent) -> Unit
 ) {
     Text(text = "Or register a new account if you want", style = TextStyle.Default)

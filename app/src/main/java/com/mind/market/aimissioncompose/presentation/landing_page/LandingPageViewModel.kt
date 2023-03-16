@@ -141,7 +141,7 @@ class LandingPageViewModel @Inject constructor(
             }
             is LandingPageUiEvent.OnLogoutUserClicked -> {
                 viewModelScope.launch {
-                    logoutUser()
+                    logoutUser { navigateToAuthenticationScreen() }
                 }
             }
             is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
@@ -190,6 +190,12 @@ class LandingPageViewModel @Inject constructor(
     private fun navigateToAddGoalScreen() {
         viewModelScope.launch {
             _uiEvent.send(LandingPageUiEvent.NavigateToDetailGoal())
+        }
+    }
+
+    private fun navigateToAuthenticationScreen() {
+        viewModelScope.launch {
+            _uiEvent.send(LandingPageUiEvent.NavigateToAuthenticationScreen)
         }
     }
 

@@ -1,12 +1,12 @@
 package com.mind.market.aimissioncompose.auth.presentation
 
-import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
+import com.mind.market.aimissioncompose.auth.utils.AuthenticationValidationErrorStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -20,10 +20,10 @@ class AuthenticationViewModel @Inject constructor(
     private val loginUser: LoginUserUseCase
 ) : ViewModel() {
     private val TAG = "AuthenticationViewModel"
-    private val _state = MutableStateFlow(AuthenticationState())
+    private val _state = MutableStateFlow(AuthenticationUiState())
     val state = _state.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5_000), AuthenticationState()
+        SharingStarted.WhileSubscribed(5_000), AuthenticationUiState()
     )
 
     private val _uiEvent = Channel<AuthenticationUiEvent>()
@@ -53,8 +53,8 @@ class AuthenticationViewModel @Inject constructor(
                         isLoading = true
                     )
                 }
-                val resultCode = validateLogin()
-                if (resultCode == ValidationCode.OK) {
+                val errorCode = validateLogin()
+                if (errorCode == null) {
                     viewModelScope.launch {
                         loginUser(
                             _state.value.email,
@@ -67,7 +67,8 @@ class AuthenticationViewModel @Inject constructor(
                                         user = user,
                                         toastMessage = "User ${user.id} successfully logged in.",
                                         isLoading = false,
-                                        isUserAuthenticated = true
+                                        isUserAuthenticated = true,
+                                        validationErrorStatus = null
                                     )
                                 }
                                 // TODO MIC nested coroutine bad. Look for solution to run coroutines sequentially
@@ -76,30 +77,41 @@ class AuthenticationViewModel @Inject constructor(
                                     storeLocalUser(_state.value.user)
                                 }
                             } else {
-                                // error case - show in ui
+                                // ERROR CASE - show in ui
                                 _state.update {
                                     it.copy(
                                         toastMessage = error?.message
                                             ?: "Unknown error while trying to login user.",
                                         isLoading = false,
-                                        isUserAuthenticated = false
+                                        isUserAuthenticated = false,
+                                        validationErrorStatus = AuthenticationValidationErrorStatus.LOGIN_FAILED
                                     )
                                 }
                             }
                         }
                     }
                 } else {
-                    Log.e(TAG, "Cannot login user. Email or password are invalid or empty.")
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isUserAuthenticated = false,
+                            validationErrorStatus = errorCode
+                        )
+                    }
                 }
             }
         }
     }
 
-    private fun validateLogin(): ValidationCode {
-        return if (_state.value.email.isBlank() || _state.value.password.isBlank()) {
-            ValidationCode.MISSING_EMAIL_OR_PASSWORD
+    private fun validateLogin(): AuthenticationValidationErrorStatus? {
+        return if (_state.value.email.isBlank()) {
+            AuthenticationValidationErrorStatus.NO_EMAIL
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(_state.value.email).matches()) {
+            AuthenticationValidationErrorStatus.INVALID_EMAIL
+        } else if (_state.value.password.isBlank()) {
+            AuthenticationValidationErrorStatus.NO_PASSWORD
         } else {
-            ValidationCode.OK
+            null
         }
     }
 

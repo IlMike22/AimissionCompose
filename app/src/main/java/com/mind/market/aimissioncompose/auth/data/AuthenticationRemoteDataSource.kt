@@ -44,8 +44,9 @@ class AuthenticationRemoteDataSource(
             }
     }
 
-    override suspend fun logoutUser() {
+    override suspend fun logoutUser(onUserLoggedOut:() -> Unit) {
         auth.signOut()
+        onUserLoggedOut()
     }
 
     override fun isUserAuthenticated(): Boolean {

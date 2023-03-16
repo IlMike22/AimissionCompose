@@ -27,8 +27,8 @@ class AuthenticationRepository(
         }
     }
 
-    override suspend fun logoutUser() {
-        remoteDataSource.logoutUser()
+    override suspend fun logoutUser(onUserLoggedOut:() -> Unit) {
+        remoteDataSource.logoutUser(onUserLoggedOut)
     }
 
     override suspend fun saveFirebaseUser(user: User) {

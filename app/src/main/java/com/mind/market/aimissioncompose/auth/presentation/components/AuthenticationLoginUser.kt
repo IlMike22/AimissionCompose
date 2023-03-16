@@ -6,10 +6,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.Center
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -22,17 +21,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationEvent
-import com.mind.market.aimissioncompose.auth.presentation.AuthenticationState
+import com.mind.market.aimissioncompose.auth.presentation.AuthenticationUiState
+import com.mind.market.aimissioncompose.auth.utils.toText
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun AuthenticationLoginUser(
     modifier: Modifier = Modifier,
-    state: AuthenticationState,
+    state: AuthenticationUiState,
     navController: NavController,
     onEvent: (AuthenticationEvent) -> Unit
 ) {
-
+    val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
 
     var password by rememberSaveable { mutableStateOf("") }
@@ -94,7 +94,13 @@ fun AuthenticationLoginUser(
                 },
                 visualTransformation = if (isPasswordHidden) VisualTransformation.None else PasswordVisualTransformation()
             )
-
+            if (state.validationErrorStatus != null) {
+                Text(
+                    modifier = Modifier.padding(start = 16.dp),
+                    text = state.validationErrorStatus.toText(context),
+                    color = Color.Red
+                )
+            }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
