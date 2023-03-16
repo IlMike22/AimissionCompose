@@ -57,7 +57,7 @@ class LandingPageViewModel @Inject constructor(
         }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5_000
+            SharingStarted.WhileSubscribed(5_000),
             _goals.value
         )
     val state = combine(_uiState, _searchText, _goals, _searchResult) { state, searchText, goals, searchResult ->
