@@ -34,6 +34,7 @@ import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.detail.DetailViewModel
 import com.mind.market.aimissioncompose.presentation.information.InformationScreen
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
+import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageUiState
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageViewModel
 import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsScreen
@@ -124,16 +125,12 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                     val viewModel = hiltViewModel<LandingPageViewModel>()
                                     val state by viewModel.state.collectAsState()
-                                    val searchText by viewModel.searchText.collectAsState()
-                                    val goals by viewModel.goals.collectAsState()
                                     LandingPageScreen(
                                         navController = navController,
                                         state = state,
                                         uiEvent = viewModel.uiEvent,
                                         onEvent = viewModel::onEvent,
-                                        onShowFeedbackDialog = ::showFeedbackDialog,
-                                        searchText = searchText,
-                                        goals = goals
+                                        onShowFeedbackDialog = ::showFeedbackDialog
                                     )
                                 }
                             }

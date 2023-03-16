@@ -56,8 +56,6 @@ fun LandingPageScreen(
     onEvent: (LandingPageUiEvent) -> Unit,
     onShowFeedbackDialog: () -> Unit,
     navController: NavController,
-    searchText: String,
-    goals: List<Goal>
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
@@ -227,8 +225,8 @@ fun LandingPageScreen(
                                 .focusRequester(focusRequester)
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp),
-                            value = searchText,
-                            trailingIcon = { if (searchText.isNotBlank()) ClearIcon(onEvent) },
+                            value = state.searchText,
+                            trailingIcon = { if (state.searchText.isNotBlank()) ClearIcon(onEvent) },
                             onValueChange = {
                                 onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
                             },
@@ -291,7 +289,7 @@ fun LandingPageScreen(
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize()
                             ) {
-                                items(goals) { goal ->
+                                items(state.goals) { goal ->
                                     Goal(
                                         modifier = Modifier
                                             .fillMaxWidth()

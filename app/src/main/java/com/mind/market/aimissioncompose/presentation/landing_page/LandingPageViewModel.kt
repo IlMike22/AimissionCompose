@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,18 +31,9 @@ class LandingPageViewModel @Inject constructor(
     private val settingsUseCase: ISettingsUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LandingPageUiState())
-    val state = _uiState.stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        LandingPageUiState()
-    )
-
-    // Searching for goals
+    private val _goals = MutableStateFlow(emptyList<Goal>())
     private val _searchText = MutableStateFlow("")
-    val searchText = _searchText.asStateFlow()
-
-    private var _goals = MutableStateFlow(emptyList<Goal>())
-    val goals = searchText
+    private val _searchResult = _searchText
         .debounce(1000L)
         .onEach {
             _uiState.update { it.copy(isLoading = true, requestSearchTextFocus = true) }
@@ -55,12 +47,29 @@ class LandingPageViewModel @Inject constructor(
                 }
             }
         }
-        .onEach { _uiState.update { it.copy(isLoading = false, requestSearchTextFocus = true) } }
+        .onEach {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    requestSearchTextFocus = true
+                )
+            }
+        }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
+            SharingStarted.WhileSubscribed(5_000
             _goals.value
         )
+    val state = combine(_uiState, _searchText, _goals, _searchResult) { state, searchText, goals, searchResult ->
+        state.copy(
+            searchText = searchText,
+            goals = if (searchText.isNotBlank()) searchResult else goals
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5_000),
+        LandingPageUiState()
+    )
 
     var isDeleteAllGoals: LiveData<Boolean>? = null
     private var isDoneGoalHidden = false
