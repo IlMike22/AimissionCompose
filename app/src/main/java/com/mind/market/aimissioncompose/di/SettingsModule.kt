@@ -1,12 +1,13 @@
 package com.mind.market.aimissioncompose.di
 
 import android.content.Context
-import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.data.GoalRoomDatabase
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource
 import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository
 import com.mind.market.aimissioncompose.data.settings.repository.SettingsRepository
-import com.mind.market.aimissioncompose.domain.settings.use_case.implementation.SettingsUseCase
+import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettingsUseCase
+import com.mind.market.aimissioncompose.domain.settings.use_case.HideDoneGoalsUseCase
+import com.mind.market.aimissioncompose.domain.settings.use_case.ShowOverdueDialogUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,12 +18,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object SettingsModule {
-    @Provides
-    @Singleton
-    fun provideSettingsUseCase(repository: ISettingsRepository): ISettingsUseCase {
-        return SettingsUseCase(repository)
-    }
-
     @Provides
     @Singleton
     fun provideSettingsLocalDataSource(
@@ -42,5 +37,23 @@ object SettingsModule {
         database: GoalRoomDatabase
     ): ISettingsRepository {
         return SettingsRepository(localDataSource, database.goalDao())
+    }
+
+    @Provides
+    @Singleton
+    fun provideHideDoneGoalsUseCase(repository: ISettingsRepository): HideDoneGoalsUseCase {
+        return HideDoneGoalsUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideShowOverdueDialogUseCase(repository: ISettingsRepository): ShowOverdueDialogUseCase {
+        return ShowOverdueDialogUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetUserSettingsUseCase(repository: ISettingsRepository): GetUserSettingsUseCase {
+        return GetUserSettingsUseCase(repository)
     }
 }

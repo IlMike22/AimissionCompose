@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -14,17 +15,17 @@ import androidx.navigation.NavController
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun SettingsScreen(
-    viewModel: SettingsViewModel = hiltViewModel(),
+    state: SettingsState,
+    onEvent: (SettingsEvent) -> Unit,
     navController: NavController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val state = viewModel.settingsState
     val scaffoldState = rememberScaffoldState()
 
     if (state.isShowSnackbar) {
         LaunchedEffect(scaffoldState.snackbarHostState) {
             scaffoldState.snackbarHostState.showSnackbar(
-                message = state.snackBarDuplicateGoalsSuccessMessage
+                message = state.snackbarMessage?:"Unknown message"
             )
         }
     }
@@ -38,19 +39,8 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(text = "Your personal settings")
+            Text(text = "Your personal settings", fontStyle = FontStyle.Normal)
             Spacer(modifier = modifier.height(8.dp))
-
-            Button(onClick = {
-                viewModel.onEvent(SettingsEvent.DuplicateGoals)
-            }) {
-                Text(text = "Duplicate the goals!")
-            }
-
-            Spacer(modifier = modifier.height(16.dp))
-            Text(text = state.duplicateGoalsMessage)
-            Spacer(modifier = modifier.height(24.dp))
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
@@ -59,7 +49,7 @@ fun SettingsScreen(
                 Checkbox(
                     checked = state.isDoneGoalsHidden,
                     onCheckedChange = { isChecked ->
-                        viewModel.onEvent(SettingsEvent.HideDoneGoals(isChecked))
+                        onEvent(SettingsEvent.HideDoneGoals(isChecked))
                     })
 
                 Spacer(modifier = modifier.width(8.dp))
@@ -76,7 +66,7 @@ fun SettingsScreen(
                 Checkbox(
                     checked = state.showGoalOverdueDialogOnStart,
                     onCheckedChange = { isChecked ->
-                        viewModel.onEvent(SettingsEvent.ShowGoalOverdueDialog(isChecked))
+                        onEvent(SettingsEvent.ShowGoalOverdueDialog(isChecked))
                     })
 
                 Spacer(modifier = modifier.width(8.dp))

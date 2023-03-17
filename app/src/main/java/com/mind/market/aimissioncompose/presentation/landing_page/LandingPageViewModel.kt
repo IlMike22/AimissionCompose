@@ -3,13 +3,14 @@ package com.mind.market.aimissioncompose.presentation.landing_page
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
+import com.mind.market.aimissioncompose.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.GoalListItem
 import com.mind.market.aimissioncompose.domain.models.Status
+import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettingsUseCase
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +29,7 @@ class LandingPageViewModel @Inject constructor(
     private val getGoals: GetGoalsUseCase,
     private val updateGoalStatus: UpdateGoalStatusUseCase,
     private val isGoalOverdue: IsGoalOverdueUseCase,
-    private val settingsUseCase: ISettingsUseCase
+    private val getUserSettings: GetUserSettingsUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LandingPageUiState())
     private val _goals = MutableStateFlow(emptyList<Goal>())
@@ -91,7 +92,7 @@ class LandingPageViewModel @Inject constructor(
                 handleGoalsResponse(it)
             }
             launch {
-                settingsUseCase.getUserSettings().collect { userSettings ->
+                getUserSettings().collect { userSettings ->
                     isDoneGoalHidden = userSettings.isHideDoneGoals
                     showGoalOverdueDialog = userSettings.showGoalOverdueDialog
                 }
@@ -110,12 +111,6 @@ class LandingPageViewModel @Inject constructor(
             is LandingPageUiEvent.OnDeleteGoalClicked -> {
                 cacheAndDeleteGoal(event.goal ?: Goal.EMPTY)
             }
-            /*
-             We want to avoid calling getGoals() again after status was updated. Therefore first
-             the old status is sent to UseCase where it will be transformed into new status. Then new
-             status will be stored in firebase and after that was successful we update also the state
-             so the ui will be updated as well.
-             */
             is LandingPageUiEvent.OnStatusChangedClicked -> {
                 event.goal?.apply {
                     viewModelScope.launch {

@@ -1,4 +1,4 @@
-package com.example.aimissionlite.domain.settings.use_case
+package com.mind.market.aimissioncompose.domain.settings.use_case
 
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.settings.repository.SettingEntries

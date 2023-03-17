@@ -1,6 +1,6 @@
 package com.mind.market.aimissioncompose.domain.settings.use_case.implementation
 
-import com.example.aimissionlite.domain.settings.use_case.ISettingsUseCase
+import com.mind.market.aimissioncompose.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.settings.repository.ISettingsRepository
 import com.mind.market.aimissioncompose.data.settings.repository.SettingEntries

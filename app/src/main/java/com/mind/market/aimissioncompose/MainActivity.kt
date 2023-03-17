@@ -33,10 +33,11 @@ import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.detail.DetailScreen
 import com.mind.market.aimissioncompose.presentation.detail.DetailViewModel
 import com.mind.market.aimissioncompose.presentation.information.InformationScreen
+import com.mind.market.aimissioncompose.presentation.information.InformationViewModel
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageScreen
-import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageUiState
 import com.mind.market.aimissioncompose.presentation.landing_page.LandingPageViewModel
 import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
+import com.mind.market.aimissioncompose.presentation.settings.SettingsViewModel
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsScreen
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsViewModel
 import com.mind.market.aimissioncompose.ui.theme.AimissionComposeTheme
@@ -156,14 +157,21 @@ class MainActivity : ComponentActivity() {
                             composable(
                                 route = Route.INFORMATION
                             ) {
+                                val viewModel = hiltViewModel<InformationViewModel>()
+                                val state by viewModel.state.collectAsState()
                                 InformationScreen(
-                                    navController = navController
+                                    state = state,
+                                    onEvent = viewModel::onEvent
                                 )
                             }
                             composable(
                                 route = Route.SETTINGS
                             ) {
+                                val viewModel = hiltViewModel<SettingsViewModel>()
+                                val state = viewModel.settingsState
                                 SettingsScreen(
+                                    state = state,
+                                    onEvent = viewModel::onEvent,
                                     navController = navController
                                 )
                             }

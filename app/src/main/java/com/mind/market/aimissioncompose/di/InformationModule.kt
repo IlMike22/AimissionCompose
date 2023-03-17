@@ -1,9 +1,8 @@
 package com.mind.market.aimissioncompose.di
 
 import com.mind.market.aimissioncompose.data.info.repository.InformationRepository
-import com.mind.market.aimissioncompose.domain.information.use_case.IInformationUseCase
-import com.mind.market.aimissioncompose.domain.information.use_case.implementation.InformationUseCase
 import com.mind.market.aimissioncompose.data.info.repository.IInformationRepository
+import com.mind.market.aimissioncompose.domain.information.use_case.GetInformationUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,13 +14,13 @@ import javax.inject.Singleton
 object InformationModule {
     @Provides
     @Singleton
-    fun provideUseCase(repository: IInformationRepository): IInformationUseCase {
-        return InformationUseCase(repository)
+    fun provideRepository(): IInformationRepository {
+        return InformationRepository()
     }
 
     @Provides
     @Singleton
-    fun provideRepository(): IInformationRepository {
-        return InformationRepository()
+    fun provideGetInformationUseCase(repository: IInformationRepository): GetInformationUseCase {
+        return GetInformationUseCase(repository)
     }
 }
