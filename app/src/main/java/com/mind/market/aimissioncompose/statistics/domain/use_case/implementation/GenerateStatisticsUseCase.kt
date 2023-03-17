@@ -5,9 +5,9 @@ import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
-import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsGrade
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticData
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsGrade
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -113,6 +113,7 @@ class GenerateStatisticsUseCase(
     }
 
     private fun generateStatisticEntityGrade(data: StatisticData): StatisticsGrade {
+        val totalGoalsOpen = data.totalGoalsToDo + data.totalGoalsInProgress
         if (data.totalAmount == 0) {
             return StatisticsGrade.NO_GOALS_ADDED
         }
@@ -120,13 +121,15 @@ class GenerateStatisticsUseCase(
             return StatisticsGrade.DEPRECATED_GOAL_EXIST
         }
 
-        val allGoalsCompleted = data.totalAmount / data.totalGoalsInProgress == 1
-        val noGoalsCompleted = data.totalAmount / data.totalGoalsInProgress == data.totalAmount
-        val someGoalsCompleted = data.totalAmount / data.totalGoalsInProgress > 1 &&
-                data.totalAmount / data.totalGoalsInProgress < data.totalAmount
+        if (totalGoalsOpen == 0) {
+            return StatisticsGrade.ALL_GOALS_COMPLETED
+        }
+
+        val noGoalsCompleted = data.totalAmount / totalGoalsOpen == data.totalAmount
+        val someGoalsCompleted = data.totalAmount / totalGoalsOpen > 1 &&
+                data.totalAmount / totalGoalsOpen < data.totalAmount
         return when {
             noGoalsCompleted -> StatisticsGrade.NO_GOALS_COMPLETED
-            allGoalsCompleted -> StatisticsGrade.ALL_GOALS_COMPLETED
             someGoalsCompleted -> StatisticsGrade.SOME_GOALS_COMPLETED
             else -> StatisticsGrade.UNDEFINED
         }
