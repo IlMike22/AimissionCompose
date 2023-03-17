@@ -82,11 +82,6 @@ fun SettingsScreen(
                 Spacer(modifier = modifier.width(8.dp))
                 Text(text = "Show goal overdue dialog on startup")
             }
-
-            Spacer(modifier.height(16.dp))
-            Text(text = "Full amount of completed goals is ${state.goalsCompleted}")
-            Text(text = "Full amount of open goals is ${state.goalsTodo}")
-            Text(text = "Full amount of goals in progress is ${state.goalsInProgress}")
         }
     }
 }

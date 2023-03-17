@@ -1,7 +1,7 @@
 package com.mind.market.aimissioncompose.domain.models
 
-import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Month
 
 data class Goal(
     val id: Int,

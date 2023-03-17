@@ -31,10 +31,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
-import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
@@ -289,36 +289,48 @@ fun LandingPageScreen(
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize()
                             ) {
-                                items(state.goals) { goal ->
-                                    Goal(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .fillMaxSize()
-                                            .clickable {
-                                                navController.navigate(Route.ADD + "?goalId=${goal.id}")
-                                            }
-                                            .padding(8.dp),
-                                        goal = goal,
-                                        onDeleteClicked = { goalToDelete ->
-                                            onEvent(
-                                                LandingPageUiEvent.OnDeleteGoalClicked(
-                                                    goalToDelete
-                                                )
+                                items(state.goalItems) { goalListItem ->
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Text(
+                                            text = "${goalListItem.monthValue} ${goalListItem.yearValue}",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier.padding(8.dp)
+                                        )
+                                        goalListItem.goals.forEach {
+                                            Goal(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .fillMaxSize()
+                                                    .clickable {
+                                                        navController.navigate(Route.ADD + "?goalId=${it.id}")
+                                                    }
+                                                    .padding(8.dp),
+                                                goal = it,
+                                                onDeleteClicked = { goalToDelete ->
+                                                    onEvent(
+                                                        LandingPageUiEvent.OnDeleteGoalClicked(
+                                                            goalToDelete
+                                                        )
+                                                    )
+                                                },
+                                                onStatusChangeClicked = { selectedGoal ->
+                                                    onEvent(
+                                                        LandingPageUiEvent.OnStatusChangedClicked(
+                                                            selectedGoal
+                                                        )
+                                                    )
+                                                }
                                             )
-                                        },
-                                        onStatusChangeClicked = { selectedGoal ->
-                                            onEvent(
-                                                LandingPageUiEvent.OnStatusChangedClicked(
-                                                    selectedGoal
-                                                )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Divider(
+                                                modifier = Modifier
+                                                    .padding(horizontal = 16.dp)
                                             )
                                         }
-                                    )
-
-                                    Divider(
-                                        modifier = Modifier
-                                            .padding(horizontal = 16.dp)
-                                    )
+                                    }
                                 }
                             }
                         }

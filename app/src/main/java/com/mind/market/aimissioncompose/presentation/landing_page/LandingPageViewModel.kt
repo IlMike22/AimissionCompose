@@ -1,6 +1,5 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +8,7 @@ import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.domain.models.GoalListItem
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
@@ -60,10 +60,15 @@ class LandingPageViewModel @Inject constructor(
             SharingStarted.WhileSubscribed(5_000),
             _goals.value
         )
-    val state = combine(_uiState, _searchText, _goals, _searchResult) { state, searchText, goals, searchResult ->
+    val state = combine(
+        _uiState,
+        _searchText,
+        _goals,
+        _searchResult
+    ) { state, searchText, goals, searchResult ->
         state.copy(
             searchText = searchText,
-            goals = if (searchText.isNotBlank()) searchResult else goals
+            goalItems = if (searchText.isNotBlank()) searchResult.createGoalListItems() else goals.createGoalListItems()
         )
     }.stateIn(
         viewModelScope,
@@ -301,6 +306,38 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
+    private fun List<Goal>.createGoalListItems(): List<GoalListItem> {
+        val monthYearValuesFound = mutableMapOf<MonthYearValue, String>()
+        val goalsPerMonthAndYear = mutableMapOf<MonthYearValue, MutableList<Goal>>()
+        val goalListItems = mutableListOf<GoalListItem>()
+        this.forEach { goal ->
+            monthYearValuesFound[MonthYearValue(goal.creationDate.month, goal.creationDate.year)] =
+                goal.creationDate.month.toMonthName()
+        }
+
+        this.forEach { goal ->
+            monthYearValuesFound.keys.find {
+                goal.creationDate.month == it.month && goal.creationDate.year == it.year
+            }.apply {
+                if (this != null && goalsPerMonthAndYear[this] == null) {
+                    goalsPerMonthAndYear[this] = mutableListOf()
+                }
+                goalsPerMonthAndYear[this]?.add(goal)
+            }
+        }
+
+        goalsPerMonthAndYear.forEach {
+            goalListItems.add(
+                GoalListItem(
+                    monthValue = it.key.month.toMonthName(),
+                    yearValue = it.key.year.toString(),
+                    goals = it.value
+                )
+            )
+        }
+        return goalListItems
+    }
+
     private fun showGoalOverdueDialogIfNeeded(goals: List<Goal>) {
         if (showGoalOverdueDialog.not()) {
             return
@@ -331,14 +368,6 @@ class LandingPageViewModel @Inject constructor(
             goals
         }
     }
-
-    private fun getNewGoalStatus(oldStatus: Status): Status =
-        when (oldStatus) {
-            Status.DONE -> Status.TODO
-            Status.TODO -> Status.IN_PROGRESS
-            Status.IN_PROGRESS -> Status.DONE
-            else -> Status.UNKNOWN
-        }
 
     private fun Goal.doesMatchSearchQuery(query: String): Boolean {
         return try {
@@ -377,4 +406,9 @@ class LandingPageViewModel @Inject constructor(
                 Month.DECEMBER -> "December"
             }
     }
+
+    data class MonthYearValue(
+        val month: Month,
+        val year: Int
+    )
 }
