@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
                                         navController = navController,
                                         state = state,
                                         uiEvent = viewModel.uiEvent,
-                                        onEvent = viewModel::onEvent,
+                                        commandProcessor = viewModel::processCommand,
                                         onShowFeedbackDialog = ::showFeedbackDialog
                                     )
                                 }

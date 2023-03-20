@@ -1,9 +1,7 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mind.market.aimissioncompose.domain.settings.use_case.ISettingsUseCase
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
@@ -30,7 +28,7 @@ class LandingPageViewModel @Inject constructor(
     private val updateGoalStatus: UpdateGoalStatusUseCase,
     private val isGoalOverdue: IsGoalOverdueUseCase,
     private val getUserSettings: GetUserSettingsUseCase,
-) : ViewModel() {
+) : ViewModel(), ICommandReceiver {
     private val _uiState = MutableStateFlow(LandingPageUiState())
     private val _goals = MutableStateFlow(emptyList<Goal>())
     private val _searchText = MutableStateFlow("")
@@ -77,7 +75,6 @@ class LandingPageViewModel @Inject constructor(
         LandingPageUiState()
     )
 
-    var isDeleteAllGoals: LiveData<Boolean>? = null
     private var isDoneGoalHidden = false
     private var showGoalOverdueDialog = false
     private lateinit var deletedGoal: Goal
@@ -100,100 +97,108 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: LandingPageUiEvent) {
-        when (event) {
-            is LandingPageUiEvent.OnAddGoalClicked -> {
-                navigateToAddGoalScreen()
-            }
-            is LandingPageUiEvent.NavigateToDetailGoal -> {
-                onGoalContainerClicked(event.goal)
-            }
-            is LandingPageUiEvent.OnDeleteGoalClicked -> {
-                cacheAndDeleteGoal(event.goal ?: Goal.EMPTY)
-            }
-            is LandingPageUiEvent.OnStatusChangedClicked -> {
-                event.goal?.apply {
-                    viewModelScope.launch {
-                        val oldGoals = _goals.value
-                        val oldGoal = oldGoals.firstOrNull {
-                            it.id == this@apply.id
-                        }
-                        val newGoals = mutableListOf<Goal>()
-                        var newGoal: Goal? = null
-                        updateGoalStatus(id, status) { newStatus ->
-                            oldGoals.forEach {
-                                if (it.id == oldGoal?.id) {
-                                    newGoal = it.copy(
-                                        status = newStatus
-                                    )
-                                    newGoals.add(newGoal as Goal)
-                                } else {
-                                    newGoals.add(it)
-                                }
-                            }
-                            _goals.value = newGoals
-                        }
-                    }
-                } ?: _uiState.update {
-                    it.copy(
-                        errorMessage = "Cannot update goal because it is invalid."
-                    )
+    override fun onAddGoalClicked() {
+        navigateToAddGoalScreen()
+    }
+
+    override fun onNavigateToDetailGoal(goal: Goal?) {
+        onGoalContainerClicked(goal)
+    }
+
+    override fun onNavigateToAuthenticationScreen() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onDeleteGoalClicked(goal: Goal) {
+        cacheAndDeleteGoal(goal)
+    }
+
+    override fun onStatusChangedClicked(goal: Goal) {
+        goal.apply {
+            viewModelScope.launch {
+                val oldGoals = _goals.value
+                val oldGoal = oldGoals.firstOrNull {
+                    it.id == this@apply.id
                 }
-            }
-            is LandingPageUiEvent.OnUndoDeleteGoalClicked -> {
-                restoreDeletedGoal()
-            }
-            is LandingPageUiEvent.OnGoalUpdate -> {
-                viewModelScope.launch {
-                    getGoals().collect { handleGoalsResponse(it) }
+                val newGoals = mutableListOf<Goal>()
+                var newGoal: Goal?
+                updateGoalStatus(id, status) { newStatus ->
+                    oldGoals.forEach {
+                        if (it.id == oldGoal?.id) {
+                            newGoal = it.copy(
+                                status = newStatus
+                            )
+                            newGoals.add(newGoal as Goal)
+                        } else {
+                            newGoals.add(it)
+                        }
+                    }
+                    _goals.value = newGoals
                 }
-            }
-            is LandingPageUiEvent.OnLogoutUserClicked -> {
-                viewModelScope.launch {
-                    logoutUser { navigateToAuthenticationScreen() }
-                }
-            }
-            is LandingPageUiEvent.ShowGoalOverdueDialog -> TODO()
-            is LandingPageUiEvent.ShowSnackbar -> TODO()
-            is LandingPageUiEvent.OnSearchTextUpdate -> {
-                _searchText.value = event.newText
-            }
-            is LandingPageUiEvent.OnDropDownStateChanged -> {
-                _uiState.update { it.copy(isDropDownExpanded = event.isVisible) }
-            }
-            is LandingPageUiEvent.OnSortingChanged -> {
-                _uiState.update { it.copy(isDropDownExpanded = false) }
-                when (event.sortMode) {
-                    SortingMode.SORT_BY_GOALS_IN_PROGRESS -> {
-                        _goals.update { goals ->
-                            goals.sortedByDescending { it.status == Status.IN_PROGRESS }
-                        }
-                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_PROGRESS) }
-                    }
-                    SortingMode.SORT_BY_GOALS_IN_TODO -> {
-                        _goals.update { goals ->
-                            goals.sortedByDescending { it.status == Status.TODO }
-                        }
-                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_TODO) }
-                    }
-                    SortingMode.SORT_BY_GOALS_COMPLETED -> {
-                        _goals.update { goals ->
-                            goals.sortedByDescending { it.status == Status.DONE }
-                        }
-                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_COMPLETED) }
-                    }
-                    SortingMode.SORT_BY_GOALS_DEPRECATED -> {
-                        _goals.update { goals ->
-                            goals.sortedByDescending { it.status == Status.DEPRECATED }
-                        }
-                        _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_DEPRECATED) }
-                    }
-                }
-            }
-            LandingPageUiEvent.OnClearSearchText -> {
-                _searchText.value = ""
             }
         }
+    }
+
+    override fun onUndoDeletedGoalClicked() {
+        restoreDeletedGoal()
+    }
+
+    override fun onShowDialog(title: String, message: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onLogoutUserClicked() {
+        viewModelScope.launch {
+            logoutUser { navigateToAuthenticationScreen() }
+        }
+    }
+
+    override fun onGoalUpdated() {
+        viewModelScope.launch {
+            getGoals().collect { handleGoalsResponse(it) }
+        }
+    }
+
+    override fun onSearchTextUpdate(newText: String) {
+        _searchText.value = newText
+    }
+
+    override fun onDropDownStateChanged(isVisible: Boolean) {
+        _uiState.update { it.copy(isDropDownExpanded = isVisible) }
+    }
+
+    override fun onSortingChanged(sortMode: SortingMode) {
+        _uiState.update { it.copy(isDropDownExpanded = false) }
+        when (sortMode) {
+            SortingMode.SORT_BY_GOALS_IN_PROGRESS -> {
+                _goals.update { goals ->
+                    goals.sortedByDescending { it.status == Status.IN_PROGRESS }
+                }
+                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_PROGRESS) }
+            }
+            SortingMode.SORT_BY_GOALS_IN_TODO -> {
+                _goals.update { goals ->
+                    goals.sortedByDescending { it.status == Status.TODO }
+                }
+                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_TODO) }
+            }
+            SortingMode.SORT_BY_GOALS_COMPLETED -> {
+                _goals.update { goals ->
+                    goals.sortedByDescending { it.status == Status.DONE }
+                }
+                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_COMPLETED) }
+            }
+            SortingMode.SORT_BY_GOALS_DEPRECATED -> {
+                _goals.update { goals ->
+                    goals.sortedByDescending { it.status == Status.DEPRECATED }
+                }
+                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_DEPRECATED) }
+            }
+        }
+    }
+
+    override fun onClearSearchText() {
+        _searchText.value = ""
     }
 
     private fun navigateToAddGoalScreen() {
@@ -254,11 +259,18 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
+    private fun getGoalItemForGoal(goal: Goal): GoalListItem? {
+        return _uiState.value.goalItems.firstOrNull { listItem ->
+            listItem.monthValue == goal.creationDate.month.toMonthName()
+                    && listItem.yearValue == goal.creationDate.year.toString()
+        }
+    }
+
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
                 insertGoal(deletedGoal)
-                _goals.value + deletedGoal
+                _goals.update { _goals.value.plus(deletedGoal) }
             }
         }
     }

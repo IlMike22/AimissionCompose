@@ -53,7 +53,7 @@ fun LandingPageScreen(
     state: LandingPageUiState,
     modifier: Modifier = Modifier,
     uiEvent: Flow<LandingPageUiEvent>,
-    onEvent: (LandingPageUiEvent) -> Unit,
+    commandProcessor: (ICommand) -> Unit,
     onShowFeedbackDialog: () -> Unit,
     navController: NavController,
 ) {
@@ -67,7 +67,7 @@ fun LandingPageScreen(
         ?.getLiveData<Boolean>("invalidate")?.observeAsState()
     detailPageScreenResult?.value?.let { isUpdateList ->
         if (isUpdateList) {
-            onEvent(LandingPageUiEvent.OnGoalUpdate)
+            commandProcessor(GoalUpdateCommand())
             navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
         }
     }
@@ -99,7 +99,7 @@ fun LandingPageScreen(
                         SnackbarResult.ActionPerformed -> {
                             when (event.snackbarAction) {
                                 SnackBarAction.UNDO -> {
-                                    onEvent(LandingPageUiEvent.OnUndoDeleteGoalClicked)
+                                    commandProcessor(UndoDeletedGoalCommand())
                                 }
                                 else -> {}
                             }
@@ -150,7 +150,7 @@ fun LandingPageScreen(
                     Button(
                         modifier = Modifier
                             .align(Alignment.CenterStart),
-                        onClick = { onEvent(LandingPageUiEvent.OnLogoutUserClicked) }
+                        onClick = { commandProcessor(LogoutCommand()) }
                     ) { Text(text = stringResource(R.string.bottom_sheet_button_text_logout)) }
                 }
                 Text(
@@ -195,7 +195,7 @@ fun LandingPageScreen(
 
                                 Button(
                                     modifier = Modifier.fillMaxWidth(),
-                                    onClick = { onEvent(LandingPageUiEvent.OnAddGoalClicked) },
+                                    onClick = { commandProcessor(AddCommand()) },
                                 ) {
                                     Text(text = "Create goal")
                                 }
@@ -226,9 +226,13 @@ fun LandingPageScreen(
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp),
                             value = state.searchText,
-                            trailingIcon = { if (state.searchText.isNotBlank()) ClearIcon(onEvent) },
+                            trailingIcon = {
+                                if (state.searchText.isNotBlank()) ClearIcon(
+                                    commandProcessor
+                                )
+                            },
                             onValueChange = {
-                                onEvent(LandingPageUiEvent.OnSearchTextUpdate(it))
+                                commandProcessor(SearchTextUpdateCommand(it))
                             },
                             placeholder = {
                                 if (state.searchText.isBlank()) Text(text = "Search for a goal")
@@ -236,7 +240,7 @@ fun LandingPageScreen(
                         )
                         Box {
                             IconButton(
-                                onClick = { onEvent(LandingPageUiEvent.OnDropDownStateChanged(true)) },
+                                onClick = { commandProcessor(DropDownStateChangeCommand(true)) },
                                 modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
                                     dropDownPosition = layoutCoordinates.size.toSize()
                                 },
@@ -250,16 +254,14 @@ fun LandingPageScreen(
                             DropdownMenu(
                                 expanded = state.isDropDownExpanded,
                                 onDismissRequest = {
-                                    onEvent(
-                                        LandingPageUiEvent.OnDropDownStateChanged(
-                                            false
-                                        )
+                                    commandProcessor(
+                                        DropDownStateChangeCommand(true)
                                     )
                                 }
                             ) {
                                 SortingMode.values().forEach {
                                     DropdownMenuItem(onClick = {
-                                        onEvent(LandingPageUiEvent.OnSortingChanged(it))
+                                        commandProcessor(SortingChangeCommand(it))
                                     }) {
                                         Text(
                                             text = it.toText(context),
@@ -310,15 +312,11 @@ fun LandingPageScreen(
                                                     .padding(8.dp),
                                                 goal = it,
                                                 onDeleteClicked = { goalToDelete ->
-                                                    onEvent(
-                                                        LandingPageUiEvent.OnDeleteGoalClicked(
-                                                            goalToDelete
-                                                        )
-                                                    )
+                                                    commandProcessor(DeleteCommand(goalToDelete))
                                                 },
                                                 onStatusChangeClicked = { selectedGoal ->
-                                                    onEvent(
-                                                        LandingPageUiEvent.OnStatusChangedClicked(
+                                                    commandProcessor(
+                                                        StatusChangeCommand(
                                                             selectedGoal
                                                         )
                                                     )
@@ -363,12 +361,12 @@ fun LandingPageScreen(
 }
 
 @Composable
-private fun ClearIcon(onEvent: (LandingPageUiEvent) -> Unit) {
+private fun ClearIcon(processCommand: (ICommand) -> Unit) {
     Icon(
         imageVector = Icons.Default.Clear,
         contentDescription = "clear text",
         modifier = Modifier
-            .clickable { onEvent(LandingPageUiEvent.OnClearSearchText) }
+            .clickable { processCommand(ClearSearchTextCommand()) }
             .padding(8.dp)
     )
 }
