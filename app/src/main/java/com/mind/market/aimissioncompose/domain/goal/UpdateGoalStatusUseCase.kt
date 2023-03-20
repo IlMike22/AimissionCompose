@@ -18,7 +18,6 @@ class UpdateGoalStatusUseCase(
             status = newStatus,
             operation = GoalReadWriteOperation.FIREBASE_DATABASE,
             onResult = onResult
-
         )
     }
 

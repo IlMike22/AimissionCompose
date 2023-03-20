@@ -259,13 +259,6 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private fun getGoalItemForGoal(goal: Goal): GoalListItem? {
-        return _uiState.value.goalItems.firstOrNull { listItem ->
-            listItem.monthValue == goal.creationDate.month.toMonthName()
-                    && listItem.yearValue == goal.creationDate.year.toString()
-        }
-    }
-
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
