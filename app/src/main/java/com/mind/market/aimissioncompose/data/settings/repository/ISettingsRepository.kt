@@ -10,10 +10,8 @@ interface ISettingsRepository {
 //    fun getDeleteGoalsOnStartup(): Flow<Boolean>
 
     suspend fun duplicateGoals(): Boolean
-
     suspend fun setHideDoneGoals(isHide: Boolean)
     suspend fun showGoalOverdueDialog(show: Boolean)
-
     fun getUserSettings(): Flow<SettingEntries>
 
     suspend fun getAmountGoalsForStatus(status: Status): Flow<Resource<Int>>

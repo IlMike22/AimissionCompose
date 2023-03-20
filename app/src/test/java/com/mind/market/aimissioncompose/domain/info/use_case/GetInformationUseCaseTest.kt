@@ -7,10 +7,12 @@ import com.mind.market.aimissioncompose.data.USED_TECHNOLOGIES
 import com.mind.market.aimissioncompose.data.VERSION
 import com.mind.market.aimissioncompose.data.info.repository.FakeInfoRepository
 import com.mind.market.aimissioncompose.domain.information.use_case.GetInformationUseCase
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class GetInformationUseCaseTest {
     private lateinit var getInformation: GetInformationUseCase
     private lateinit var fakeInfoRepository: FakeInfoRepository
@@ -30,10 +32,8 @@ class GetInformationUseCaseTest {
     }
 
     @Test
-    fun `Get information gets expected information from repo`() {
-        runBlocking {
-            val result = getInformation()
-            assertThat(result).isEqualTo(listOf(AUTHOR_NAME, APP_NAME, VERSION, USED_TECHNOLOGIES))
-        }
+    fun `Get information gets expected information`() = runTest {
+        val result = getInformation()
+        assertThat(result).isEqualTo(listOf(AUTHOR_NAME, APP_NAME, VERSION, USED_TECHNOLOGIES))
     }
 }

@@ -11,13 +11,9 @@ class SettingsRepository(
     private val localDataSource: SettingsLocalDataSource,
     private val goalDao: IGoalDao
 ) : ISettingsRepository {
-    //private val localDataSource = SettingsLocalDataSource(context)
-
     override suspend fun setDeleteGoalsOnStartup(enabled: Boolean) {
         localDataSource.setDeleteGoalsOnStartup(enabled)
     }
-
-//    override fun getDeleteGoalsOnStartup() = localDataSource.getDeleteGoalsOnStartup()
 
     override suspend fun duplicateGoals(): Boolean {
         return localDataSource.duplicateGoals()

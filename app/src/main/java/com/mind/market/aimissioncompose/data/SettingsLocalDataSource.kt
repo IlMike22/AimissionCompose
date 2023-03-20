@@ -58,11 +58,6 @@ data class SettingsLocalDataSource(
         )
     }
 
-//    fun getDeleteGoalsOnStartup(): Flow<Boolean> =
-//        context.dataStore.data.map { preferences ->
-//            preferences[DELETE_GOALS_ON_STARTUP] ?: false
-//        }
-
     private object PreferencesKeys {
         val DELETE_GOALS_ON_STARTUP = booleanPreferencesKey("delete_goals_on_startup")
         val HIDE_DONE_GOALS = booleanPreferencesKey("hide_done_goals")
