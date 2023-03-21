@@ -289,7 +289,9 @@ fun LandingPageScreen(
                     Box(modifier = Modifier.fillMaxSize()) {// SUCCESS SCREEN
                         Column {
                             LazyColumn(
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp)
                             ) {
                                 items(state.goalItems) { goalListItem ->
                                     Column(
@@ -301,18 +303,18 @@ fun LandingPageScreen(
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier.padding(8.dp)
                                         )
-                                        goalListItem.goals.forEach {
+                                        goalListItem.goals.forEach { goal ->
                                             Goal(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .fillMaxSize()
-                                                    .clickable {
-                                                        navController.navigate(Route.ADD + "?goalId=${it.id}")
-                                                    }
                                                     .padding(8.dp),
-                                                goal = it,
-                                                onDeleteClicked = { goalToDelete ->
-                                                    commandProcessor(DeleteCommand(goalToDelete))
+                                                onClicked = {
+                                                    navController.navigate(Route.ADD + "?goalId=${it.id}")
+                                                },
+                                                goal = goal,
+                                                onDeleteClicked = {
+                                                    commandProcessor(DeleteCommand(it))
                                                 },
                                                 onStatusChangeClicked = { selectedGoal ->
                                                     commandProcessor(
@@ -325,7 +327,7 @@ fun LandingPageScreen(
                                             Spacer(modifier = Modifier.height(4.dp))
                                             Divider(
                                                 modifier = Modifier
-                                                    .padding(horizontal = 16.dp)
+                                                    .padding(horizontal = 16.dp, vertical = 8.dp)
                                             )
                                         }
                                     }
