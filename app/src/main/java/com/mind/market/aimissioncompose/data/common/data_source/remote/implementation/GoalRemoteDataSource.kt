@@ -75,9 +75,9 @@ class GoalRemoteDataSource(
             }
     }
 
-    override suspend fun insertGoal(goal: Goal, userId: String?) {
+    override suspend fun insertGoal(goal: Goal, userId: String?, onResult: (Throwable?) -> Unit) {
         if (userId == null) {
-            Log.e(TAG, "Cannot add goal. Firebase user id is null")
+            onResult(Throwable("Cannot add goal. Firebase user id is null"))
             return
         }
         firebaseDatabase
@@ -86,6 +86,13 @@ class GoalRemoteDataSource(
             .child(FIREBASE_TABLE_GOAL)
             .child(goal.id.toString())
             .setValue(goal.toGoalDto())
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    onResult(null)
+                } else {
+                    onResult(Throwable(it.exception?.message))
+                }
+            }
     }
 
     override suspend fun update(goal: Goal, userId: String?, onResult: (Boolean) -> Unit) {

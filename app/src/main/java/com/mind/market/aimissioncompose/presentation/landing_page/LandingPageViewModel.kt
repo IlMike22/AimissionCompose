@@ -262,10 +262,14 @@ class LandingPageViewModel @Inject constructor(
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                insertGoal(deletedGoal)
+                insertGoal(deletedGoal, ::onInsertGoalError)
                 _goals.update { _goals.value.plus(deletedGoal) }
             }
         }
+    }
+
+    private fun onInsertGoalError(error: Throwable?) {
+        _uiState.update { it.copy(errorMessage = error?.message) }
     }
 
     private fun handleGoalsResponse(response: Resource<List<Goal>>) {

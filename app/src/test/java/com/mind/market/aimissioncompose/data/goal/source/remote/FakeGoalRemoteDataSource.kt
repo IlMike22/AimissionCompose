@@ -19,7 +19,9 @@ class FakeGoalRemoteDataSource: IGoalDataSource {
         onResult(null, listOf(Goal.EMPTY, Goal.EMPTY))
     }
 
-    override suspend fun insertGoal(goal: Goal, userId: String?) {}
+    override suspend fun insertGoal(goal: Goal, userId: String?, onResult: (Throwable?) -> Unit) {
+        onResult(null)
+    }
 
     override suspend fun getGoal(id: Int, userId: String?, onResult: (Throwable?, Goal?) -> Unit) {
         if (id > 0) {

@@ -15,7 +15,7 @@ interface IGoalDataSource {
         onResult: (Throwable?, List<Goal>) -> Unit
     )
 
-    suspend fun insertGoal(goal: Goal, userId: String? = null)
+    suspend fun insertGoal(goal: Goal, userId: String? = null, onResult: (Throwable?) -> Unit)
     suspend fun getGoal(id: Int, userId: String? = null, onResult: (Throwable?, Goal?) -> Unit)
     suspend fun update(goal: Goal, userId: String? = null, onResult: (Boolean) -> Unit)
     suspend fun deleteAll(userId: String? = null, onResult: (Boolean) -> Unit)

@@ -10,7 +10,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class FakeGoalRepository : IGoalRepository {
-    override suspend fun insert(goal: Goal, mode: GoalReadWriteOperation) {
+    override suspend fun insert(
+        goal: Goal,
+        onResult: (Throwable?) -> Unit,
+        mode: GoalReadWriteOperation
+    ) {
+        if (goal == Goal.EMPTY) {
+            onResult(Throwable("Goal is not set. Cannot add an empty goal."))
+            return
+        }
+        onResult(null)
     }
 
     override suspend fun getGoal(id: Int, operation: GoalReadWriteOperation): Flow<Resource<Goal>> {

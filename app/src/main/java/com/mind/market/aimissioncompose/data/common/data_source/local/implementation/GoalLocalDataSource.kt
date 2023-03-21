@@ -29,8 +29,9 @@ class GoalLocalDataSource(
         }
     }
 
-    override suspend fun insertGoal(goal: Goal, userId: String?) {
+    override suspend fun insertGoal(goal: Goal, userId: String?, onResult: (Throwable?) -> Unit) {
         goalDao.insert(goal.toGoalDto())
+        onResult(null)
     }
 
     override suspend fun update(goal: Goal, userId: String?, onResult: (Boolean) -> Unit) {

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface IGoalRepository {
     suspend fun insert(
         goal: Goal,
+        onResult: (Throwable?) -> Unit,
         mode: GoalReadWriteOperation = GoalReadWriteOperation.LOCAL_DATABASE
     )
 

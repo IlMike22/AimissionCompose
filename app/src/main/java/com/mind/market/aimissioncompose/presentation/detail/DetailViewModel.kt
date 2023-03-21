@@ -234,9 +234,13 @@ class DetailViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            insertGoal(newGoal)
+            insertGoal(newGoal, ::onInsertGoalError)
             _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
         }
+    }
+
+    private fun onInsertGoalError(error: Throwable?) {
+        _state.update { it.copy(errorMessage = error?.message) }
     }
 
     private fun getCurrentDate() = LocalDateTime.now()

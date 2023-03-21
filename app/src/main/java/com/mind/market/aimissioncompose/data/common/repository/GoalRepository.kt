@@ -19,13 +19,21 @@ class GoalRepository(
 ) : IGoalRepository {
     @Suppress("RedundantSuspendModifier")
     @WorkerThread
-    override suspend fun insert(goal: Goal, mode: GoalReadWriteOperation) {
+    override suspend fun insert(
+        goal: Goal,
+        onResult: (Throwable?) -> Unit,
+        mode: GoalReadWriteOperation
+    ) {
         if (mode == GoalReadWriteOperation.LOCAL_DATABASE) {
-            goalLocalDataSource.insertGoal(goal, null)
+            goalLocalDataSource.insertGoal(goal, null) { error ->
+                onResult(error)
+            }
             return
         }
 
-        goalRemoteDataSource.insertGoal(goal, getFirebaseUserId())
+        goalRemoteDataSource.insertGoal(goal, getFirebaseUserId()) { error ->
+            onResult(error)
+        }
     }
 
     @WorkerThread
