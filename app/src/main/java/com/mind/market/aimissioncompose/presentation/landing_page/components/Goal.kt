@@ -21,6 +21,7 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getStatusIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
+import com.mind.market.aimissioncompose.ui.theme.*
 
 @Composable
 fun Goal(
@@ -32,7 +33,7 @@ fun Goal(
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = Color.LightGray,
+        backgroundColor = LighterBlue,
         modifier = Modifier
             .clickable { onClicked(goal) }
     ) {
@@ -46,44 +47,49 @@ fun Goal(
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Column {
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
                     Text(
                         text = goal.title,
-                        modifier = Modifier.padding(end = 16.dp),
+                        color = Color.DarkGray,
                         style = MaterialTheme.typography.h6,
-                        overflow = TextOverflow.Clip
+                        overflow = TextOverflow.Ellipsis
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Created date: ${goal.creationDate.toText()}",
+                        color = Color.DarkGray,
                         style = MaterialTheme.typography.caption
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Finish date: ${goal.finishDate.toText()}",
+                        color = Color.DarkGray,
                         style = MaterialTheme.typography.caption
                     )
                 }
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(4.dp))
                 IconButton(
                     onClick = { onDeleteClicked(goal) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(R.string.goal_text_delete_goal)
+                        contentDescription = stringResource(R.string.goal_text_delete_goal),
+                        tint = Color.DarkGray
                     )
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
             Row(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
                 Text(
                     text = goal.description,
                     style = MaterialTheme.typography.body2,
+                    color = Color.DarkGray,
                     overflow = TextOverflow.Ellipsis
                 )
             }
@@ -147,6 +153,7 @@ fun Tag(
         ) {
             Text(
                 text = text,
+                color = Color.DarkGray,
                 style = MaterialTheme.typography.body2
             )
         }

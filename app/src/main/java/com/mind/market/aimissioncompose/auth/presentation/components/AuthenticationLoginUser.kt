@@ -64,6 +64,7 @@ fun AuthenticationLoginUser(
             Spacer(modifier = Modifier.height(24.dp))
             OutlinedTextField(
                 value = state.email,
+                textStyle = TextStyle(color = Color.Black),
                 placeholder = { Text(text = "Email Address") },
                 label = { Text(text = "Your email address") },
                 modifier = Modifier
@@ -77,6 +78,7 @@ fun AuthenticationLoginUser(
 
             OutlinedTextField(
                 value = state.password,
+                textStyle = TextStyle(color = Color.Black),
                 placeholder = { Text(text = "Password") },
                 label = { Text(text = "Your password") },
                 modifier = Modifier

@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +41,7 @@ import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
+import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -184,7 +186,10 @@ fun LandingPageScreen(
                                 style = MaterialTheme.typography.h4
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text(text = "It`s very empty here. Start to create some goals.")
+                            Text(
+                                text = "It`s very empty here. Start to create some goals.",
+                                color = Color.DarkGray
+                            )
                             Spacer(modifier = Modifier.height(16.dp))
                             Column(modifier = Modifier.align(CenterHorizontally)) {
                                 Image(
@@ -210,7 +215,8 @@ fun LandingPageScreen(
                     ) {
                         Text(
                             modifier = Modifier.align(Center),
-                            text = "An error occured! Please try again. Details: ${state.errorMessage}"
+                            text = "An error occured! Please try again. Details: ${state.errorMessage}",
+                            color = Color.DarkGray
                         )
                     }
 
@@ -225,6 +231,7 @@ fun LandingPageScreen(
                                 .focusRequester(focusRequester)
                                 .fillMaxWidth()
                                 .padding(bottom = 8.dp),
+                            textStyle = TextStyle(color = Color.Black),
                             value = state.searchText,
                             trailingIcon = {
                                 if (state.searchText.isNotBlank()) ClearIcon(
@@ -300,6 +307,7 @@ fun LandingPageScreen(
                                         Text(
                                             text = "${goalListItem.monthValue} ${goalListItem.yearValue}",
                                             fontSize = 14.sp,
+                                            color = DarkestBlue,
                                             fontWeight = FontWeight.Bold,
                                             modifier = Modifier.padding(8.dp)
                                         )
