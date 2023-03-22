@@ -17,12 +17,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationEvent
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationUiState
 import com.mind.market.aimissioncompose.auth.utils.toText
+import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -57,8 +57,8 @@ fun AuthenticationLoginUser(
         ) {
             Text(
                 text = stringResource(R.string.authentication_login_header),
-                style = TextStyle.Default,
-                fontSize = 18.sp,
+                style = MaterialTheme.typography.body1,
+                color = DarkBlue,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(24.dp))

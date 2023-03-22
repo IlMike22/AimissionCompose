@@ -9,8 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mind.market.aimissioncompose.ui.theme.DarkBlue
+import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
@@ -25,7 +26,7 @@ fun SettingsScreen(
     if (state.isShowSnackbar) {
         LaunchedEffect(scaffoldState.snackbarHostState) {
             scaffoldState.snackbarHostState.showSnackbar(
-                message = state.snackbarMessage?:"Unknown message"
+                message = state.snackbarMessage ?: "Unknown message"
             )
         }
     }
@@ -39,7 +40,7 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text(text = "Your personal settings", fontStyle = FontStyle.Normal)
+            Text(text = "Your personal settings", style = MaterialTheme.typography.h6, color = DarkestBlue)
             Spacer(modifier = modifier.height(8.dp))
             Row(
                 modifier = Modifier
@@ -54,7 +55,7 @@ fun SettingsScreen(
 
                 Spacer(modifier = modifier.width(8.dp))
 
-                Text(text = "Hide successfully done goals in list")
+                Text(text = "Hide successfully done goals in list", color = DarkBlue)
             }
 
             Spacer(modifier.height(16.dp))
@@ -70,7 +71,7 @@ fun SettingsScreen(
                     })
 
                 Spacer(modifier = modifier.width(8.dp))
-                Text(text = "Show goal overdue dialog on startup")
+                Text(text = "Show goal overdue dialog on startup", color = DarkBlue)
             }
         }
     }

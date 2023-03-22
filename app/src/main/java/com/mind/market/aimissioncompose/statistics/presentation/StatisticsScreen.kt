@@ -10,11 +10,15 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.HorizontalAlignmentLine
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mind.market.aimissioncompose.statistics.presentation.components.StatisticsItem
+import com.mind.market.aimissioncompose.ui.theme.DarkBlue
+import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
+import com.mind.market.aimissioncompose.ui.theme.LightestBlue
 
 @Composable
 fun StatisticsScreen(
@@ -45,7 +49,8 @@ fun StatisticsScreen(
                     Text(
                         text = "Your statistics overview",
                         modifier = Modifier.align(Alignment.Center),
-                        fontSize = 18.sp
+                        style = MaterialTheme.typography.h4,
+                        color = DarkBlue
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Divider(thickness = 2.dp)

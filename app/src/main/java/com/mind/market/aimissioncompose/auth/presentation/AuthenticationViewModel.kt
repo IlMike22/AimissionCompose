@@ -38,11 +38,13 @@ class AuthenticationViewModel @Inject constructor(
             }
             is AuthenticationEvent.OnEmailChanged -> _state.update {
                 it.copy(
+                    validationErrorStatus = null,
                     email = event.email
                 )
             }
             is AuthenticationEvent.OnPasswordChanged -> _state.update {
                 it.copy(
+                    validationErrorStatus = null,
                     password = event.password
                 )
             }

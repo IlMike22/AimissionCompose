@@ -200,7 +200,7 @@ class DetailViewModel @Inject constructor(
 
     private fun updateGoalAndNavigateBack() {
         viewModelScope.launch {
-            updateGoal(currentGoal) { isSuccess ->
+            updateGoal(_state.value.goal) { isSuccess ->
                 if (isSuccess) {
                     navigateToLandingPage()
                 } else {

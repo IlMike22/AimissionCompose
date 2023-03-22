@@ -2,6 +2,7 @@ package com.mind.market.aimissioncompose.statistics.presentation.components
 
 import android.content.Context
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsGrade
+import com.mind.market.aimissioncompose.ui.theme.DarkerBlue
+import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 
 @Composable
 fun StatisticsItem(
@@ -38,8 +41,8 @@ fun StatisticsItem(
             Text(
                 text = item.title,
                 textAlign = TextAlign.Center,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.h5,
+                color = DarkestBlue
             )
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -51,14 +54,15 @@ fun StatisticsItem(
                     modifier = Modifier.align(Alignment.TopStart),
                     text = stringResource(R.string.statistics_item_text_goals_created),
                     textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
                     text = "${item.data.totalAmount}",
                     fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal,
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -70,14 +74,14 @@ fun StatisticsItem(
                     modifier = Modifier.align(Alignment.TopStart),
                     text = stringResource(R.string.statistics_item_text_goals_started),
                     textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
                     text = "${item.data.totalGoalsInProgress}",
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal,
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -89,14 +93,14 @@ fun StatisticsItem(
                 Text(
                     text = stringResource(R.string.statistics_item_text_goals_completed),
                     modifier = Modifier.align(Alignment.TopStart),
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
                     text = "${item.data.totalGoalsCompleted}",
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal,
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -108,14 +112,13 @@ fun StatisticsItem(
                 Text(
                     text = stringResource(R.string.statistics_item_text_goals_deprecated),
                     modifier = Modifier.align(Alignment.TopStart),
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal
+                    style = MaterialTheme.typography.body1,
+                    color = DarkerBlue
                 )
                 Text(
                     modifier = Modifier.align(Alignment.TopEnd),
                     text = "${item.data.totalGoalsDeprecated}",
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal,
+                    style = MaterialTheme.typography.body1,
                     color = if (item.data.totalGoalsDeprecated > 0) Color.Red else Color.Green,
                     fontWeight = FontWeight.Bold
                 )
@@ -125,8 +128,8 @@ fun StatisticsItem(
             Text(
                 text = item.grade.toText(context),
                 textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontStyle = FontStyle.Normal
+                style = MaterialTheme.typography.body1,
+                color = DarkerBlue
             )
         }
     }
