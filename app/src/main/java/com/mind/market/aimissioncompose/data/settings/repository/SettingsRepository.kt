@@ -4,6 +4,8 @@ import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.data.IGoalDao
 import com.mind.market.aimissioncompose.data.SettingsLocalDataSource
 import com.mind.market.aimissioncompose.domain.models.Status
+import com.mind.market.aimissioncompose.presentation.utils.SortingMode
+import com.mind.market.aimissioncompose.statistics.presentation.SortMode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -42,9 +44,14 @@ class SettingsRepository(
             }
         }
     }
+
+    override suspend fun setSortingMode(mode: SortingMode) {
+        localDataSource.setSortingMode(mode)
+    }
 }
 
 data class SettingEntries(
     val isHideDoneGoals: Boolean,
-    val showGoalOverdueDialog: Boolean
+    val showGoalOverdueDialog: Boolean,
+    val selectedSortingMode: SortingMode?
 )

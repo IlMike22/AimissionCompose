@@ -22,6 +22,7 @@ import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getStatusIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 import com.mind.market.aimissioncompose.ui.theme.LighterBlue
+import com.mind.market.aimissioncompose.ui.theme.LightestRed
 import java.time.LocalDateTime
 
 @Composable
@@ -34,7 +35,7 @@ fun Goal(
 ) {
     Card(
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = LighterBlue,
+        backgroundColor = if (goal.status == Status.DEPRECATED) LightestRed else LighterBlue,
         modifier = Modifier
             .clickable { onClicked(goal) }
     ) {
@@ -115,7 +116,7 @@ fun Goal(
                 Spacer(modifier = Modifier.weight(1f))
 
                 IconButton(
-                    onClick = { onStatusChangeClicked(goal) }
+                    onClick = { if (goal.status != Status.DEPRECATED) onStatusChangeClicked(goal) }
                 ) {
                     Image(
                         painter = painterResource(id = getStatusIcon(goal.status)),

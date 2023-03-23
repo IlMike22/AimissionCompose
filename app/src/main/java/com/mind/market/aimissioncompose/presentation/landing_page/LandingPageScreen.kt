@@ -41,7 +41,6 @@ import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
-import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
@@ -275,7 +274,7 @@ fun LandingPageScreen(
                                     }) {
                                         Text(
                                             text = it.toText(context),
-                                            fontWeight = if (state.selectedSortMode == it) FontWeight.Bold else FontWeight.Normal
+                                            fontWeight = if (state.selectedSortingMode == it) FontWeight.Bold else FontWeight.Normal
                                         )
                                     }
                                 }

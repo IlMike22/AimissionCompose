@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.*
+import com.mind.market.aimissioncompose.domain.landing_page.use_case.SetSortingModeUseCase
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.GoalListItem
 import com.mind.market.aimissioncompose.domain.models.Status
@@ -12,10 +13,12 @@ import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettings
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import java.time.Month
 import javax.inject.Inject
 
@@ -28,6 +31,7 @@ class LandingPageViewModel @Inject constructor(
     private val updateGoalStatus: UpdateGoalStatusUseCase,
     private val isGoalOverdue: IsGoalOverdueUseCase,
     private val getUserSettings: GetUserSettingsUseCase,
+    private val setSortingMode: SetSortingModeUseCase
 ) : ViewModel(), ICommandReceiver {
     private val _uiState = MutableStateFlow(LandingPageUiState())
     private val _goals = MutableStateFlow(emptyList<Goal>())
@@ -67,7 +71,7 @@ class LandingPageViewModel @Inject constructor(
     ) { state, searchText, goals, searchResult ->
         state.copy(
             searchText = searchText,
-            goalItems = if (searchText.isNotBlank()) searchResult.createGoalListItems() else goals.createGoalListItems()
+            goalItems = if (searchText.isNotBlank()) searchResult.createGoalListItems() else goals.createGoalListItems(),
         )
     }.stateIn(
         viewModelScope,
@@ -84,14 +88,17 @@ class LandingPageViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        viewModelScope.launch {
+        val job = viewModelScope.launch(context = Dispatchers.IO) {
             getGoals().collect {
                 handleGoalsResponse(it)
             }
-            launch {
-                getUserSettings().collect { userSettings ->
-                    isDoneGoalHidden = userSettings.isHideDoneGoals
-                    showGoalOverdueDialog = userSettings.showGoalOverdueDialog
+        }
+        viewModelScope.launch {
+            getUserSettings().collect { userSettings ->
+                isDoneGoalHidden = userSettings.isHideDoneGoals
+                showGoalOverdueDialog = userSettings.showGoalOverdueDialog
+                if (userSettings.selectedSortingMode != null) {
+                    _uiState.update { it.copy(selectedSortingMode = userSettings.selectedSortingMode) }
                 }
             }
         }
@@ -169,30 +176,31 @@ class LandingPageViewModel @Inject constructor(
 
     override fun onSortingChanged(sortMode: SortingMode) {
         _uiState.update { it.copy(isDropDownExpanded = false) }
+        viewModelScope.launch { setSortingMode(sortMode) }
         when (sortMode) {
             SortingMode.SORT_BY_GOALS_IN_PROGRESS -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.IN_PROGRESS }
                 }
-                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_PROGRESS) }
+                _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_IN_PROGRESS) }
             }
             SortingMode.SORT_BY_GOALS_IN_TODO -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.TODO }
                 }
-                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_IN_TODO) }
+                _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_IN_TODO) }
             }
             SortingMode.SORT_BY_GOALS_COMPLETED -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.DONE }
                 }
-                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_COMPLETED) }
+                _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_COMPLETED) }
             }
             SortingMode.SORT_BY_GOALS_DEPRECATED -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.DEPRECATED }
                 }
-                _uiState.update { it.copy(selectedSortMode = SortingMode.SORT_BY_GOALS_DEPRECATED) }
+                _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_DEPRECATED) }
             }
         }
     }
@@ -275,7 +283,9 @@ class LandingPageViewModel @Inject constructor(
     private fun handleGoalsResponse(response: Resource<List<Goal>>) {
         when (response) {
             is Resource.Success -> {
-                _goals.value = filterGoals(response.data ?: emptyList())
+                _goals.value = filterGoals(
+                    goals = response.data ?: emptyList()
+                ).let { checkForDeprecatedGoals(it) }
                 _uiState.update {
                     it.copy(
                         hasResults = response.data?.isNotEmpty() ?: false,
@@ -284,7 +294,10 @@ class LandingPageViewModel @Inject constructor(
                         requestSearchTextFocus = true
                     )
                 }
-
+                val currentSortingMode = _uiState.value.selectedSortingMode
+                if (currentSortingMode != null) {
+                    onSortingChanged(currentSortingMode)
+                }
                 showGoalOverdueDialogIfNeeded(_goals.value)
             }
 
@@ -371,6 +384,17 @@ class LandingPageViewModel @Inject constructor(
         } else {
             goals
         }
+    }
+
+    private fun checkForDeprecatedGoals(goals: List<Goal>): List<Goal> {
+        val result = goals.map { goal ->
+            if (goal.status != Status.DONE && goal.finishDate < LocalDateTime.now()) {
+                goal.copy(status = Status.DEPRECATED)
+            } else {
+                goal
+            }
+        }
+        return result
     }
 
     private fun Goal.doesMatchSearchQuery(query: String): Boolean {

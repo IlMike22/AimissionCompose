@@ -11,5 +11,5 @@ data class LandingPageUiState(
     val requestSearchTextFocus: Boolean = false,
     val hasResults: Boolean = false,
     val isDropDownExpanded: Boolean = false,
-    val selectedSortMode: SortingMode? = null
+    val selectedSortingMode: SortingMode? = null
 )
