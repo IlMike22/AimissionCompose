@@ -33,8 +33,12 @@ import com.mind.market.aimissioncompose.presentation.utils.Converters.getPriorit
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toGenre
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toPriority
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
+import com.mind.market.aimissioncompose.ui.theme.DarkBlue
+import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 import com.mind.market.aimissioncompose.ui.theme.LightestBlue
 import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerColors
+import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.flow.Flow
@@ -216,6 +220,7 @@ fun DetailScreen(
 
                                 Text(
                                     modifier = Modifier.padding(top = 16.dp),
+                                    color = DarkBlue,
                                     text = DateTimeFormatter
                                         .ofPattern("dd.MM.yyyy")
                                         .format(state.goal.finishDate)
@@ -258,6 +263,11 @@ fun DetailScreen(
     ) {
         datepicker(
             initialDate = LocalDate.now(),
+            colors = DatePickerDefaults.colors(
+                headerTextColor = LightestBlue,
+                dateActiveTextColor = Color.Black,
+                dateInactiveTextColor = DarkestBlue
+            ),
             title = "Pick a date"
         ) { picked ->
             pickedDate = picked
@@ -269,6 +279,7 @@ fun DetailScreen(
                         picked.dayOfMonth,
                         LocalDateTime.now().hour,
                         LocalDateTime.now().minute,
+                        LocalDateTime.now().second
                     )
                 )
             )

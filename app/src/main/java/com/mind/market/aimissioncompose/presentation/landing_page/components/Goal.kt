@@ -1,7 +1,6 @@
 package com.mind.market.aimissioncompose.presentation.landing_page.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,9 +18,11 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Priority
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.presentation.utils.Converters.getStatusIcon
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
-import com.mind.market.aimissioncompose.ui.theme.*
+import com.mind.market.aimissioncompose.ui.theme.LighterBlue
+import java.time.LocalDateTime
 
 @Composable
 fun Goal(
@@ -65,7 +66,7 @@ fun Goal(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Finish date: ${goal.finishDate.toText()}",
-                        color = Color.DarkGray,
+                        color = if (goal.finishDate <= LocalDateTime.now() && goal.status != Status.DONE) Color.Red else Color.DarkGray,
                         style = MaterialTheme.typography.caption
                     )
                 }

@@ -41,6 +41,7 @@ import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.landing_page.components.Goal
 import com.mind.market.aimissioncompose.presentation.utils.Converters.toText
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
+import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.message
@@ -183,6 +184,7 @@ fun LandingPageScreen(
                         ) {// EMPTY SCREEN
                             Text(
                                 text = "No goals yet",
+                                color = DarkestBlue,
                                 style = MaterialTheme.typography.h4
                             )
                             Spacer(modifier = Modifier.height(16.dp))
@@ -254,6 +256,7 @@ fun LandingPageScreen(
                                 content = {
                                     Icon(
                                         imageVector = Icons.Default.ArrowDropDown,
+                                        tint = DarkestBlue,
                                         contentDescription = "sort"
                                     )
                                 }
