@@ -64,5 +64,9 @@
     <string name="authentication_validation_error_message_no_password">Please enter a valid password to login.</string>
     <string name="authentication_validation_error_message_invalid_login_credentials">Your email or password seem to be incorrect. Please try again.</string>
     <string name="authentication_validation_error_message_invalid_email">Your email has an invalid format. Please try again.</string>
+    <string name="detail_user_not_authenticated_error_title">You are not signed in</string>
+    <string name="detail_user_not_authenticated_error_subtitle">Please sign in or sign up to add a new goal.</string>
+    <string name="authentication_login_placeholder_email">Email Address</string>
+    <string name="authentication_login_placeholder_password">Your password</string>
 
 </resources>

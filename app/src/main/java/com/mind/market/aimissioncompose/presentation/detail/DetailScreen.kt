@@ -84,6 +84,8 @@ fun DetailScreen(
                     .padding(16.dp)
             )
         }
+    } else if (!state.isUserAuthenticated) {
+        UserNotAuthenticatedScreen(modifier)
     } else {
         Card(
             modifier = Modifier
@@ -272,4 +274,39 @@ fun DetailScreen(
             )
         }
     }
+}
+
+@Composable
+fun UserNotAuthenticatedScreen(modifier: Modifier) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+    ) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                modifier = modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                painter = painterResource(id = R.drawable.ic_baseline_sports_handball_yellow_24),
+                contentDescription = "not authenticated screen"
+            )
+            Text(
+                text = stringResource(R.string.detail_user_not_authenticated_error_title),
+                style = MaterialTheme.typography.h6,
+                color = Color.Black
+            )
+            Text(
+                text = stringResource(R.string.detail_user_not_authenticated_error_subtitle),
+                modifier = Modifier.padding(bottom = 128.dp),
+                style = MaterialTheme.typography.body1,
+                color = Color.Black
+            )
+        }
+    }
+
 }

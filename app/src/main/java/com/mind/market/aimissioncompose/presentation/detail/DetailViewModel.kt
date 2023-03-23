@@ -4,6 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.AimissionComposeApplication
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.core.Resource
@@ -40,7 +43,7 @@ class DetailViewModel @Inject constructor(
     private val _uiEvent = Channel<DetailUIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    private var currentGoal = Goal.EMPTY
+    private var auth: FirebaseAuth = Firebase.auth
 
     init {
         if (goalId != -1) {
@@ -48,7 +51,8 @@ class DetailViewModel @Inject constructor(
         } else {
             _state.update {
                 it.copy(
-                    ctaButtonText = resourceProvider.getString(R.string.button_text_add)
+                    ctaButtonText = resourceProvider.getString(R.string.button_text_add),
+                    isUserAuthenticated = auth.currentUser != null
                 )
             }
         }
@@ -138,15 +142,14 @@ class DetailViewModel @Inject constructor(
             getGoal(id).collect { response ->
                 when (response) {
                     is Resource.Success -> {
-                        currentGoal = response.data ?: Goal.EMPTY
                         _state.update {
                             it.copy(
-                                goal = currentGoal,
+                                goal = response.data ?: Goal.EMPTY,
                                 ctaButtonText = resourceProvider.getString(R.string.button_text_update),
-                                isLoading = false
+                                isLoading = false,
+                                isUserAuthenticated = auth.currentUser != null
                             )
                         }
-//                    showGoal(currentGoal)
                     }
                     is Resource.Loading -> {
                         _state.update {

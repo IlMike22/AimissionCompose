@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [GoalDto::class, UserDto::class],
-    version = 5,
+    version = 6,
     autoMigrations = [AutoMigration(from = 3, to = 4)]
 )
 @TypeConverters(Converters::class)

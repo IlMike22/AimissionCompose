@@ -2,6 +2,9 @@ package com.mind.market.aimissioncompose.statistics.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GenerateStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -18,6 +21,8 @@ class StatisticsViewModel @Inject constructor(
         SharingStarted.WhileSubscribed(5000), StatisticsState()
     )
 
+    private var auth: FirebaseAuth = Firebase.auth
+
     init {
         viewModelScope.launch {
             generateStatistics()
@@ -27,6 +32,7 @@ class StatisticsViewModel @Inject constructor(
                             isLoading = false,
                             errorMessage = null,
                             statisticsEntities = entities,
+                            isUsersAuthenticated = auth.currentUser != null
                         )
                     }
                 }

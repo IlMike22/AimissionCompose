@@ -5,6 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettingsUseCase
 import com.mind.market.aimissioncompose.domain.settings.use_case.HideDoneGoalsUseCase
 import com.mind.market.aimissioncompose.domain.settings.use_case.ShowOverdueDialogUseCase
@@ -21,13 +24,16 @@ class SettingsViewModel @Inject constructor(
     var settingsState by mutableStateOf(SettingsState())
         private set
 
+    private val auth: FirebaseAuth = Firebase.auth
+
     init {
         viewModelScope.launch {
             launch {
                 getUserSettings().collect { userSettings ->
                     settingsState = settingsState.copy(
                         isDoneGoalsHidden = userSettings.isHideDoneGoals,
-                        showGoalOverdueDialogOnStart = userSettings.showGoalOverdueDialog
+                        showGoalOverdueDialogOnStart = userSettings.showGoalOverdueDialog,
+                        isUserAuthenticated = auth.currentUser != null
                     )
                 }
             }

@@ -7,6 +7,7 @@ import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
 import com.mind.market.aimissioncompose.auth.utils.AuthenticationValidationErrorStatus
+import com.mind.market.aimissioncompose.presentation.landing_page.ICommandReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -102,6 +103,7 @@ class AuthenticationViewModel @Inject constructor(
                     }
                 }
             }
+            AuthenticationEvent.OnClearEmailText -> _state.update { it.copy(email = "") }
         }
     }
 
@@ -115,10 +117,5 @@ class AuthenticationViewModel @Inject constructor(
         } else {
             null
         }
-    }
-
-    enum class ValidationCode {
-        OK,
-        MISSING_EMAIL_OR_PASSWORD
     }
 }

@@ -22,6 +22,7 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationEvent
 import com.mind.market.aimissioncompose.auth.presentation.AuthenticationUiState
 import com.mind.market.aimissioncompose.auth.utils.toText
+import com.mind.market.aimissioncompose.presentation.common.ClearIcon
 import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -30,7 +31,7 @@ fun AuthenticationLoginUser(
     modifier: Modifier = Modifier,
     state: AuthenticationUiState,
     navController: NavController,
-    onEvent: (AuthenticationEvent) -> Unit
+    onEvent: (AuthenticationEvent) -> Unit,
 ) {
     val context = LocalContext.current
     val scaffoldState = rememberScaffoldState()
@@ -65,8 +66,11 @@ fun AuthenticationLoginUser(
             OutlinedTextField(
                 value = state.email,
                 textStyle = TextStyle(color = Color.Black),
-                placeholder = { Text(text = "Email Address") },
-                label = { Text(text = "Your email address") },
+                placeholder = { Text(text = stringResource(R.string.authentication_login_placeholder_email)) },
+                label = { Text(text = stringResource(R.string.authentication_login_placeholder_email)) },
+                trailingIcon = {
+                    if (state.email.isNotBlank()) ClearIcon(onEvent::invoke)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
@@ -79,8 +83,8 @@ fun AuthenticationLoginUser(
             OutlinedTextField(
                 value = state.password,
                 textStyle = TextStyle(color = Color.Black),
-                placeholder = { Text(text = "Password") },
-                label = { Text(text = "Your password") },
+                placeholder = { Text(text = stringResource(R.string.authentication_login_placeholder_password)) },
+                label = { Text(text = stringResource(R.string.authentication_login_placeholder_password)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),

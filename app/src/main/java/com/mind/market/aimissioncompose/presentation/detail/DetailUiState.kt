@@ -9,5 +9,6 @@ data class DetailUiState(
     val errorMessage: String? = null,
     val ctaButtonText: String = "",
     val hasValidationErrors: Boolean = false,
-    val validationCode: ValidationStatusCode? = null
+    val validationCode: ValidationStatusCode? = null,
+    val isUserAuthenticated: Boolean = false
 )

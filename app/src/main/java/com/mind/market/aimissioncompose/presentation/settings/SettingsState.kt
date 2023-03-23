@@ -4,6 +4,7 @@ data class SettingsState(
     val isShowSnackbar: Boolean = false,
     val isDoneGoalsHidden: Boolean = false,
     val showGoalOverdueDialogOnStart: Boolean = false,
-    val snackbarMessage: String? = null
+    val snackbarMessage: String? = null,
+    val isUserAuthenticated: Boolean = false
 )
 
