@@ -264,7 +264,7 @@ fun LandingPageScreen(
                                 expanded = state.isDropDownExpanded,
                                 onDismissRequest = {
                                     commandProcessor(
-                                        DropDownStateChangeCommand(true)
+                                        DropDownStateChangeCommand(false)
                                     )
                                 }
                             ) {
