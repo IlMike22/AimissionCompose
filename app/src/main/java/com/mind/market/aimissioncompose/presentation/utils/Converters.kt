@@ -19,6 +19,7 @@ object Converters {
             "MONEY" -> Genre.MONEY
             "HEALTH" -> Genre.HEALTH
             "SOCIALISING" -> Genre.SOCIALISING
+            "NOT_SPECIFIED" -> Genre.NOT_SPECIFIED
             else -> Genre.UNKNOWN
         }
 
@@ -48,6 +49,7 @@ object Converters {
             Genre.PARTNERSHIP -> R.drawable.genre_partnership
             Genre.SOCIALISING -> R.drawable.genre_socialising
             Genre.HEALTH -> R.drawable.genre_health
+            Genre.NOT_SPECIFIED -> R.drawable.genre_unknown
             Genre.UNKNOWN -> R.drawable.genre_unknown
         }
     }

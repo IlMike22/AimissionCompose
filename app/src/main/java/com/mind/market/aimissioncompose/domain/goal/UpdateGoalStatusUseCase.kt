@@ -8,14 +8,9 @@ class UpdateGoalStatusUseCase(
     private val repository: IGoalRepository
 ) {
     suspend operator fun invoke(goalId: Int, oldStatus: Status, onResult: (Status) -> Unit) {
-        if (oldStatus == Status.DEPRECATED) { // if goal is deprecated user cannot edit state anymore
-            onResult(oldStatus)
-            return
-        }
-        val newStatus = updateGoalStatus(oldStatus)
         repository.updateStatus(
             id = goalId,
-            status = newStatus,
+            status = if (oldStatus != Status.DEPRECATED) updateGoalStatus(oldStatus) else oldStatus,
             operation = GoalReadWriteOperation.FIREBASE_DATABASE,
             onResult = onResult
         )

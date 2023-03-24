@@ -15,6 +15,7 @@ class Converters {
             Genre.MONEY -> "MONEY"
             Genre.SOCIALISING -> "SOCIALISING"
             Genre.HEALTH -> "HEALTH"
+            Genre.NOT_SPECIFIED -> "NOT_SPECIFIED"
             Genre.UNKNOWN -> "UNKNOWN"
         }
     }
@@ -82,6 +83,7 @@ class Converters {
                 Genre.MONEY -> 3
                 Genre.SOCIALISING -> 4
                 Genre.HEALTH -> 5
+                Genre.NOT_SPECIFIED -> 6
             }
         }
 

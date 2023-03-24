@@ -7,6 +7,7 @@ enum class Genre(var value: String) : IChipGroupValue {
     PARTNERSHIP("PARTNERSHIP"),
     SOCIALISING("SOCIALISING"),
     HEALTH("HEALTH"),
+    NOT_SPECIFIED("NOT_SPECIFIED"),
     UNKNOWN("UNKNOWN")
 }
 
@@ -17,7 +18,8 @@ fun getGenres(): List<Genre> {
         Genre.MONEY,
         Genre.PARTNERSHIP,
         Genre.SOCIALISING,
-        Genre.HEALTH
+        Genre.HEALTH,
+        Genre.NOT_SPECIFIED
     )
 }
 

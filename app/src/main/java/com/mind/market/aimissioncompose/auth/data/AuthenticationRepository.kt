@@ -7,8 +7,8 @@ class AuthenticationRepository(
     private val remoteDataSource: IAuthenticationRemoteDataSource,
     private val localDataSource: IAuthenticationLocalDataSource
 ) : IAuthenticationRepository {
-    override suspend fun createUser(email: String, password: String) {
-        remoteDataSource.createUser(email, password)
+    override suspend fun createUser(email: String, password: String, onResult: (Throwable?, User?) -> Unit) {
+        remoteDataSource.createUser(email, password, onResult)
     }
 
     override suspend fun loginUser(

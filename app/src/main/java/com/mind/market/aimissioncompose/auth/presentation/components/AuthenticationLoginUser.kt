@@ -59,7 +59,7 @@ fun AuthenticationLoginUser(
             Text(
                 text = stringResource(R.string.authentication_login_header),
                 style = MaterialTheme.typography.body1,
-                color = DarkBlue,
+                color = Color.Black,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(24.dp))
@@ -79,7 +79,6 @@ fun AuthenticationLoginUser(
                 }
             )
             Spacer(modifier = Modifier.height(16.dp))
-
             OutlinedTextField(
                 value = state.password,
                 textStyle = TextStyle(color = Color.Black),

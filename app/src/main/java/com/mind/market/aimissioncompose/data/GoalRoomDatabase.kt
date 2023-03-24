@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 @Database(
     entities = [GoalDto::class, UserDto::class],
     version = 6,
-    autoMigrations = [AutoMigration(from = 3, to = 4)]
+    autoMigrations = [AutoMigration(from = 3, to = 4), AutoMigration(from = 5, to = 6)]
 )
 @TypeConverters(Converters::class)
 abstract class GoalRoomDatabase : RoomDatabase() {

@@ -68,5 +68,6 @@
     <string name="detail_user_not_authenticated_error_subtitle">Please sign in or sign up to add a new goal.</string>
     <string name="authentication_login_placeholder_email">Email Address</string>
     <string name="authentication_login_placeholder_password">Your password</string>
+    <string name="detail_error_message_goal_is_deprecated">This goal is deprecated. Your time to achieve this goal is passed by.</string>
 
 </resources>

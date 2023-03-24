@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.domain.models.Priority
+import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.models.getGenres
 import com.mind.market.aimissioncompose.domain.models.getPriorities
 import com.mind.market.aimissioncompose.presentation.common.ChipGroupGenre
@@ -37,7 +38,6 @@ import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 import com.mind.market.aimissioncompose.ui.theme.DarkestBlue
 import com.mind.market.aimissioncompose.ui.theme.LightestBlue
 import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.datetime.date.DatePickerColors
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
@@ -217,7 +217,6 @@ fun DetailScreen(
                                     Text(text = "Pick a date")
                                 }
                                 Spacer(modifier = Modifier.width(16.dp))
-
                                 Text(
                                     modifier = Modifier.padding(top = 16.dp),
                                     color = DarkBlue,
@@ -227,7 +226,7 @@ fun DetailScreen(
                                 )
                             }
                         }
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
                         AnimatedVisibility(visible = state.hasValidationErrors) {
                             Text(
                                 text = state.validationCode?.toText(context)
@@ -242,7 +241,14 @@ fun DetailScreen(
                                 )
                             )
                         }
-
+                        if (state.goal.status == Status.DEPRECATED) {
+                            Text(
+                                text = stringResource(R.string.detail_error_message_goal_is_deprecated),
+                                style = MaterialTheme.typography.body1,
+                                color = MaterialTheme.colors.error
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
                         MainButton(
                             text = state.ctaButtonText,
                             icon = 0,

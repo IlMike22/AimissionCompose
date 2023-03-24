@@ -3,11 +3,11 @@ package com.mind.market.aimissioncompose.auth.presentation
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mind.market.aimissioncompose.auth.data.model.User
 import com.mind.market.aimissioncompose.auth.domain.CreateUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.LoginUserUseCase
 import com.mind.market.aimissioncompose.auth.domain.StoreLocalUserUseCase
 import com.mind.market.aimissioncompose.auth.utils.AuthenticationValidationErrorStatus
-import com.mind.market.aimissioncompose.presentation.landing_page.ICommandReceiver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -33,8 +33,16 @@ class AuthenticationViewModel @Inject constructor(
     fun onEvent(event: AuthenticationEvent) {
         when (event) {
             is AuthenticationEvent.OnCreateNewUser -> {
+                _state.update {
+                    it.copy(
+                        toastMessage = null,
+                        isLoading = true
+                    )
+                }
                 viewModelScope.launch {
-                    createUser(_state.value.email, _state.value.password)
+                    createUser(_state.value.email, _state.value.password) { error, user ->
+                        handleSignInRequest(error, user)
+                    }
                 }
             }
             is AuthenticationEvent.OnEmailChanged -> _state.update {
@@ -62,36 +70,7 @@ class AuthenticationViewModel @Inject constructor(
                         loginUser(
                             _state.value.email,
                             _state.value.password
-                        ) { user, error ->
-                            if (error == null && user != null) { // SUCCESS CASE
-                                // success case
-                                _state.update {
-                                    it.copy(
-                                        user = user,
-                                        toastMessage = "User ${user.id} successfully logged in.",
-                                        isLoading = false,
-                                        isUserAuthenticated = true,
-                                        validationErrorStatus = null
-                                    )
-                                }
-                                // TODO MIC nested coroutine bad. Look for solution to run coroutines sequentially
-                                viewModelScope.launch {
-                                    _uiEvent.send(AuthenticationUiEvent.NavigateToLandingPageAfterLogin)
-                                    storeLocalUser(_state.value.user)
-                                }
-                            } else {
-                                // ERROR CASE - show in ui
-                                _state.update {
-                                    it.copy(
-                                        toastMessage = error?.message
-                                            ?: "Unknown error while trying to login user.",
-                                        isLoading = false,
-                                        isUserAuthenticated = false,
-                                        validationErrorStatus = AuthenticationValidationErrorStatus.LOGIN_FAILED
-                                    )
-                                }
-                            }
-                        }
+                        ) { user, error -> handleSignInRequest(error, user) }
                     }
                 } else {
                     _state.update {
@@ -116,6 +95,36 @@ class AuthenticationViewModel @Inject constructor(
             AuthenticationValidationErrorStatus.NO_PASSWORD
         } else {
             null
+        }
+    }
+
+    private fun handleSignInRequest(error: Throwable?, user: User?) {
+        if (error == null && user != null) { // SUCCESS CASE
+            // success case
+            _state.update {
+                it.copy(
+                    user = user,
+                    toastMessage = "User ${user.id} successfully logged in.",
+                    isLoading = false,
+                    isUserAuthenticated = true,
+                    validationErrorStatus = null
+                )
+            }
+            viewModelScope.launch {
+                _uiEvent.send(AuthenticationUiEvent.NavigateToLandingPageAfterLogin)
+                storeLocalUser(_state.value.user)
+            }
+        } else {
+            // ERROR CASE - show in ui
+            _state.update {
+                it.copy(
+                    toastMessage = error?.message
+                        ?: "Unknown error while trying to login user.",
+                    isLoading = false,
+                    isUserAuthenticated = false,
+                    validationErrorStatus = AuthenticationValidationErrorStatus.LOGIN_FAILED
+                )
+            }
         }
     }
 }

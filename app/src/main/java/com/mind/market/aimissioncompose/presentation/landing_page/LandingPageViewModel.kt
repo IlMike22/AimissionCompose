@@ -283,24 +283,27 @@ class LandingPageViewModel @Inject constructor(
     private fun handleGoalsResponse(response: Resource<List<Goal>>) {
         when (response) {
             is Resource.Success -> {
-                _goals.value = filterGoals(
-                    goals = response.data ?: emptyList()
-                ).let { checkForDeprecatedGoals(it) }
-                _uiState.update {
-                    it.copy(
-                        hasResults = response.data?.isNotEmpty() ?: false,
-                        isLoading = false,
-                        errorMessage = null,
-                        requestSearchTextFocus = true
-                    )
+                viewModelScope.launch {
+                    _goals.value = filterGoals(
+                        goals = response.data ?: emptyList()
+                    ).let {
+                        checkForDeprecatedGoals(it)
+                    }
+                    _uiState.update {
+                        it.copy(
+                            hasResults = response.data?.isNotEmpty() ?: false,
+                            isLoading = false,
+                            errorMessage = null,
+                            requestSearchTextFocus = true
+                        )
+                    }
+                    val currentSortingMode = _uiState.value.selectedSortingMode
+                    if (currentSortingMode != null) {
+                        onSortingChanged(currentSortingMode)
+                    }
+                    showGoalOverdueDialogIfNeeded(_goals.value)
                 }
-                val currentSortingMode = _uiState.value.selectedSortingMode
-                if (currentSortingMode != null) {
-                    onSortingChanged(currentSortingMode)
-                }
-                showGoalOverdueDialogIfNeeded(_goals.value)
             }
-
             is Resource.Loading -> {
                 _uiState.update {
                     it.copy(
@@ -386,9 +389,10 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private fun checkForDeprecatedGoals(goals: List<Goal>): List<Goal> {
+    private suspend fun checkForDeprecatedGoals(goals: List<Goal>): List<Goal> {
         val result = goals.map { goal ->
-            if (goal.status != Status.DONE && goal.finishDate < LocalDateTime.now()) {
+            if (goal.status != Status.DONE && goal.finishDate <= LocalDateTime.now().minusDays(1)) {
+                updateGoalStatus(goal.id, Status.DEPRECATED) {}
                 goal.copy(status = Status.DEPRECATED)
             } else {
                 goal

@@ -183,5 +183,6 @@ fun Genre.toText(): String =
         Genre.PARTNERSHIP -> "partnership"
         Genre.SOCIALISING -> "socialising"
         Genre.HEALTH -> "health"
+        Genre.NOT_SPECIFIED -> "not specified"
         Genre.UNKNOWN -> ""
     }
