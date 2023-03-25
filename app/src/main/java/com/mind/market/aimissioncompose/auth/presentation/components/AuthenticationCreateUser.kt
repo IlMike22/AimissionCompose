@@ -36,7 +36,7 @@ fun AuthenticationCreateUser(
         else painterResource(id = com.google.android.material.R.drawable.design_ic_visibility_off)
 
     Text(
-        text = "Create a new account to add your first goal.",
+        text = stringResource(R.string.authentication_sign_up_header),
         style = MaterialTheme.typography.body1,
         color = Color.Black,
         textAlign = TextAlign.Center
@@ -99,7 +99,7 @@ fun AuthenticationCreateUser(
                 strokeWidth = 3.dp
             )
         } else {
-            Text(text = "Create new account")
+            Text(text = stringResource(R.string.authentication_sign_up_button_text))
         }
     }
 }

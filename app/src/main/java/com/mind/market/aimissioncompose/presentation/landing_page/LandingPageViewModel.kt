@@ -88,7 +88,19 @@ class LandingPageViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        val job = viewModelScope.launch(context = Dispatchers.IO) {
+        //TODO MIC this does not work atm (with zip) but would be a great refactoring
+//        viewModelScope.launch(context = Dispatchers.IO) {
+//            getGoals().zip(getUserSettings()) { goals, settings ->
+//                handleGoalsResponse(goals)
+//                isDoneGoalHidden = settings.isHideDoneGoals
+//                showGoalOverdueDialog = settings.showGoalOverdueDialog
+//                if (settings.selectedSortingMode != null) {
+//                    _uiState.update { it.copy(selectedSortingMode = settings.selectedSortingMode) }
+//                }
+//            }
+//        }
+
+        viewModelScope.launch(context = Dispatchers.IO) {
             getGoals().collect {
                 handleGoalsResponse(it)
             }
