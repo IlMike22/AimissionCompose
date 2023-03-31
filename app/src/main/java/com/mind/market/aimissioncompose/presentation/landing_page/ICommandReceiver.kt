@@ -19,6 +19,7 @@ interface ICommandReceiver {
     fun onSortingChanged(sortMode: SortingMode)
     fun onClearSearchText()
     fun onDropDownItemClicked(item: DropDownItem)
+    fun onResetErrorStateCommand()
     fun processCommand(command: ICommand) {
         command.execute(this)
     }
@@ -75,6 +76,13 @@ class SearchTextUpdateCommand(private val newText: String) : ICommand {
     override fun execute(receiver: ICommandReceiver) {
         receiver.onSearchTextUpdate(newText)
     }
+}
+
+class ResetErrorStateCommand():ICommand {
+    override fun execute(receiver: ICommandReceiver) {
+        receiver.onResetErrorStateCommand()
+    }
+
 }
 
 class DropDownStateChangeCommand(private val isVisible: Boolean) : ICommand {

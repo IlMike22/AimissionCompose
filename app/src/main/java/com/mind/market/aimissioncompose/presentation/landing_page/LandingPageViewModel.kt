@@ -11,6 +11,7 @@ import com.mind.market.aimissioncompose.domain.models.GoalListItem
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettingsUseCase
 import com.mind.market.aimissioncompose.presentation.common.DropDownItem
+import com.mind.market.aimissioncompose.presentation.common.DropDownItemId
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -223,7 +224,20 @@ class LandingPageViewModel @Inject constructor(
     }
 
     override fun onDropDownItemClicked(item: DropDownItem) {
-        println("!! item $item clicked!")
+        when (item.id) {
+            DropDownItemId.DELETE_GOAL -> {
+                cacheAndDeleteGoal(item.correspondingGoal)
+            }
+            DropDownItemId.HIDE_GOAL -> {
+                _uiState.update {
+                    it.copy(errorMessage = "This feature is not implemented yet. Please come back later.")
+                }
+            }
+        }
+    }
+
+    override fun onResetErrorStateCommand() {
+        _uiState.update { it.copy(errorMessage = null) }
     }
 
     private fun navigateToAddGoalScreen() {
@@ -246,7 +260,10 @@ class LandingPageViewModel @Inject constructor(
         }
     }
 
-    private fun cacheAndDeleteGoal(goal: Goal) {
+    private fun cacheAndDeleteGoal(goal: Goal?) {
+        if (goal == null) {
+            return
+        }
         deletedGoal = goal
         goalIndex = _goals.value.indexOf(goal)
         goal.apply {
@@ -313,9 +330,14 @@ class LandingPageViewModel @Inject constructor(
                             errorMessage = null,
                             requestSearchTextFocus = true,
                             dropDownItems = listOf(
-                                DropDownItem("Delete"),
-                                DropDownItem("Show details"),
-                                DropDownItem("Hide item")
+                                DropDownItem(
+                                    id = DropDownItemId.DELETE_GOAL,
+                                    name = "Delete goal"
+                                ),
+                                DropDownItem(
+                                    id = DropDownItemId.HIDE_GOAL,
+                                    name = "Hide goal"
+                                )
                             )
                         )
                     }

@@ -99,11 +99,11 @@ fun Goal(
             dropDownItems.forEach { item ->
                 DropdownMenuItem(
                     onClick = {
-                        onDropDownItemClicked(item)
+                        onDropDownItemClicked(item.copy(correspondingGoal = goal))
                         isContextMenuVisible = false
                     }
                 ) {
-                    Text(item.text)
+                    Text(item.name)
                 }
             }
         }

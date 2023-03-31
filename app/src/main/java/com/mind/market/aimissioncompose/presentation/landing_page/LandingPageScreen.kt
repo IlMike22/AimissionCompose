@@ -23,9 +23,7 @@ import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +31,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.navigation.Route
@@ -212,9 +209,19 @@ fun LandingPageScreen(
                     ) {
                         Text(
                             modifier = Modifier.align(Center),
-                            text = "An error occured! Please try again. Details: ${state.errorMessage}",
+                            text = "${state.errorMessage}",
+                            style = MaterialTheme.typography.h6,
                             color = Color.DarkGray
                         )
+                        Button(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter),
+                            onClick = {
+                                commandProcessor(ResetErrorStateCommand())
+                            }
+                        ) {
+                            Text(stringResource(R.string.landing_page_error_button_text_I_understand))
+                        }
                     }
 
                 } else {

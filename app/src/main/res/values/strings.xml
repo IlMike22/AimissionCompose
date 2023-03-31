@@ -71,5 +71,6 @@
     <string name="detail_error_message_goal_is_deprecated">This goal is deprecated. Your time to achieve this goal is passed by.</string>
     <string name="authentication_sign_up_header">Create a new account to add your first goal.</string>
     <string name="authentication_sign_up_button_text">Create new account</string>
+    <string name="landing_page_error_button_text_I_understand">I understand.</string>
 
 </resources>
