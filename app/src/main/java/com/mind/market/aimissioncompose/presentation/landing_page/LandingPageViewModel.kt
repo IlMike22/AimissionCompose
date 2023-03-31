@@ -10,6 +10,7 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.GoalListItem
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettingsUseCase
+import com.mind.market.aimissioncompose.presentation.common.DropDownItem
 import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -221,6 +222,10 @@ class LandingPageViewModel @Inject constructor(
         _searchText.value = ""
     }
 
+    override fun onDropDownItemClicked(item: DropDownItem) {
+        println("!! item $item clicked!")
+    }
+
     private fun navigateToAddGoalScreen() {
         viewModelScope.launch {
             _uiEvent.send(LandingPageUiEvent.NavigateToDetailGoal())
@@ -306,7 +311,12 @@ class LandingPageViewModel @Inject constructor(
                             hasResults = response.data?.isNotEmpty() ?: false,
                             isLoading = false,
                             errorMessage = null,
-                            requestSearchTextFocus = true
+                            requestSearchTextFocus = true,
+                            dropDownItems = listOf(
+                                DropDownItem("Delete"),
+                                DropDownItem("Show details"),
+                                DropDownItem("Hide item")
+                            )
                         )
                     }
                     val currentSortingMode = _uiState.value.selectedSortingMode

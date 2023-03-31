@@ -85,10 +85,6 @@ fun LandingPageScreen(
         bottomSheetState = sheetState
     )
 
-    var dropDownPosition by remember {
-        mutableStateOf(Size.Zero)
-    }
-
     LaunchedEffect(key1 = true) {
         uiEvent.collect { event ->
             when (event) {
@@ -249,9 +245,6 @@ fun LandingPageScreen(
                         Box {
                             IconButton(
                                 onClick = { commandProcessor(DropDownStateChangeCommand(true)) },
-                                modifier = Modifier.onGloballyPositioned { layoutCoordinates ->
-                                    dropDownPosition = layoutCoordinates.size.toSize()
-                                },
                                 content = {
                                     Icon(
                                         imageVector = Icons.Default.ArrowDropDown,
@@ -331,6 +324,12 @@ fun LandingPageScreen(
                                                         StatusChangeCommand(
                                                             selectedGoal
                                                         )
+                                                    )
+                                                },
+                                                dropDownItems = state.dropDownItems,
+                                                onDropDownItemClicked = {
+                                                    commandProcessor(
+                                                        ShowDropDownListCommand(it)
                                                     )
                                                 }
                                             )

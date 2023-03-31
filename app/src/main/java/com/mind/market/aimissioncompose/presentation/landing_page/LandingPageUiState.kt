@@ -1,6 +1,7 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
 import com.mind.market.aimissioncompose.domain.models.GoalListItem
+import com.mind.market.aimissioncompose.presentation.common.DropDownItem
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 
 data class LandingPageUiState(
@@ -11,5 +12,6 @@ data class LandingPageUiState(
     val requestSearchTextFocus: Boolean = false,
     val hasResults: Boolean = false,
     val isDropDownExpanded: Boolean = false,
-    val selectedSortingMode: SortingMode? = null
+    val selectedSortingMode: SortingMode? = null,
+    val dropDownItems: List<DropDownItem> = emptyList()
 )

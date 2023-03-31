@@ -1,6 +1,7 @@
 package com.mind.market.aimissioncompose.presentation.landing_page
 
 import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.presentation.common.DropDownItem
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 
 interface ICommandReceiver {
@@ -17,6 +18,7 @@ interface ICommandReceiver {
     fun onDropDownStateChanged(isVisible: Boolean = false)
     fun onSortingChanged(sortMode: SortingMode)
     fun onClearSearchText()
+    fun onDropDownItemClicked(item: DropDownItem)
     fun processCommand(command: ICommand) {
         command.execute(this)
     }
@@ -96,6 +98,12 @@ class GoalUpdateCommand() : ICommand {
 class UndoDeletedGoalCommand() : ICommand {
     override fun execute(receiver: ICommandReceiver) {
         receiver.onUndoDeletedGoalClicked()
+    }
+}
+
+class ShowDropDownListCommand(private val item: DropDownItem) : ICommand {
+    override fun execute(receiver: ICommandReceiver) {
+        receiver.onDropDownItemClicked(item)
     }
 }
 
