@@ -43,7 +43,6 @@ class GenerateStatisticsUseCase(
     ): Map<String, String> {
         val entitiesContent = mutableMapOf<String, String>()
 
-
         createdDates.forEach { createdDate ->
             entitiesContent[createStatisticsEntityId(createdDate)] =
                 getMonthAsString(createdDate.month)
@@ -102,9 +101,9 @@ class GenerateStatisticsUseCase(
                     data = data,
                     created = LocalDateTime.now(),
                     grade = generateStatisticEntityGrade(data),
-                    month = 0,
-                    year = 0,
-                    lastUpdated = LocalDateTime.now() // TODO MIC check if needed
+                    month = 0, // TODO MIC set correct month here (for sorting)
+                    year = 0, // TODO MIC set correct year (int) here (for sorting)
+                    lastUpdated = LocalDateTime.now()
                 )
             )
         }

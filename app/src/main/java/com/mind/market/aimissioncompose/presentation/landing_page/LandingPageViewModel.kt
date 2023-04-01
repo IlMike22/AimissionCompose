@@ -393,13 +393,15 @@ class LandingPageViewModel @Inject constructor(
         goalsPerMonthAndYear.forEach {
             goalListItems.add(
                 GoalListItem(
+                    year = it.key.year,
+                    month = it.key.month,
                     monthValue = it.key.month.toMonthName(),
                     yearValue = it.key.year.toString(),
                     goals = it.value
                 )
             )
         }
-        return goalListItems
+        return goalListItems.sortedWith(compareByDescending<GoalListItem> { it.year }.thenByDescending { it.month })
     }
 
     private fun showGoalOverdueDialogIfNeeded(goals: List<Goal>) {

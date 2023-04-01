@@ -179,8 +179,7 @@ class MainActivity : ComponentActivity() {
                                 val viewModel = hiltViewModel<StatisticsViewModel>()
                                 val state by viewModel.state.collectAsState()
                                 StatisticsScreen(
-                                    state = state,
-                                    onEvent = viewModel::onEvent
+                                    state = state
                                 )
                             }
                             composable(

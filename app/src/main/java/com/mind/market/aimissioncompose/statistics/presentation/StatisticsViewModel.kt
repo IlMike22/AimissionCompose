@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.mind.market.aimissioncompose.statistics.domain.models.StatisticsEntity
 import com.mind.market.aimissioncompose.statistics.domain.use_case.implementation.GenerateStatisticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -27,11 +28,13 @@ class StatisticsViewModel @Inject constructor(
         viewModelScope.launch {
             generateStatistics()
                 .collectLatest { entities ->
-                    _state.update {
-                        it.copy(
+                    _state.update { state ->
+                        state.copy(
                             isLoading = false,
                             errorMessage = null,
-                            statisticsEntities = entities,
+                            statisticsEntities = entities
+                                .sortedWith(compareByDescending<StatisticsEntity> { it.year }
+                                    .thenByDescending { it.month }),
                             isUsersAuthenticated = auth.currentUser != null
                         )
                     }

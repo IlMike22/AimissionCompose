@@ -19,7 +19,6 @@ import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 @Composable
 fun StatisticsScreen(
     state: StatisticsState,
-    onEvent: (StatisticsEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
