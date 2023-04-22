@@ -158,15 +158,14 @@ class MainActivity : ComponentActivity() {
                                 val viewModel = hiltViewModel<InformationViewModel>()
                                 val state by viewModel.state.collectAsState()
                                 InformationScreen(
-                                    state = state,
-                                    onEvent = viewModel::onEvent
+                                    state = state
                                 )
                             }
                             composable(
                                 route = Route.SETTINGS
                             ) {
                                 val viewModel = hiltViewModel<SettingsViewModel>()
-                                val state = viewModel.settingsState
+                                val state by viewModel.settingsState.collectAsState()
                                 SettingsScreen(
                                     state = state,
                                     onEvent = viewModel::onEvent,

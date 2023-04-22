@@ -13,7 +13,6 @@ import com.mind.market.aimissioncompose.ui.theme.DarkBlue
 @Composable
 fun InformationScreen(
     state: InformationState,
-    onEvent: (InformationEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -28,13 +27,6 @@ fun InformationScreen(
                 color = DarkBlue
             )
             Spacer(modifier = modifier.height(16.dp))
-        }
-
-        Button(
-            onClick = {
-                onEvent(InformationEvent.OnChangeVersion)
-            }) {
-            Text(text = "Change version")
         }
     }
 }

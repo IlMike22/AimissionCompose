@@ -72,5 +72,6 @@
     <string name="authentication_sign_up_header">Create a new account to add your first goal.</string>
     <string name="authentication_sign_up_button_text">Create new account</string>
     <string name="landing_page_error_button_text_I_understand">I understand.</string>
+    <string name="detail_goal_description_hint_text">Goal`s description</string>
 
 </resources>

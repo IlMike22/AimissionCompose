@@ -1,8 +1,5 @@
 package com.mind.market.aimissioncompose.presentation.settings
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -12,6 +9,9 @@ import com.mind.market.aimissioncompose.domain.settings.use_case.GetUserSettings
 import com.mind.market.aimissioncompose.domain.settings.use_case.HideDoneGoalsUseCase
 import com.mind.market.aimissioncompose.domain.settings.use_case.ShowOverdueDialogUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,8 +21,9 @@ class SettingsViewModel @Inject constructor(
     private val hideDoneGoals: HideDoneGoalsUseCase,
     private val showOverdueDialog: ShowOverdueDialogUseCase,
 ) : ViewModel() {
-    var settingsState by mutableStateOf(SettingsState())
-        private set
+
+    private val _settingsState = MutableStateFlow(SettingsState())
+    val settingsState = _settingsState.asStateFlow()
 
     private val auth: FirebaseAuth = Firebase.auth
 
@@ -30,11 +31,13 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 getUserSettings().collect { userSettings ->
-                    settingsState = settingsState.copy(
-                        isDoneGoalsHidden = userSettings.isHideDoneGoals,
-                        showGoalOverdueDialogOnStart = userSettings.showGoalOverdueDialog,
-                        isUserAuthenticated = auth.currentUser != null
-                    )
+                    _settingsState.update {
+                        it.copy(
+                            isDoneGoalsHidden = userSettings.isHideDoneGoals,
+                            showGoalOverdueDialogOnStart = userSettings.showGoalOverdueDialog,
+                            isUserAuthenticated = auth.currentUser != null
+                        )
+                    }
                 }
             }
         }
@@ -45,17 +48,14 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.HideDoneGoals -> {
                 viewModelScope.launch {
                     hideDoneGoals(event.hide)
-                    settingsState = settingsState.copy(
-                        isDoneGoalsHidden = event.hide
-                    )
+                    _settingsState.update { it.copy(isDoneGoalsHidden = event.hide) }
                 }
             }
+
             is SettingsEvent.ShowGoalOverdueDialog -> {
                 viewModelScope.launch {
                     showOverdueDialog(event.show)
-                    settingsState = settingsState.copy(
-                        showGoalOverdueDialogOnStart = event.show
-                    )
+                    _settingsState.update { it.copy(showGoalOverdueDialogOnStart = event.show) }
                 }
             }
         }

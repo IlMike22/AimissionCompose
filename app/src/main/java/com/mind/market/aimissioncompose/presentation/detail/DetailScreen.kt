@@ -111,6 +111,7 @@ fun DetailScreen(
                             textStyle = TextStyle(color = Color.Black),
                             placeholder = { Text(text = "Goal`s title") },
                             label = { Text(text = "Goal`s title") },
+                            maxLines = 1,
                             onValueChange = { newTitle ->
                                 onEvent(DetailEvent.OnTitleChanged(newTitle))
                             }
@@ -122,13 +123,15 @@ fun DetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(256.dp),
-                            placeholder = { Text(text = "Goal`s description") },
-                            label = { Text(text = "Goal`s description") },
+                            placeholder = {
+                                Text(text = stringResource(R.string.detail_goal_description_hint_text)) },
+                            label = {
+                                Text(text = stringResource(R.string.detail_goal_description_hint_text)) },
                             onValueChange = { newDescription ->
                                 onEvent(DetailEvent.OnDescriptionChanged(newDescription))
-                            }
+                            },
+                            maxLines = 5
                         )
-
                         Column(
                             modifier = Modifier
                                 .padding(8.dp)
