@@ -20,6 +20,7 @@ interface ICommandReceiver {
     fun onClearSearchText()
     fun onDropDownItemClicked(item: DropDownItem)
     fun onResetErrorStateCommand()
+    fun onNavigateToStocksDiaryOverview()
     fun processCommand(command: ICommand) {
         command.execute(this)
     }
@@ -33,6 +34,12 @@ interface ICommand {
 class AddCommand : ICommand {
     override fun execute(receiver: ICommandReceiver) {
         receiver.onAddGoalClicked()
+    }
+}
+
+class NavigateToStocksDiaryOverviewCommand: ICommand {
+    override fun execute(receiver: ICommandReceiver) {
+        receiver.onNavigateToStocksDiaryOverview()
     }
 }
 

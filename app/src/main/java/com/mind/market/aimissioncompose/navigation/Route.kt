@@ -8,4 +8,6 @@ object Route {
     const val INFORMATION = "info"
     const val STATISTICS = "statistics"
     const val AUTHENTICATION = "authentication"
+    const val STOCKS_DIARY_OVERVIEW = "stocks_diary_overview"
+    const val STOCKS_DIARY_DETAIL = "stocks_diary_detail"
 }

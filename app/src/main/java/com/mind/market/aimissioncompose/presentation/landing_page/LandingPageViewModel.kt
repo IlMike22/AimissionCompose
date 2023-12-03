@@ -240,6 +240,12 @@ class LandingPageViewModel @Inject constructor(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
+    override fun onNavigateToStocksDiaryOverview() {
+        viewModelScope.launch {
+            _uiEvent.send(LandingPageUiEvent.NavigateToStocksDiaryOverviewScreen)
+        }
+    }
+
     private fun navigateToAddGoalScreen() {
         viewModelScope.launch {
             _uiEvent.send(LandingPageUiEvent.NavigateToDetailGoal())

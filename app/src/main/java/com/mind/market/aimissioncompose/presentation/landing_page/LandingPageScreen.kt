@@ -64,12 +64,8 @@ fun LandingPageScreen(
     val detailPageScreenResult = navController.currentBackStackEntry
         ?.savedStateHandle
         ?.getLiveData<Boolean>("invalidate")?.observeAsState()
-    detailPageScreenResult?.value?.let { isUpdateList ->
-        if (isUpdateList) {
-            commandProcessor(GoalUpdateCommand())
-            navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
-        }
-    }
+
+    handleBackNavigationUpdate(navController, detailPageScreenResult, commandProcessor)
 
     val sheetState: BottomSheetState =
         rememberBottomSheetState(
@@ -96,21 +92,29 @@ fun LandingPageScreen(
                                 SnackBarAction.UNDO -> {
                                     commandProcessor(UndoDeletedGoalCommand())
                                 }
+
                                 else -> {}
                             }
                         }
+
                         SnackbarResult.Dismissed -> Unit
                     }
                 }
+
                 is LandingPageUiEvent.ShowGoalOverdueDialog -> {
                     alertDialogState.show()
                 }
+
                 is LandingPageUiEvent.NavigateToAuthenticationScreen -> {
                     navController.navigate(Route.AUTHENTICATION) {
                         popUpTo(0)
                     }
                 }
-                else -> {}
+
+                is LandingPageUiEvent.NavigateToDetailGoal -> Unit
+                LandingPageUiEvent.NavigateToStocksDiaryOverviewScreen -> {
+                    navController.navigate(Route.STOCKS_DIARY_OVERVIEW)
+                }
             }
         }
     }
@@ -137,10 +141,17 @@ fun LandingPageScreen(
                         }
                     ) { Text(text = stringResource(R.string.bottom_sheet_button_text_statistics)) }
 
+//                    Button(
+//                        modifier = Modifier.align(Center),
+//                        onClick = { onShowFeedbackDialog() }
+//                    ) { Text(text = stringResource(R.string.bottom_sheet_button_text_review)) }
+
                     Button(
                         modifier = Modifier.align(Center),
-                        onClick = { onShowFeedbackDialog() }
-                    ) { Text(text = stringResource(R.string.bottom_sheet_button_text_review)) }
+                        onClick = { commandProcessor(NavigateToStocksDiaryOverviewCommand()) }
+                    ) {
+                        Text(text = "Stocks Diary")
+                    }
 
                     Button(
                         modifier = Modifier
@@ -387,4 +398,17 @@ private fun ClearIcon(processCommand: (ICommand) -> Unit) {
             .clickable { processCommand(ClearSearchTextCommand()) }
             .padding(8.dp)
     )
+}
+
+private fun handleBackNavigationUpdate(
+    navController: NavController,
+    result: State<Boolean?>?,
+    commandProcessor: (ICommand) -> Unit
+) {
+    result?.value?.let { isUpdateList ->
+        if (isUpdateList) {
+            commandProcessor(GoalUpdateCommand())
+            navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
+        }
+    }
 }

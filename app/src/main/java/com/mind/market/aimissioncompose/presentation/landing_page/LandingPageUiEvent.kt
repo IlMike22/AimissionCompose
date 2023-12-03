@@ -12,5 +12,7 @@ sealed class LandingPageUiEvent(val goal: Goal? = null) {
     ) : LandingPageUiEvent()
     class NavigateToDetailGoal(goal: Goal? = null) : LandingPageUiEvent(goal = goal)
     object NavigateToAuthenticationScreen : LandingPageUiEvent()
+    object NavigateToStocksDiaryOverviewScreen: LandingPageUiEvent()
     data class ShowGoalOverdueDialog(val title: String, val message: String) : LandingPageUiEvent()
+
 }

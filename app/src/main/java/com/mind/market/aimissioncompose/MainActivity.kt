@@ -40,6 +40,10 @@ import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
 import com.mind.market.aimissioncompose.presentation.settings.SettingsViewModel
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsScreen
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsViewModel
+import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.StocksDiaryDetailScreen
+import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.StocksDiaryDetailViewModel
+import com.mind.market.aimissioncompose.stocks_diary.overview.presentation.StocksDiaryOverviewScreen
+import com.mind.market.aimissioncompose.stocks_diary.overview.presentation.StocksDiaryOverviewViewModel
 import com.mind.market.aimissioncompose.ui.theme.AimissionComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -177,9 +181,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 val viewModel = hiltViewModel<StatisticsViewModel>()
                                 val state by viewModel.state.collectAsState()
-                                StatisticsScreen(
-                                    state = state
-                                )
+                                StatisticsScreen(state)
                             }
                             composable(
                                 route = Route.AUTHENTICATION
@@ -191,6 +193,24 @@ class MainActivity : ComponentActivity() {
                                     viewModel = viewModel,
                                     navController = navController
                                 )
+                            }
+                            composable(
+                                route = Route.STOCKS_DIARY_OVERVIEW
+                            ) {
+                                val viewModel = hiltViewModel<StocksDiaryOverviewViewModel>()
+                                val state by viewModel.state.collectAsState()
+                                StocksDiaryOverviewScreen(
+                                    navController = navController,
+                                    state = state,
+                                    onEvent = viewModel::onEvent
+                                )
+                            }
+                            composable(
+                                route = Route.STOCKS_DIARY_DETAIL
+                            ) {
+                                val viewModel = hiltViewModel<StocksDiaryDetailViewModel>()
+                                val state by viewModel.state.collectAsState()
+                                StocksDiaryDetailScreen(state, navController,viewModel::onEvent)
                             }
                         }
                     }
@@ -210,5 +230,9 @@ class MainActivity : ComponentActivity() {
                 reviewManager.launchReviewFlow(this, it.result)
             }
         }
+    }
+
+    private fun showStocksDiaryOverview() {
+
     }
 }
