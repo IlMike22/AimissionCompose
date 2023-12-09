@@ -35,7 +35,7 @@ class StocksDiaryDetailViewModel @Inject constructor(
         diary: StocksDiaryDomain
     ) {
         repository.getStocksDiaryOfToday { diaryOfToday ->
-            if (diaryOfToday == null || diary.createdDate != LocalDate.now()) {
+//            if (diaryOfToday == null || diary.createdDate != LocalDate.now()) { // TODO MIC just tmp. removed for testing with more items
                 viewModelScope.launch {// TODO MIC ANTIPATTERN? How to avoid nested vm scopes??
                     repository.addDiary(diary) { error ->
                         if (error != null) {
@@ -56,14 +56,14 @@ class StocksDiaryDetailViewModel @Inject constructor(
                         }
                     }
                 }
-            } else {
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "You have already added an item for today."
-                    )
-                }
-            }
+//            } else {
+//                _state.update {
+//                    it.copy(
+//                        isLoading = false,
+//                        errorMessage = "You have already added an item for today."
+//                    )
+//                }
+//            }
         }
     }
 }

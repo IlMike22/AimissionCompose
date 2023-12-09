@@ -79,4 +79,29 @@ class StocksDiaryRemoteDataSource(
                 onResult(itemOfToday)
             }
     }
+
+    override suspend fun removeDiary(
+        userId: String?,
+        diary: StocksDiaryData,
+        onResult: (Throwable?) -> Unit
+    ) {
+        if (userId == null) {
+            onResult(Throwable("Cannot add diary. UserId is null."))
+            return
+        }
+
+        firebaseDatabase
+            .child(FIREBASE_TABLE_USER)
+            .child(userId)
+            .child(FIREBASE_TABLE_STOCKS_DIARY)
+            .child(diary.id.toString())
+            .removeValue()
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    onResult(null)
+                } else {
+                    onResult(Throwable(it.exception?.message))
+                }
+            }
+    }
 }

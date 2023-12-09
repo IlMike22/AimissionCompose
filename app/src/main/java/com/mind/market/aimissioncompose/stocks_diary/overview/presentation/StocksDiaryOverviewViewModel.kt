@@ -3,6 +3,7 @@ package com.mind.market.aimissioncompose.stocks_diary.overview.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.IStocksDiaryRepository
+import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,18 @@ class StocksDiaryOverviewViewModel @Inject constructor(
             StocksDiaryOverviewEvent.OnUpdateList -> {
                 viewModelScope.launch {
                     loadDiaries()
+                }
+            }
+
+            is StocksDiaryOverviewEvent.OnItemRemove -> {
+                viewModelScope.launch {
+                    repository.removeStocksDiary(event.item) { error ->
+                        if (error != null) {
+                            _state.update { it.copy(errorMessage = error.message) }
+                        } else {
+                            _state.update { it.copy(stockDiaries = _state.value.stockDiaries - event.item) }
+                        }
+                    }
                 }
             }
         }

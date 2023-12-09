@@ -29,6 +29,13 @@ class StocksDiaryRepository(
         remoteDataSource.getDiaryForToday(getFirebaseUserId(), onResult = onResult)
     }
 
+    override suspend fun removeStocksDiary(
+        diary: StocksDiaryDomain,
+        onResult: (Throwable?) -> Unit
+    ) {
+        remoteDataSource.removeDiary(getFirebaseUserId(), diary.toStocksDiaryData(), onResult)
+    }
+
     private fun getFirebaseUserId(): String =
         authRemoteDataSource.getUserData().id
 }
