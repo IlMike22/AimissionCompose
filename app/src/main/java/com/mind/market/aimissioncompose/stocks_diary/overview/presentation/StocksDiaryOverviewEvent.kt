@@ -4,5 +4,6 @@ import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.Stocks
 
 sealed interface StocksDiaryOverviewEvent {
     object OnUpdateList : StocksDiaryOverviewEvent
-    data class OnItemRemove(val item: StocksDiaryDomain): StocksDiaryOverviewEvent
+    data class OnItemRemove(val item: StocksDiaryDomain) : StocksDiaryOverviewEvent
+    object OnOpenChartView : StocksDiaryOverviewEvent
 }

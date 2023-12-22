@@ -10,4 +10,5 @@ object Route {
     const val AUTHENTICATION = "authentication"
     const val STOCKS_DIARY_OVERVIEW = "stocks_diary_overview"
     const val STOCKS_DIARY_DETAIL = "stocks_diary_detail"
+    const val STOCKS_DIARY_CHART = "stocks_diary_chart"
 }

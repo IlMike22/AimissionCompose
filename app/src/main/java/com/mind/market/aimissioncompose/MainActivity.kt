@@ -40,6 +40,8 @@ import com.mind.market.aimissioncompose.presentation.settings.SettingsScreen
 import com.mind.market.aimissioncompose.presentation.settings.SettingsViewModel
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsScreen
 import com.mind.market.aimissioncompose.statistics.presentation.StatisticsViewModel
+import com.mind.market.aimissioncompose.stocks_diary.chart.presentation.StocksDiaryChartScreen
+import com.mind.market.aimissioncompose.stocks_diary.chart.presentation.StocksDiaryChartViewModel
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.StocksDiaryDetailScreen
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.StocksDiaryDetailViewModel
 import com.mind.market.aimissioncompose.stocks_diary.overview.presentation.StocksDiaryOverviewScreen
@@ -211,6 +213,13 @@ class MainActivity : ComponentActivity() {
                                 val viewModel = hiltViewModel<StocksDiaryDetailViewModel>()
                                 val state by viewModel.state.collectAsState()
                                 StocksDiaryDetailScreen(state, navController,viewModel::onEvent)
+                            }
+                            composable(
+                                route = Route.STOCKS_DIARY_CHART
+                            ) {
+                                val viewModel = hiltViewModel<StocksDiaryChartViewModel>()
+                                val state by viewModel.state.collectAsState()
+                                StocksDiaryChartScreen(state, navController,viewModel::onEvent)
                             }
                         }
                     }

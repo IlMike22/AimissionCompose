@@ -72,6 +72,11 @@ fun DetailScreen(
                         ?.savedStateHandle?.set("invalidate", true)
                     navController.popBackStack()
                 }
+
+                DetailUIEvent.HideKeyboard -> TODO()
+                DetailUIEvent.NavigateToInfo -> TODO()
+                DetailUIEvent.NavigateToSettings -> TODO()
+                is DetailUIEvent.ShowValidationResult -> TODO()
             }
         }
     }

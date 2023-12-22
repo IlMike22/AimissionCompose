@@ -5,13 +5,15 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DismissDirection
@@ -76,67 +78,82 @@ fun StocksDiaryOverviewScreen(
         } else if (state.errorMessage != null) {
             Text(text = state.errorMessage)
         } else {
-            LazyColumn(modifier = Modifier.padding(16.dp)) {
-                itemsIndexed(state.stockDiaries) { index,item ->
-                    val dismissState = rememberDismissState()
-
-                    //TODO MIC current problem here. all items below current item are removed !!!
-                    if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                        onEvent(StocksDiaryOverviewEvent.OnItemRemove(item))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Button(
+                    modifier = Modifier.padding(4.dp),
+                    onClick = {
+                        navController.navigate(Route.STOCKS_DIARY_CHART)
                     }
+                ) {
+                    Text(text = "Open Chart View")
+                }
+                LazyColumn(modifier = Modifier.padding(16.dp)) {
+                    itemsIndexed(state.stockDiaries) { index, item ->
+                        val dismissState = rememberDismissState()
 
-                    SwipeToDismiss(
-                        state = dismissState,
-                        modifier = Modifier.padding(vertical = Dp(1f)),
-                        directions = setOf(DismissDirection.EndToStart),
-                        dismissThresholds = { direction ->
-                            FractionalThreshold(if (direction == DismissDirection.EndToStart) 0.1f else 0.05f)
-                        },
-                        background = {
-                            val color by animateColorAsState(
-                                when (dismissState.targetValue) {
-                                    DismissValue.Default -> Color.White
-                                    else -> Color.Red
-                                }
-                            )
-                            val alignment = Alignment.CenterEnd
-                            val icon = Icons.Default.Delete
-
-                            val scale by animateFloatAsState(
-                                if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
-                            )
-
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .background(color)
-                                    .padding(horizontal = Dp(20f)),
-                                contentAlignment = alignment
-                            ) {
-                                Icon(
-                                    icon,
-                                    contentDescription = "Delete Icon",
-                                    modifier = Modifier.scale(scale)
-                                )
-                            }
-                        },
-                        dismissContent = {
-                            Card(
-                                elevation = animateDpAsState(
-                                    if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                                ).value,
-                                modifier = Modifier
-                                    .height(140.dp)
-                                    .fillMaxWidth()
-                                    .padding(4.dp)
-                                    .align(alignment = Alignment.CenterVertically)
-                            ) {
-                                StocksDiaryItem(item)
-                            }
+                        //TODO MIC current problem here. all items below current item are removed !!!
+                        if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                            onEvent(StocksDiaryOverviewEvent.OnItemRemove(item))
                         }
-                    )
+
+                        SwipeToDismiss(
+                            state = dismissState,
+                            modifier = Modifier.padding(vertical = Dp(1f)),
+                            directions = setOf(DismissDirection.EndToStart),
+                            dismissThresholds = { direction ->
+                                FractionalThreshold(if (direction == DismissDirection.EndToStart) 0.1f else 0.05f)
+                            },
+                            background = {
+                                val color by animateColorAsState(
+                                    when (dismissState.targetValue) {
+                                        DismissValue.Default -> Color.White
+                                        else -> Color.Red
+                                    }
+                                )
+                                val alignment = Alignment.CenterEnd
+                                val icon = Icons.Default.Delete
+
+                                val scale by animateFloatAsState(
+                                    if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
+                                )
+
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(color)
+                                        .padding(horizontal = Dp(20f)),
+                                    contentAlignment = alignment
+                                ) {
+                                    Icon(
+                                        icon,
+                                        contentDescription = "Delete Icon",
+                                        modifier = Modifier.scale(scale)
+                                    )
+                                }
+                            },
+                            dismissContent = {
+                                Card(
+                                    elevation = animateDpAsState(
+                                        if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                                    ).value,
+                                    modifier = Modifier
+                                        .height(140.dp)
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                        .align(alignment = Alignment.CenterVertically)
+                                ) {
+                                    StocksDiaryItem(item)
+                                }
+                            }
+                        )
+                    }
                 }
             }
+            
         }
         FloatingActionButton(
             modifier = Modifier

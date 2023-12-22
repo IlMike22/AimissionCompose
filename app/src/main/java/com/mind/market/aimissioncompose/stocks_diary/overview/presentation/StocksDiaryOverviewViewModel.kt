@@ -48,6 +48,8 @@ class StocksDiaryOverviewViewModel @Inject constructor(
                     }
                 }
             }
+
+            StocksDiaryOverviewEvent.OnOpenChartView -> Unit
         }
     }
 
