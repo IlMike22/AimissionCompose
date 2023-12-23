@@ -2,6 +2,7 @@ package com.mind.market.aimissioncompose.stocks_diary.detail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper.toStocksDiaryData
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.IStocksDiaryRepository
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +38,7 @@ class StocksDiaryDetailViewModel @Inject constructor(
         repository.getStocksDiaryOfToday { diaryOfToday ->
 //            if (diaryOfToday == null || diary.createdDate != LocalDate.now()) { // TODO MIC just tmp. removed for testing with more items
                 viewModelScope.launch {// TODO MIC ANTIPATTERN? How to avoid nested vm scopes??
-                    repository.addDiary(diary) { error ->
+                    repository.addDiary(diary.toStocksDiaryData()) { error ->
                         if (error != null) {
                             _state.update {
                                 it.copy(

@@ -5,5 +5,6 @@ import java.time.LocalDate
 
 data class StocksDiaryChartState(
     val monthName: String = "",
-    val plots: Map<Mood, List<LocalDate>> = emptyMap()
+    val plots: Map<Mood, List<LocalDate>> = emptyMap(),
+
 )

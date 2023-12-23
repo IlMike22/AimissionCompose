@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -74,7 +73,9 @@ fun StocksDiaryOverviewScreen(
     )
     {
         if (state.isLoading) {
-            CircularProgressIndicator()
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
         } else if (state.errorMessage != null) {
             Text(text = state.errorMessage)
         } else {
@@ -86,7 +87,10 @@ fun StocksDiaryOverviewScreen(
                 Button(
                     modifier = Modifier.padding(4.dp),
                     onClick = {
-                        navController.navigate(Route.STOCKS_DIARY_CHART)
+                        navController.navigate(
+                            Route.STOCKS_DIARY_CHART
+                                    + "?month=${state.currentMonth}&year=${state.currentYear}"
+                        )
                     }
                 ) {
                     Text(text = "Open Chart View")
@@ -153,13 +157,14 @@ fun StocksDiaryOverviewScreen(
                     }
                 }
             }
-            
+
         }
         FloatingActionButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(bottom = 24.dp),
             onClick = { navController.navigate(Route.STOCKS_DIARY_DETAIL) }
+
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,

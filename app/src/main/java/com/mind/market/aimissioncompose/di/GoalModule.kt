@@ -65,7 +65,9 @@ object GoalModule {
             app,
             GoalRoomDatabase::class.java,
             "goal_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides

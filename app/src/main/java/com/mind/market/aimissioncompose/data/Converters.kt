@@ -4,6 +4,7 @@ import androidx.room.TypeConverter
 import com.mind.market.aimissioncompose.domain.models.Status
 import com.mind.market.aimissioncompose.domain.models.Genre
 import com.mind.market.aimissioncompose.domain.models.Priority
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryData
 
 class Converters {
     @TypeConverter

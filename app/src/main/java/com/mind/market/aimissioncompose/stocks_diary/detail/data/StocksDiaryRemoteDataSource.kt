@@ -37,7 +37,7 @@ class StocksDiaryRemoteDataSource(
 
     override fun getDiaries(
         userId: String,
-        onResult: (Throwable?, List<StocksDiaryDomain>) -> Unit
+        onResult: (Throwable?, List<StocksDiaryData>) -> Unit
     ) {
         val diaries = mutableListOf<StocksDiaryData>()
         firebaseDatabase
@@ -51,7 +51,7 @@ class StocksDiaryRemoteDataSource(
                         diaries.add(this)
                     }
                 }
-                onResult(null, diaries.map { it.toDomain() })
+                onResult(null, diaries)
             }.addOnFailureListener { error ->
                 onResult(
                     Throwable(message = "Unable to load diaries. Details: ${error.message}"),

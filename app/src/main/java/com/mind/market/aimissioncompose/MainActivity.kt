@@ -141,12 +141,12 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(
                                 route = Route.ADD + "?goalId={goalId}",
-                                arguments = listOf(navArgument(
-                                    name = "goalId"
-                                ) {
-                                    type = NavType.IntType
-                                    defaultValue = -1
-                                }
+                                arguments = listOf(
+                                    navArgument(name = "goalId")
+                                    {
+                                        type = NavType.IntType
+                                        defaultValue = -1
+                                    }
                                 )
                             ) {
                                 val viewModel = hiltViewModel<DetailViewModel>()
@@ -212,14 +212,26 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 val viewModel = hiltViewModel<StocksDiaryDetailViewModel>()
                                 val state by viewModel.state.collectAsState()
-                                StocksDiaryDetailScreen(state, navController,viewModel::onEvent)
+                                StocksDiaryDetailScreen(state, navController, viewModel::onEvent)
                             }
                             composable(
-                                route = Route.STOCKS_DIARY_CHART
+                                route = Route.STOCKS_DIARY_CHART + "?month={currentMonth}&year={currentYear}",
+                                arguments = listOf(
+                                    navArgument(name = "currentMonth")
+                                    {
+                                        type = NavType.IntType
+                                        defaultValue = -1
+                                    },
+                                    navArgument(name = "currentYear")
+                                    {
+                                        type = NavType.IntType
+                                        defaultValue = -1
+                                    },
+                                )
                             ) {
                                 val viewModel = hiltViewModel<StocksDiaryChartViewModel>()
                                 val state by viewModel.state.collectAsState()
-                                StocksDiaryChartScreen(state, navController,viewModel::onEvent)
+                                StocksDiaryChartScreen(state, navController, viewModel::onEvent)
                             }
                         }
                     }

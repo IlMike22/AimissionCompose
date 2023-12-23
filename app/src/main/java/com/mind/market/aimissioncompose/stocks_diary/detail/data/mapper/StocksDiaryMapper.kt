@@ -3,6 +3,7 @@ package com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryData
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.Mood
+import com.mind.market.aimissioncompose.stocks_diary.overview.data.StocksDiaryDto
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
@@ -16,6 +17,15 @@ fun StocksDiaryDomain.toStocksDiaryData(): StocksDiaryData =
         createdDate = "${getCorrectDayOfMonth(this.createdDate.dayOfMonth)}.${this.createdDate.monthValue}.${this.createdDate.year}"
     )
 
+fun StocksDiaryData.toStocksDiaryDto() =
+    StocksDiaryDto(
+        diaryId = this.id,
+        title = this.title,
+        description = this.description,
+        mood = this.mood,
+        createdDate = this.createdDate,
+    )
+
 private fun getCorrectDayOfMonth(day: Int) =
     if (day < 10) {
         "0$day"
@@ -23,8 +33,8 @@ private fun getCorrectDayOfMonth(day: Int) =
         day.toString()
     }
 
-fun StocksDiaryDomain.addUniqueId(): StocksDiaryDomain =
-    StocksDiaryDomain(
+fun StocksDiaryData.addUniqueId() =
+    StocksDiaryData(
         id = Random.nextInt(0, 10_000),
         title = title,
         description = description,

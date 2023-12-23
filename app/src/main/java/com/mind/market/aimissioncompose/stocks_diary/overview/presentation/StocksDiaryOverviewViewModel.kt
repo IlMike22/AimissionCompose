@@ -2,13 +2,14 @@ package com.mind.market.aimissioncompose.stocks_diary.overview.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper.toDomain
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.IStocksDiaryRepository
-import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -66,7 +67,9 @@ class StocksDiaryOverviewViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        stockDiaries = diaries
+                        stockDiaries = diaries.map { it.toDomain() },
+                        currentMonth = LocalDate.now().monthValue,
+                        currentYear = LocalDate.now().year
                     )
                 }
             }

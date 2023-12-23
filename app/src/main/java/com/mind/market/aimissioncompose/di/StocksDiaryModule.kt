@@ -1,11 +1,17 @@
 package com.mind.market.aimissioncompose.di
 
 import com.google.firebase.database.DatabaseReference
+import com.mind.market.aimissioncompose.auth.data.AuthenticationLocalDataSource
+import com.mind.market.aimissioncompose.auth.data.IAuthenticationLocalDataSource
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
+import com.mind.market.aimissioncompose.data.GoalRoomDatabase
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.IStocksDiaryLocalDataSource
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.IStocksDiaryRemoteDataSource
-import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryRepository
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryLocalDataSource
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryRemoteDataSource
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryRepository
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.IStocksDiaryRepository
+import com.mind.market.aimissioncompose.stocks_diary.overview.data.IStocksDiaryDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,13 +21,21 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object StocksDiaryModule {
+
+    @Provides
+    @Singleton
+    fun provideStocksDiaryLocalDataSource(database: GoalRoomDatabase): IStocksDiaryLocalDataSource =
+        StocksDiaryLocalDataSource(database.stocksDiaryDao())
+
     @Provides
     @Singleton
     fun provideStocksDiaryDetailRepository(
         remoteDataSource: IStocksDiaryRemoteDataSource,
+        localDataSource: IStocksDiaryLocalDataSource,
         authDataSource: IAuthenticationRemoteDataSource
     ): IStocksDiaryRepository = StocksDiaryRepository(
         remoteDataSource,
+        localDataSource,
         authDataSource
     )
 
