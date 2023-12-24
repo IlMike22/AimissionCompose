@@ -1,6 +1,7 @@
 package com.mind.market.aimissioncompose.stocks_diary.overview.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -13,4 +14,7 @@ interface IStocksDiaryDao {
 
     @Query("SELECT * FROM stocks_diary_table")
     suspend fun getDiaries(): List<StocksDiaryDto>
+
+    @Delete
+    suspend fun removeDiary(diary:StocksDiaryDto)
 }

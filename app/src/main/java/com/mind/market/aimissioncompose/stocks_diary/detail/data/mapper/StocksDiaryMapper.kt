@@ -26,6 +26,15 @@ fun StocksDiaryData.toStocksDiaryDto() =
         createdDate = this.createdDate,
     )
 
+fun StocksDiaryDto.toStocksDiaryData() =
+    StocksDiaryData(
+        id = this.diaryId,
+        title = this.title,
+        description = this.description,
+        mood = this.mood,
+        createdDate = this.createdDate
+    )
+
 private fun getCorrectDayOfMonth(day: Int) =
     if (day < 10) {
         "0$day"
@@ -38,7 +47,8 @@ fun StocksDiaryData.addUniqueId() =
         id = Random.nextInt(0, 10_000),
         title = title,
         description = description,
-        mood = mood
+        mood = mood,
+        createdDate = createdDate
     )
 
 fun StocksDiaryData.toDomain() =

@@ -7,5 +7,5 @@ interface IStocksDiaryRepository {
     suspend fun addDiary(diary: StocksDiaryData, onResult: (Throwable?) -> Unit)
     suspend fun getDiaries(onResult: (Throwable?, List<StocksDiaryData>) -> Unit)
     suspend fun getStocksDiaryOfToday(onResult: (StocksDiaryDomain?) -> Unit)
-    suspend fun removeStocksDiary(diary: StocksDiaryDomain, onResult: (Throwable?) -> Unit)
+    suspend fun removeStocksDiary(diary: StocksDiaryData, onResult: (Throwable?) -> Unit)
 }

@@ -19,4 +19,8 @@ class StocksDiaryLocalDataSource(
     override suspend fun getDiaries(): List<StocksDiaryDto> {
         return dao.getDiaries()
     }
+
+    override suspend fun removeDiary(diary: StocksDiaryDto) {
+        dao.removeDiary(diary)
+    }
 }

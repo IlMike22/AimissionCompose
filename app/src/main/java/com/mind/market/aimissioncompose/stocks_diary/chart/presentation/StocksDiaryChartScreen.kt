@@ -26,6 +26,21 @@ fun StocksDiaryChartScreen(
         Text(text = "Hello Chart View!", color = Color.Black)
         Spacer(modifier = Modifier.height(16.dp))
         Text(text = state.monthName, color = Color.Black)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Total count bad mood: ${state.moodInformation.badMoodCount}",
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Total count average mood: ${state.moodInformation.averageMoodCount}",
+            color = Color.Black
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Total count good mood: ${state.moodInformation.goodMoodCount}",
+            color = Color.Black
+        )
     }
 
 }

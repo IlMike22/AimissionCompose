@@ -6,4 +6,5 @@ interface IStocksDiaryLocalDataSource {
     fun addDiary(diary:StocksDiaryDto)
     fun addDiaries(diaries: List<StocksDiaryDto>)
     suspend fun getDiaries(): List<StocksDiaryDto>
+    suspend fun removeDiary(diary: StocksDiaryDto)
 }

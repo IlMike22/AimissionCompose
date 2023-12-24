@@ -44,10 +44,11 @@ class StocksDiaryRepository(
     }
 
     override suspend fun removeStocksDiary(
-        diary: StocksDiaryDomain,
+        diary: StocksDiaryData,
         onResult: (Throwable?) -> Unit
     ) {
-        remoteDataSource.removeDiary(getFirebaseUserId(), diary.toStocksDiaryData(), onResult)
+        remoteDataSource.removeDiary(getFirebaseUserId(), diary, onResult)
+        removeEntry(diary)
     }
 
     private fun getFirebaseUserId(): String =
@@ -62,6 +63,12 @@ class StocksDiaryRepository(
             if (localDataSource.getDiaries().isEmpty()) {
                 localDataSource.addDiaries(diaries.map { it.toStocksDiaryDto() })
             }
+        }
+    }
+
+    private fun removeEntry(diary: StocksDiaryData) {
+        CoroutineScope(Dispatchers.IO).launch {
+            localDataSource.removeDiary(diary.toStocksDiaryDto())
         }
     }
 }
