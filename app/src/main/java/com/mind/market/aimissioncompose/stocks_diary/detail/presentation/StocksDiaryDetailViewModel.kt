@@ -57,7 +57,7 @@ class StocksDiaryDetailViewModel @Inject constructor(
                         }
                     }
                 }
-//            } else {
+//            } else { // TODO do NOT remove. Needed later..
 //                _state.update {
 //                    it.copy(
 //                        isLoading = false,

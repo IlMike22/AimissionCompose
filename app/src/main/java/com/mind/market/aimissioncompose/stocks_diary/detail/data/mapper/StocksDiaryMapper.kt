@@ -1,7 +1,9 @@
 package com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper
 
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryData
+import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksInformationData
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
+import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksInformation
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.Mood
 import com.mind.market.aimissioncompose.stocks_diary.overview.data.StocksDiaryDto
 import java.time.LocalDate
@@ -14,7 +16,9 @@ fun StocksDiaryDomain.toStocksDiaryData(): StocksDiaryData =
         title = this.title,
         description = this.description,
         mood = this.mood.toMoodData(),
-        createdDate = "${getCorrectDayOfMonth(this.createdDate.dayOfMonth)}.${this.createdDate.monthValue}.${this.createdDate.year}"
+        createdDate = "${getCorrectDayOfMonth(this.createdDate.dayOfMonth)}.${this.createdDate.monthValue}.${this.createdDate.year}",
+        stocksBought = this.stocksBought.toData(),
+        stocksSold = this.stocksSold.toData()
     )
 
 fun StocksDiaryData.toStocksDiaryDto() =
@@ -24,6 +28,9 @@ fun StocksDiaryData.toStocksDiaryDto() =
         description = this.description,
         mood = this.mood,
         createdDate = this.createdDate,
+        stocksBoughtName = this.stocksBought.name,
+        stocksSoldName = this.stocksSold.name
+
     )
 
 fun StocksDiaryDto.toStocksDiaryData() =
@@ -32,7 +39,9 @@ fun StocksDiaryDto.toStocksDiaryData() =
         title = this.title,
         description = this.description,
         mood = this.mood,
-        createdDate = this.createdDate
+        createdDate = this.createdDate,
+        stocksSold = StocksInformationData(name = this.stocksSoldName),
+        stocksBought = StocksInformationData(name = this.stocksBoughtName)
     )
 
 private fun getCorrectDayOfMonth(day: Int) =
@@ -42,13 +51,23 @@ private fun getCorrectDayOfMonth(day: Int) =
         day.toString()
     }
 
+private fun StocksInformation.toData() =
+    StocksInformationData(
+        name = this.name,
+        amount = this.amount,
+        pricePerStock = this.pricePerStock,
+        reason = this.reason
+    )
+
 fun StocksDiaryData.addUniqueId() =
     StocksDiaryData(
         id = Random.nextInt(0, 10_000),
         title = title,
         description = description,
         mood = mood,
-        createdDate = createdDate
+        createdDate = createdDate,
+        stocksBought = stocksBought,
+        stocksSold = stocksSold
     )
 
 fun StocksDiaryData.toDomain() =

@@ -5,5 +5,14 @@ data class StocksDiaryData(
     val title: String = "",
     val description: String = "",
     val mood: Int = 0,
-    val createdDate: String = ""
+    val createdDate: String = "",
+    val stocksSold: StocksInformationData,
+    val stocksBought: StocksInformationData
+)
+
+data class StocksInformationData(
+    val name: String = "",
+    val amount: Int = -1,
+    val pricePerStock: Double = 0.0,
+    val reason:String = ""
 )

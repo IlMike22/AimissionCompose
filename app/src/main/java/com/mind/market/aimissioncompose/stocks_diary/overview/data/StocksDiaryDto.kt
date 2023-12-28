@@ -13,5 +13,7 @@ data class StocksDiaryDto(
     val title: String = "",
     val description: String = "",
     val mood: Int = 0,
-    val createdDate: String = ""
+    val createdDate: String = "",
+    val stocksBoughtName: String = "",
+    val stocksSoldName: String = ""
 )

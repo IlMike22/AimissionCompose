@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -26,10 +29,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.presentation.common.Chip
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
+import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksInformation
 
 @Composable
 fun StocksDiaryDetailScreen(
@@ -50,6 +55,26 @@ fun StocksDiaryDetailScreen(
         mutableStateOf(Mood.GOOD)
     }
 
+    var stocksBoughtName by remember {
+        mutableStateOf("")
+    }
+    var stocksBoughtAmount by remember {
+        mutableStateOf(0)
+    }
+    var stocksBoughtPricePerStock by remember {
+        mutableStateOf(0.0)
+    }
+
+    var stocksSoldName by remember {
+        mutableStateOf("")
+    }
+    var stocksSoldAmount by remember {
+        mutableStateOf(0)
+    }
+    var stocksSoldPricePerStock by remember {
+        mutableStateOf(0.0)
+    }
+
     LaunchedEffect(key1 = state.isNavigateBack) {
         if (state.isNavigateBack) {
             navController.previousBackStackEntry
@@ -62,6 +87,7 @@ fun StocksDiaryDetailScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         OutlinedTextField(
             modifier = Modifier
@@ -135,6 +161,63 @@ fun StocksDiaryDetailScreen(
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
+        Text(text = "Do you have any stocks sold or bought?", color = Color.Black)
+        Spacer(Modifier.height(8.dp))
+        Text(text = "Stocks bought", style = MaterialTheme.typography.h6, color = Color.Black)
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = stocksBoughtName,
+            onValueChange = { name ->
+                stocksBoughtName = name
+            },
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
+            label = { Text(text = "Name") },
+            textStyle = MaterialTheme.typography.body1,
+            maxLines = 1
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)) {
+            OutlinedTextField(
+                modifier = Modifier.weight(0.3f),
+                value = if (stocksBoughtAmount == 0) "" else stocksBoughtAmount.toString(),
+                colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
+                onValueChange = { name ->
+                    stocksBoughtAmount = if (name.isBlank()) 0 else name.toInt()
+                },
+                textStyle = MaterialTheme.typography.body1,
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = try {stocksBoughtPricePerStock.toString()} catch(exc:Exception) {""},
+                colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
+                label = { Text(text = "Price per stock") },
+                onValueChange = { name ->
+                    stocksBoughtPricePerStock = try {name.toDouble()} catch(exc:Exception) {0.0}
+                },
+                textStyle = MaterialTheme.typography.body1,
+                maxLines = 1,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
+        Text(text = "Stocks sold", style = MaterialTheme.typography.h6, color = Color.Black)
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = stocksSoldName,
+            colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
+            label = { Text(text = "Name") },
+            onValueChange = { name ->
+                stocksSoldName = name
+            },
+            textStyle = MaterialTheme.typography.body1,
+            maxLines = 1
+        )
+
+        Spacer(modifier = Modifier.height(64.dp))
         Button(
             onClick = {
                 onEvent(
@@ -142,7 +225,9 @@ fun StocksDiaryDetailScreen(
                         StocksDiaryDomain(
                             title = title,
                             description = description,
-                            mood = moodSelection
+                            mood = moodSelection,
+                            stocksSold = StocksInformation(name = stocksSoldName),
+                            stocksBought = StocksInformation(name = stocksBoughtName)
                         )
                     )
                 )

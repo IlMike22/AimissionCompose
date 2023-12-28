@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 @Database(
     entities = [GoalDto::class, UserDto::class, StocksDiaryDto::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 //    autoMigrations = [AutoMigration(from = 3, to = 4), AutoMigration(from = 5, to = 6)]
 )
