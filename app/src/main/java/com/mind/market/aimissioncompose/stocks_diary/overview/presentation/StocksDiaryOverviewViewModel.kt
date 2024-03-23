@@ -41,12 +41,11 @@ class StocksDiaryOverviewViewModel @Inject constructor(
 
             is StocksDiaryOverviewEvent.OnItemRemove -> {
                 viewModelScope.launch {
-                    repository.removeStocksDiary(event.item.toStocksDiaryData()) { error ->
-                        if (error != null) {
-                            _state.update { it.copy(errorMessage = error.message) }
-                        } else {
-                            _state.update { it.copy(stockDiaries = _state.value.stockDiaries - event.item) }
-                        }
+                    val throwable = repository.removeStocksDiary(event.item.toStocksDiaryData())
+                    if (throwable != null) {
+                        _state.update { it.copy(errorMessage = throwable.message) }
+                    } else {
+                        _state.update { it.copy(stockDiaries = _state.value.stockDiaries - event.item) }
                     }
                 }
             }
@@ -56,23 +55,22 @@ class StocksDiaryOverviewViewModel @Inject constructor(
     }
 
     private suspend fun loadDiaries() {
-        repository.getDiaries { error, diaries ->
-            if (error != null) {
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        errorMessage = "Unable to load your diaries"
-                    )
-                }
-            } else {
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        stockDiaries = diaries.map { it.toDomain() },
-                        currentMonth = LocalDate.now().monthValue,
-                        currentYear = LocalDate.now().year
-                    )
-                }
+        val response = repository.getDiaries()
+        if (response.error != null) {
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = "Unable to load your diaries"
+                )
+            }
+        } else {
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    stockDiaries = response.diaries?.map { it.toDomain() } ?: emptyList(),
+                    currentMonth = LocalDate.now().monthValue,
+                    currentYear = LocalDate.now().year
+                )
             }
         }
     }

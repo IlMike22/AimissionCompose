@@ -6,8 +6,8 @@ data class StocksDiaryData(
     val description: String = "",
     val mood: Int = 0,
     val createdDate: String = "",
-    val stocksSold: StocksInformationData,
-    val stocksBought: StocksInformationData
+//    val stocksSold: StocksInformationData,
+//    val stocksBought: StocksInformationData
 )
 
 data class StocksInformationData(

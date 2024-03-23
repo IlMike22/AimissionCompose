@@ -6,6 +6,8 @@ import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_USER
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper.toDomain
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import java.time.LocalDate
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class StocksDiaryRemoteDataSource(
     private val firebaseDatabase: DatabaseReference
@@ -35,10 +37,7 @@ class StocksDiaryRemoteDataSource(
             }
     }
 
-    override fun getDiaries(
-        userId: String,
-        onResult: (Throwable?, List<StocksDiaryData>) -> Unit
-    ) {
+    override suspend fun getDiaries(userId: String) = suspendCoroutine { continuation ->
         val diaries = mutableListOf<StocksDiaryData>()
         firebaseDatabase
             .child(FIREBASE_TABLE_USER)
@@ -51,11 +50,13 @@ class StocksDiaryRemoteDataSource(
                         diaries.add(this)
                     }
                 }
-                onResult(null, diaries)
+                continuation.resume(StocksDiaryResponse(diaries, null))
             }.addOnFailureListener { error ->
-                onResult(
-                    Throwable(message = "Unable to load diaries. Details: ${error.message}"),
-                    emptyList()
+                continuation.resume(
+                    StocksDiaryResponse(
+                        null,
+                        Throwable(message = "Unable to load diaries. Details: ${error.message}")
+                    )
                 )
             }
     }
@@ -83,13 +84,11 @@ class StocksDiaryRemoteDataSource(
     override suspend fun removeDiary(
         userId: String?,
         diary: StocksDiaryData,
-        onResult: (Throwable?) -> Unit
-    ) {
+    ): Throwable? = suspendCoroutine { continuation ->
         if (userId == null) {
-            onResult(Throwable("Cannot add diary. UserId is null."))
-            return
+            continuation.resume(Throwable("Failed to remove diary. User id cannot be empty."))
+            return@suspendCoroutine
         }
-
         firebaseDatabase
             .child(FIREBASE_TABLE_USER)
             .child(userId)
@@ -98,9 +97,9 @@ class StocksDiaryRemoteDataSource(
             .removeValue()
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    onResult(null)
+                    continuation.resume(null)
                 } else {
-                    onResult(Throwable(it.exception?.message))
+                    continuation.resume(Throwable(it.exception?.message))
                 }
             }
     }

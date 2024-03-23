@@ -16,9 +16,9 @@ fun StocksDiaryDomain.toStocksDiaryData(): StocksDiaryData =
         title = this.title,
         description = this.description,
         mood = this.mood.toMoodData(),
-        createdDate = "${getCorrectDayOfMonth(this.createdDate.dayOfMonth)}.${this.createdDate.monthValue}.${this.createdDate.year}",
-        stocksBought = this.stocksBought.toData(),
-        stocksSold = this.stocksSold.toData()
+        createdDate = "${addZeroIfNeccessary(this.createdDate.dayOfMonth)}.${addZeroIfNeccessary(this.createdDate.monthValue)}.${this.createdDate.year}",
+//        stocksBought = this.stocksBought.toData(),
+//        stocksSold = this.stocksSold.toData()
     )
 
 fun StocksDiaryData.toStocksDiaryDto() =
@@ -28,9 +28,8 @@ fun StocksDiaryData.toStocksDiaryDto() =
         description = this.description,
         mood = this.mood,
         createdDate = this.createdDate,
-        stocksBoughtName = this.stocksBought.name,
-        stocksSoldName = this.stocksSold.name
-
+//        stocksBoughtName = this.stocksBought.name,
+//        stocksSoldName = this.stocksSold.name
     )
 
 fun StocksDiaryDto.toStocksDiaryData() =
@@ -40,11 +39,11 @@ fun StocksDiaryDto.toStocksDiaryData() =
         description = this.description,
         mood = this.mood,
         createdDate = this.createdDate,
-        stocksSold = StocksInformationData(name = this.stocksSoldName),
-        stocksBought = StocksInformationData(name = this.stocksBoughtName)
+//        stocksSold = StocksInformationData(name = this.stocksSoldName),
+//        stocksBought = StocksInformationData(name = this.stocksBoughtName)
     )
 
-private fun getCorrectDayOfMonth(day: Int) =
+private fun addZeroIfNeccessary(day: Int) =
     if (day < 10) {
         "0$day"
     } else {
@@ -66,8 +65,8 @@ fun StocksDiaryData.addUniqueId() =
         description = description,
         mood = mood,
         createdDate = createdDate,
-        stocksBought = stocksBought,
-        stocksSold = stocksSold
+//        stocksBought = stocksBought,
+//        stocksSold = stocksSold
     )
 
 fun StocksDiaryData.toDomain() =

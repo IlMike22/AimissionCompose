@@ -226,8 +226,8 @@ fun StocksDiaryDetailScreen(
                             title = title,
                             description = description,
                             mood = moodSelection,
-                            stocksSold = StocksInformation(name = stocksSoldName),
-                            stocksBought = StocksInformation(name = stocksBoughtName)
+//                            stocksSold = StocksInformation(name = stocksSoldName),
+//                            stocksBought = StocksInformation(name = stocksBoughtName)
                         )
                     )
                 )

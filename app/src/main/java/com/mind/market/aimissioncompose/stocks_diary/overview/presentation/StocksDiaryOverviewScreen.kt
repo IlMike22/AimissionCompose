@@ -1,8 +1,9 @@
 package com.mind.market.aimissioncompose.stocks_diary.overview.presentation
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,15 +12,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DismissDirection
+import androidx.compose.material.DismissState
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.FractionalThreshold
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SwipeToDismiss
@@ -33,9 +34,13 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -48,6 +53,7 @@ import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.Mood
+import kotlinx.coroutines.delay
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalUnitApi::class)
@@ -96,75 +102,38 @@ fun StocksDiaryOverviewScreen(
                     Text(text = "Open Chart View")
                 }
                 LazyColumn(modifier = Modifier.padding(16.dp)) {
-                    itemsIndexed(state.stockDiaries) { index, item ->
-                        val dismissState = rememberDismissState()
+                    items(
+                        items = state.stockDiaries,
+                        key = { it }
+                    ) { item ->
+                        val alignment = Alignment.CenterEnd
+                        val icon = Icons.Default.Delete
 
-                        //TODO MIC current problem here. all items below current item are removed !!!
-                        if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                            onEvent(StocksDiaryOverviewEvent.OnItemRemove(item))
-                        }
-
-                        SwipeToDismiss(
-                            state = dismissState,
-                            modifier = Modifier.padding(vertical = Dp(1f)),
-                            directions = setOf(DismissDirection.EndToStart),
-                            dismissThresholds = { direction ->
-                                FractionalThreshold(if (direction == DismissDirection.EndToStart) 0.1f else 0.05f)
-                            },
-                            background = {
-                                val color by animateColorAsState(
-                                    when (dismissState.targetValue) {
-                                        DismissValue.Default -> Color.White
-                                        else -> Color.Red
-                                    }
-                                )
-                                val alignment = Alignment.CenterEnd
-                                val icon = Icons.Default.Delete
-
-                                val scale by animateFloatAsState(
-                                    if (dismissState.targetValue == DismissValue.Default) 0.75f else 1f
-                                )
-
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(color)
-                                        .padding(horizontal = Dp(20f)),
-                                    contentAlignment = alignment
-                                ) {
-                                    Icon(
-                                        icon,
-                                        contentDescription = "Delete Icon",
-                                        modifier = Modifier.scale(scale)
-                                    )
-                                }
-                            },
-                            dismissContent = {
-                                Card(
-                                    elevation = animateDpAsState(
-                                        if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                                    ).value,
-                                    modifier = Modifier
-                                        .height(140.dp)
-                                        .fillMaxWidth()
-                                        .padding(4.dp)
-                                        .align(alignment = Alignment.CenterVertically)
-                                ) {
-                                    StocksDiaryItem(item)
-                                }
+                        SwipeToDeleteContainer(
+                            item = item,
+                            onDelete = {
+                                onEvent(StocksDiaryOverviewEvent.OnItemRemove(item))
+                            }) { stocksItem ->
+                            Card(
+                                modifier = Modifier
+                                    .height(140.dp)
+                                    .fillMaxWidth()
+                                    .padding(4.dp)
+                                    .align(alignment = Alignment.CenterHorizontally)
+                            ) {
+                                StocksDiaryItem(stocksItem)
                             }
-                        )
+                        }
                     }
                 }
             }
-
         }
+
         FloatingActionButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(bottom = 24.dp),
             onClick = { navController.navigate(Route.STOCKS_DIARY_DETAIL) }
-
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
@@ -210,13 +179,6 @@ fun StocksDiaryItem(
     }
 }
 
-@ExperimentalUnitApi
-@Composable
-fun SetUpRow(
-    item: StocksDiaryDomain
-) {
-
-}
 
 private fun getMoodIcon(mood: Mood): ImageVector =
     when (mood) {
@@ -236,5 +198,76 @@ private fun handleBackNavigationUpdate(
             onEvent(StocksDiaryOverviewEvent.OnUpdateList)
             navController.currentBackStackEntry?.savedStateHandle?.set("invalidate", false)
         }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun <T> SwipeToDeleteContainer(
+    item: T,
+    onDelete: (T) -> Unit,
+    animationDuration: Int = 500,
+    content: @Composable (T) -> Unit
+) {
+    var isRemoved by remember() {
+        mutableStateOf(false)
+    }
+
+    val dismissState = rememberDismissState(
+        confirmStateChange = { value ->
+            if (value == DismissValue.DismissedToStart) {
+                isRemoved = true
+                true
+            } else {
+                false
+            }
+        }
+    )
+
+    LaunchedEffect(key1 = isRemoved) {
+        if (isRemoved) {
+            delay(animationDuration.toLong())
+            onDelete(item)
+        }
+    }
+
+    AnimatedVisibility(
+        visible = !isRemoved,
+        exit = shrinkVertically(
+            animationSpec = tween(durationMillis = animationDuration),
+            shrinkTowards = Alignment.Top
+        ) + fadeOut()
+    ) {
+        SwipeToDismiss(
+            state = dismissState,
+            background = {
+                DeleteBackground(dismissState)
+            },
+            dismissContent = { content(item) },
+            directions = setOf(DismissDirection.EndToStart)
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun DeleteBackground(
+    swipeDismissState: DismissState
+) {
+    val color = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) {
+        Color.Red
+    } else Color.Transparent
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color)
+            .padding(16.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete, contentDescription = null,
+            tint = Color.White
+        )
     }
 }
