@@ -7,5 +7,6 @@ data class StocksDiaryOverviewState(
     val errorMessage: String? = null,
     val stockDiaries: List<StocksDiaryDomain> = emptyList(),
     val currentMonth: Int = -1,
-    val currentYear: Int = -1
+    val currentYear: Int = -1,
+    val showUndoSnackbar: Boolean = false
 )

@@ -12,14 +12,12 @@ import kotlinx.coroutines.flow.flow
 class FakeGoalRepository : IGoalRepository {
     override suspend fun insert(
         goal: Goal,
-        onResult: (Throwable?) -> Unit,
         mode: GoalReadWriteOperation
-    ) {
+    ):Throwable? {
         if (goal == Goal.EMPTY) {
-            onResult(Throwable("Goal is not set. Cannot add an empty goal."))
-            return
+            return Throwable("Goal is not set. Cannot add an empty goal.")
         }
-        onResult(null)
+        return null
     }
 
     override suspend fun getGoal(id: Int, operation: GoalReadWriteOperation): Flow<Resource<Goal>> {
@@ -48,21 +46,18 @@ class FakeGoalRepository : IGoalRepository {
 
     override suspend fun deleteGoal(
         goal: Goal,
-        onResult: (Boolean) -> Unit,
         mode: GoalReadWriteOperation
-    ) {
+    ):Boolean {
         if (goal == Goal.EMPTY) {
-            onResult(false)
-            return
+            return false
         }
-        onResult(true)
+        return true
     }
 
     override suspend fun updateGoal(
         goal: Goal,
         operation: GoalReadWriteOperation,
-        onResult: (Boolean) -> Unit
-    ) {
+    ):Boolean {
         TODO("Not yet implemented")
     }
 

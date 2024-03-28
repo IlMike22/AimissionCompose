@@ -9,9 +9,8 @@ import kotlinx.coroutines.flow.Flow
 interface IGoalRepository {
     suspend fun insert(
         goal: Goal,
-        onResult: (Throwable?) -> Unit,
         mode: GoalReadWriteOperation = GoalReadWriteOperation.LOCAL_DATABASE
-    )
+    ):Throwable?
 
     suspend fun getGoal(id: Int, operation: GoalReadWriteOperation): Flow<Resource<Goal>>
 
@@ -29,15 +28,10 @@ interface IGoalRepository {
 
     suspend fun deleteGoal(
         goal: Goal,
-        onResult: (Boolean) -> Unit,
         mode: GoalReadWriteOperation
-    )
+    ):Boolean
 
-    suspend fun updateGoal(
-        goal: Goal,
-        operation: GoalReadWriteOperation,
-        onResult: (Boolean) -> Unit
-    )
+    suspend fun updateGoal(goal: Goal, operation: GoalReadWriteOperation): Boolean
 
     fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>>
 }

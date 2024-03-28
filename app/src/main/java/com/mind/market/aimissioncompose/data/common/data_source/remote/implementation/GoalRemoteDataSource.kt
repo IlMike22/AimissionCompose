@@ -12,6 +12,8 @@ import com.mind.market.aimissioncompose.data.toGoalDto
 import com.mind.market.aimissioncompose.data.toStatusData
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class GoalRemoteDataSource(
     private val firebaseDatabase: DatabaseReference,
@@ -19,13 +21,12 @@ class GoalRemoteDataSource(
     val TAG = "GoalRemoteDataSource"
     override suspend fun deleteGoal(
         goal: Goal,
-        userId: String?,
-        onResult: (Boolean) -> Unit
-    ) {
+        userId: String?
+    ): Boolean = suspendCoroutine {continuation ->
         if (userId == null) {
             Log.e(TAG, "Cannot delete remote goal. UserId is null")
-            onResult(false)
-            return
+            continuation.resume(false)
+            return@suspendCoroutine
         }
 
         firebaseDatabase
@@ -37,9 +38,9 @@ class GoalRemoteDataSource(
             .addOnCompleteListener {
                 if (it.isComplete) {
                     if (it.isSuccessful) {
-                        onResult(true)
+                        continuation.resume(true)
                     } else {
-                        onResult(false)
+                        continuation.resume(false)
                     }
                 }
             }
@@ -75,10 +76,10 @@ class GoalRemoteDataSource(
             }
     }
 
-    override suspend fun insertGoal(goal: Goal, userId: String?, onResult: (Throwable?) -> Unit) {
+    override suspend fun insertGoal(goal: Goal, userId: String?):Throwable?  = suspendCoroutine {continuation ->
         if (userId == null) {
-            onResult(Throwable("Cannot add goal. Firebase user id is null"))
-            return
+            continuation.resume(Throwable("Cannot add goal. Firebase user id is null"))
+            return@suspendCoroutine
         }
         firebaseDatabase
             .child(FIREBASE_TABLE_USER)
@@ -88,18 +89,18 @@ class GoalRemoteDataSource(
             .setValue(goal.toGoalDto())
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    onResult(null)
+                    continuation.resume(null)
                 } else {
-                    onResult(Throwable(it.exception?.message))
+                    continuation.resume(Throwable(it.exception?.message))
                 }
             }
     }
 
-    override suspend fun update(goal: Goal, userId: String?, onResult: (Boolean) -> Unit) {
+    override suspend fun update(goal: Goal, userId: String?):Boolean = suspendCoroutine { continuation ->
         if (userId == null) {
             Log.e(TAG, "Cannot update remote goal. UserId is null")
-            onResult(false)
-            return
+            continuation.resume(false)
+            return@suspendCoroutine
         }
 
         firebaseDatabase
@@ -110,8 +111,8 @@ class GoalRemoteDataSource(
             .setValue(goal.toGoalDto())
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    onResult(true)
-                } else onResult(false)
+                    continuation.resume(true)
+                } else continuation.resume(false)
             }
     }
 

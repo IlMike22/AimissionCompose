@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.stocks_diary.detail.data
 
+import androidx.compose.material.contentColorFor
 import com.google.firebase.database.DatabaseReference
 import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_STOCKS_DIARY
 import com.mind.market.aimissioncompose.data.common.FIREBASE_TABLE_USER
@@ -14,12 +15,11 @@ class StocksDiaryRemoteDataSource(
 ) : IStocksDiaryRemoteDataSource {
     override suspend fun addDiary(
         userId: String?,
-        diary: StocksDiaryData,
-        onResult: (Throwable?) -> Unit
-    ) {
+        diary: StocksDiaryData
+    ) = suspendCoroutine { continuation ->
         if (userId == null) {
-            onResult(Throwable("Cannot add diary. UserId is null."))
-            return
+            continuation.resume(Throwable("Cannot add diary. UserId is null!"))
+            return@suspendCoroutine
         }
 
         firebaseDatabase
@@ -30,9 +30,9 @@ class StocksDiaryRemoteDataSource(
             .setValue(diary)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
-                    onResult(null)
+                    continuation.resume(null)
                 } else {
-                    onResult(Throwable(it.exception?.message))
+                    continuation.resume(Throwable(it.exception?.message))
                 }
             }
     }
@@ -61,7 +61,7 @@ class StocksDiaryRemoteDataSource(
             }
     }
 
-    override suspend fun getDiaryForToday(userId: String, onResult: (StocksDiaryDomain?) -> Unit) {
+    override suspend fun getDiaryForToday(userId: String):StocksDiaryDomain? = suspendCoroutine{continuation ->
         var itemOfToday: StocksDiaryDomain? = null
         firebaseDatabase
             .child(FIREBASE_TABLE_USER)
@@ -77,7 +77,7 @@ class StocksDiaryRemoteDataSource(
                         }
                     }
                 }
-                onResult(itemOfToday)
+                continuation.resume(itemOfToday)
             }
     }
 

@@ -7,14 +7,9 @@ import com.mind.market.aimissioncompose.domain.models.Goal
 class DeleteGoalUseCase(
     private val repository: IGoalRepository,
 ) {
-    suspend operator fun invoke(
-        goal: Goal,
-        onResult: (Boolean) -> Unit
-    ) {
+    suspend operator fun invoke(goal: Goal) =
         repository.deleteGoal(
             goal = goal,
-            onResult = onResult,
             mode = GoalReadWriteOperation.FIREBASE_DATABASE
         )
-    }
 }

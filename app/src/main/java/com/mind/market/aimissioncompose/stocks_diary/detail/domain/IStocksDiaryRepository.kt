@@ -5,8 +5,8 @@ import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryResp
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 
 interface IStocksDiaryRepository {
-    suspend fun addDiary(diary: StocksDiaryData, onResult: (Throwable?) -> Unit)
+    suspend fun addDiary(diary: StocksDiaryData): Throwable?
     suspend fun getDiaries(): StocksDiaryResponse
-    suspend fun getStocksDiaryOfToday(onResult: (StocksDiaryDomain?) -> Unit)
+    suspend fun getStocksDiaryOfToday(): StocksDiaryDomain?
     suspend fun removeStocksDiary(diary: StocksDiaryData): Throwable?
 }

@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.stocks_diary.detail.data
 
+import androidx.compose.material.contentColorFor
 import com.mind.market.aimissioncompose.auth.data.IAuthenticationRemoteDataSource
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper.addUniqueId
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper.toStocksDiaryDto
@@ -17,23 +18,24 @@ class StocksDiaryRepository(
     private val localDataSource: IStocksDiaryLocalDataSource,
     private val authRemoteDataSource: IAuthenticationRemoteDataSource
 ) : IStocksDiaryRepository {
-    override suspend fun addDiary(diary: StocksDiaryData, onResult: (Throwable?) -> Unit) {
-        remoteDataSource.addDiary(
+    override suspend fun addDiary(diary: StocksDiaryData): Throwable? {
+        val throwable = remoteDataSource.addDiary(
             getFirebaseUserId(),
-            diary.addUniqueId(),
-            onResult = onResult
+            diary.addUniqueId()
         )
 
         withContext(Dispatchers.IO) {
             addEntryToLocalDatabase(diary)
         }
+
+        return throwable
     }
 
     override suspend fun getDiaries() = remoteDataSource.getDiaries(getFirebaseUserId())
 
-    override suspend fun getStocksDiaryOfToday(onResult: (StocksDiaryDomain?) -> Unit) {
-        remoteDataSource.getDiaryForToday(getFirebaseUserId(), onResult = onResult)
-    }
+    override suspend fun getStocksDiaryOfToday() =
+        remoteDataSource.getDiaryForToday(getFirebaseUserId())
+
 
     override suspend fun removeStocksDiary(diary: StocksDiaryData) =
         remoteDataSource.removeDiary(getFirebaseUserId(), diary)

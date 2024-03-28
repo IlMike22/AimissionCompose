@@ -4,7 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mind.market.aimissioncompose.auth.domain.LogoutUserUseCase
 import com.mind.market.aimissioncompose.core.Resource
-import com.mind.market.aimissioncompose.domain.goal.*
+import com.mind.market.aimissioncompose.domain.goal.DeleteGoalUseCase
+import com.mind.market.aimissioncompose.domain.goal.GetGoalsUseCase
+import com.mind.market.aimissioncompose.domain.goal.InsertGoalUseCase
+import com.mind.market.aimissioncompose.domain.goal.IsGoalOverdueUseCase
+import com.mind.market.aimissioncompose.domain.goal.UpdateGoalStatusUseCase
 import com.mind.market.aimissioncompose.domain.landing_page.use_case.SetSortingModeUseCase
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.GoalListItem
@@ -18,7 +22,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.Month
@@ -198,18 +209,21 @@ class LandingPageViewModel @Inject constructor(
                 }
                 _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_IN_PROGRESS) }
             }
+
             SortingMode.SORT_BY_GOALS_IN_TODO -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.TODO }
                 }
                 _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_IN_TODO) }
             }
+
             SortingMode.SORT_BY_GOALS_COMPLETED -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.DONE }
                 }
                 _uiState.update { it.copy(selectedSortingMode = SortingMode.SORT_BY_GOALS_COMPLETED) }
             }
+
             SortingMode.SORT_BY_GOALS_DEPRECATED -> {
                 _goals.update { goals ->
                     goals.sortedByDescending { it.status == Status.DEPRECATED }
@@ -228,6 +242,7 @@ class LandingPageViewModel @Inject constructor(
             DropDownItemId.DELETE_GOAL -> {
                 cacheAndDeleteGoal(item.correspondingGoal)
             }
+
             DropDownItemId.HIDE_GOAL -> {
                 _uiState.update {
                     it.copy(errorMessage = "This feature is not implemented yet. Please come back later.")
@@ -275,31 +290,30 @@ class LandingPageViewModel @Inject constructor(
         goal.apply {
             viewModelScope.launch {
                 try {
-                    deleteGoal(goal) { isGoalDeleted ->
-                        if (isGoalDeleted.not()) {
-                            _uiState.update {
-                                it.copy(errorMessage = "Goal could not be deleted. Try again.")
-                            }
-                            return@deleteGoal
-                        }
-
-                        deletedGoal = goal
-                        val updatedGoals = mutableListOf<Goal>()
-                        _goals.value.forEach {
-                            if (it != deletedGoal) {
-                                updatedGoals.add(it)
-                            }
-                        }
-                        _goals.value = updatedGoals
-                        viewModelScope.launch {
-                            _uiEvent.send(
-                                LandingPageUiEvent.ShowSnackbar(
-                                    message = "The goal was successfully deleted.",
-                                    snackbarAction = SnackBarAction.UNDO
-                                )
-                            )
+                    val isGoalDeleted = deleteGoal(goal)
+                    if (isGoalDeleted.not()) {
+                        _uiState.update {
+                            it.copy(errorMessage = "Goal could not be deleted. Try again.")
                         }
                     }
+
+                    deletedGoal = goal
+                    val updatedGoals = mutableListOf<Goal>()
+                    _goals.value.forEach {
+                        if (it != deletedGoal) {
+                            updatedGoals.add(it)
+                        }
+                    }
+                    _goals.value = updatedGoals
+                    viewModelScope.launch {
+                        _uiEvent.send(
+                            LandingPageUiEvent.ShowSnackbar(
+                                message = "The goal was successfully deleted.",
+                                snackbarAction = SnackBarAction.UNDO
+                            )
+                        )
+                    }
+
                 } catch (exception: java.lang.Exception) {
                     _uiEvent.send(LandingPageUiEvent.ShowSnackbar(message = "The goal could not be deleted. Try again."))
                 }
@@ -310,8 +324,12 @@ class LandingPageViewModel @Inject constructor(
     private fun restoreDeletedGoal() {
         if (deletedGoal != Goal.EMPTY) {
             viewModelScope.launch {
-                insertGoal(deletedGoal, ::onInsertGoalError)
-                _goals.update { _goals.value.plus(deletedGoal) }
+                val error = insertGoal(deletedGoal)
+                if (error == null) {
+                    _goals.update { _goals.value.plus(deletedGoal) }
+                } else {
+                    _uiState.update { it.copy(errorMessage = error.message) }
+                }
             }
         }
     }
@@ -354,6 +372,7 @@ class LandingPageViewModel @Inject constructor(
                     showGoalOverdueDialogIfNeeded(_goals.value)
                 }
             }
+
             is Resource.Loading -> {
                 _uiState.update {
                     it.copy(
@@ -362,6 +381,7 @@ class LandingPageViewModel @Inject constructor(
                     )
                 }
             }
+
             is Resource.Error -> {
                 _uiState.update {
                     _goals.value = emptyList()

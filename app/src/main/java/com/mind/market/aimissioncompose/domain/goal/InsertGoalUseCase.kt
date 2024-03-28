@@ -9,14 +9,11 @@ class InsertGoalUseCase(
 ) {
     suspend operator fun invoke(
         goal: Goal,
-        onResult: (Throwable?) -> Unit,
         operation: GoalReadWriteOperation = GoalReadWriteOperation.FIREBASE_DATABASE
-    ) {
+    ): Throwable? {
         if (goal == Goal.EMPTY) {
-            onResult(Throwable("Goal is not set. Cannot add an empty goal."))
-            return
+            return Throwable("Goal is not set. Cannot add an empty goal.")
         }
-
-        repository.insert(goal, onResult, operation)
+        return repository.insert(goal, operation)
     }
 }

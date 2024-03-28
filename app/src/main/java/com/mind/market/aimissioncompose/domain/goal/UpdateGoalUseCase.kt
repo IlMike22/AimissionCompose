@@ -10,10 +10,7 @@ class UpdateGoalUseCase(
     suspend operator fun invoke(
         goal: Goal,
         operation: GoalReadWriteOperation = GoalReadWriteOperation.FIREBASE_DATABASE,
-        onResult: (Boolean) -> Unit
-    ) {
-        repository.updateGoal(goal, operation) { isSuccess ->
-            onResult(isSuccess)
-        }
+    ): Boolean {
+        return repository.updateGoal(goal, operation)
     }
 }

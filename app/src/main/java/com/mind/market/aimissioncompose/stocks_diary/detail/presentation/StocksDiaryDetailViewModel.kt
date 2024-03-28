@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,28 +34,25 @@ class StocksDiaryDetailViewModel @Inject constructor(
     private suspend fun addDiaryEntryIfNotExistsAlready(
         diary: StocksDiaryDomain
     ) {
-        repository.getStocksDiaryOfToday { diaryOfToday ->
+        val diaryOfToday = repository.getStocksDiaryOfToday()
 //            if (diaryOfToday == null || diary.createdDate != LocalDate.now()) { // TODO MIC just tmp. removed for testing with more items
-                viewModelScope.launch {// TODO MIC ANTIPATTERN? How to avoid nested vm scopes??
-                    repository.addDiary(diary.toStocksDiaryData()) { error ->
-                        if (error != null) {
-                            _state.update {
-                                it.copy(
-                                    isLoading = false,
-                                    errorMessage = error.message,
-                                )
-                            }
-                        } else {
-                            _state.update {
-                                it.copy(
-                                    isLoading = false,
-                                    errorMessage = null,
-                                    isNavigateBack = true
-                                )
-                            }
-                        }
-                    }
-                }
+
+        val error = repository.addDiary(diary.toStocksDiaryData())
+        if (error != null) {
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = error.message,
+                )
+            }
+        } else {
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    errorMessage = null,
+                    isNavigateBack = true
+                )
+            }
 //            } else { // TODO do NOT remove. Needed later..
 //                _state.update {
 //                    it.copy(

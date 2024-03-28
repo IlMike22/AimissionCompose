@@ -6,4 +6,6 @@ sealed interface StocksDiaryOverviewEvent {
     object OnUpdateList : StocksDiaryOverviewEvent
     data class OnItemRemove(val item: StocksDiaryDomain) : StocksDiaryOverviewEvent
     object OnOpenChartView : StocksDiaryOverviewEvent
+    object OnUndoItemRemove : StocksDiaryOverviewEvent
+    object OnDismissSnackbar: StocksDiaryOverviewEvent
 }

@@ -1,5 +1,6 @@
 package com.mind.market.aimissioncompose.stocks_diary.overview.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -23,6 +24,11 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.SnackbarResult
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -40,23 +46,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mind.market.aimissioncompose.navigation.Route
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.Mood
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalUnitApi::class)
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun StocksDiaryOverviewScreen(
     navController: NavController,
@@ -73,72 +78,99 @@ fun StocksDiaryOverviewScreen(
         onEvent
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    )
-    {
-        if (state.isLoading) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-        } else if (state.errorMessage != null) {
-            Text(text = state.errorMessage)
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                Button(
-                    modifier = Modifier.padding(4.dp),
-                    onClick = {
-                        navController.navigate(
-                            Route.STOCKS_DIARY_CHART
-                                    + "?month=${state.currentMonth}&year=${state.currentYear}"
-                        )
-                    }
-                ) {
-                    Text(text = "Open Chart View")
-                }
-                LazyColumn(modifier = Modifier.padding(16.dp)) {
-                    items(
-                        items = state.stockDiaries,
-                        key = { it }
-                    ) { item ->
-                        val alignment = Alignment.CenterEnd
-                        val icon = Icons.Default.Delete
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember {
+        SnackbarHostState()
+    }
 
-                        SwipeToDeleteContainer(
-                            item = item,
-                            onDelete = {
-                                onEvent(StocksDiaryOverviewEvent.OnItemRemove(item))
-                            }) { stocksItem ->
-                            Card(
-                                modifier = Modifier
-                                    .height(140.dp)
-                                    .fillMaxWidth()
-                                    .padding(4.dp)
-                                    .align(alignment = Alignment.CenterHorizontally)
-                            ) {
-                                StocksDiaryItem(stocksItem)
+
+    LaunchedEffect(key1 = state.showUndoSnackbar) {
+        if (state.showUndoSnackbar) {
+            scope.launch {
+                val result = snackbarHostState.showSnackbar(
+                    message = "Item deleted. Do you want to revert this?",
+                    actionLabel = "Undo",
+                    duration = SnackbarDuration.Long
+                )
+
+                when (result) {
+                    SnackbarResult.Dismissed -> onEvent(StocksDiaryOverviewEvent.OnDismissSnackbar)
+                    SnackbarResult.ActionPerformed -> onEvent(StocksDiaryOverviewEvent.OnUndoItemRemove)
+                }
+            }
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        )
+        {
+            if (state.isLoading) {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            } else if (state.errorMessage != null) {
+                Text(text = state.errorMessage)
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Button(
+                        modifier = Modifier.padding(4.dp),
+                        onClick = {
+                            navController.navigate(
+                                Route.STOCKS_DIARY_CHART
+                                        + "?month=${state.currentMonth}&year=${state.currentYear}"
+                            )
+                        }
+                    ) {
+                        Text(text = "Open Chart View")
+                    }
+                    LazyColumn(modifier = Modifier.padding(16.dp)) {
+                        items(
+                            items = state.stockDiaries,
+                            key = { it }
+                        ) { item ->
+                            val alignment = Alignment.CenterEnd
+                            val icon = Icons.Default.Delete
+
+                            SwipeToDeleteContainer(
+                                item = item,
+                                onDelete = {
+                                    onEvent(StocksDiaryOverviewEvent.OnItemRemove(item))
+                                }) { stocksItem ->
+                                Card(
+                                    modifier = Modifier
+                                        .height(140.dp)
+                                        .fillMaxWidth()
+                                        .padding(4.dp)
+                                        .align(alignment = Alignment.CenterHorizontally)
+                                ) {
+                                    StocksDiaryItem(stocksItem)
+                                }
                             }
                         }
                     }
                 }
             }
-        }
 
-        FloatingActionButton(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 24.dp),
-            onClick = { navController.navigate(Route.STOCKS_DIARY_DETAIL) }
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "Add new stock diary entry"
-            )
+            FloatingActionButton(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 24.dp),
+                onClick = { navController.navigate(Route.STOCKS_DIARY_DETAIL) }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "Add new stock diary entry"
+                )
+            }
         }
     }
 }

@@ -13,10 +13,18 @@ import com.mind.market.aimissioncompose.core.Resource
 import com.mind.market.aimissioncompose.domain.goal.GetGoalUseCase
 import com.mind.market.aimissioncompose.domain.goal.InsertGoalUseCase
 import com.mind.market.aimissioncompose.domain.goal.UpdateGoalUseCase
-import com.mind.market.aimissioncompose.domain.models.*
+import com.mind.market.aimissioncompose.domain.models.Genre
+import com.mind.market.aimissioncompose.domain.models.Goal
+import com.mind.market.aimissioncompose.domain.models.Priority
+import com.mind.market.aimissioncompose.domain.models.Status
+import com.mind.market.aimissioncompose.domain.models.ValidationStatusCode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -69,6 +77,7 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+
             is DetailEvent.OnDescriptionChanged -> {
                 _state.update {
                     it.copy(
@@ -78,6 +87,7 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+
             is DetailEvent.OnPriorityChanged -> {
                 _state.update {
                     it.copy(
@@ -87,6 +97,7 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+
             is DetailEvent.OnGenreChanged -> {
                 _state.update {
                     it.copy(
@@ -96,6 +107,7 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+
             is DetailEvent.OnStatusChanged -> {
                 _state.update {
                     it.copy(
@@ -105,6 +117,7 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+
             is DetailEvent.OnFinishDateChanged -> {
                 _state.update {
                     it.copy(
@@ -114,6 +127,7 @@ class DetailViewModel @Inject constructor(
                     )
                 }
             }
+
             is DetailEvent.OnSaveButtonClicked -> {
                 if (goalId != -1) {
                     updateGoal(
@@ -151,11 +165,13 @@ class DetailViewModel @Inject constructor(
                             )
                         }
                     }
+
                     is Resource.Loading -> {
                         _state.update {
                             it.copy(isLoading = true)
                         }
                     }
+
                     is Resource.Error -> {
                         _state.update {
                             it.copy(
@@ -181,7 +197,7 @@ class DetailViewModel @Inject constructor(
         val validationCode = isGoalValid(newGoal)
         if (validationCode != ValidationStatusCode.OK) {
             updateValidationErrorUi(validationCode)
-            return
+
         }
         _state.update {
             it.copy(
@@ -203,17 +219,7 @@ class DetailViewModel @Inject constructor(
 
     private fun updateGoalAndNavigateBack() {
         viewModelScope.launch {
-            updateGoal(_state.value.goal) { isSuccess ->
-                if (isSuccess) {
-                    navigateToLandingPage()
-                } else {
-                    _state.update {
-                        it.copy(
-                            errorMessage = "Unable to update goal. An error occurred."
-                        )
-                    }
-                }
-            }
+            updateGoal(_state.value.goal)
         }
     }
 
@@ -237,8 +243,10 @@ class DetailViewModel @Inject constructor(
             return
         }
         viewModelScope.launch {
-            insertGoal(newGoal, ::onInsertGoalError)
-            _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
+            val error = insertGoal(newGoal)
+            if (error == null) {
+                _uiEvent.send(DetailUIEvent.NavigateToLandingPage) //TODO has to be NavigateUp plus Invalidation
+            } else _state.update { it.copy(errorMessage = error.message) }
         }
     }
 

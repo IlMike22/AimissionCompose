@@ -7,7 +7,6 @@ import com.mind.market.aimissioncompose.data.common.data_source.IGoalDataSource
 import com.mind.market.aimissioncompose.data.common.repository.IGoalRepository
 import com.mind.market.aimissioncompose.domain.models.Goal
 import com.mind.market.aimissioncompose.domain.models.Status
-import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,19 +20,13 @@ class GoalRepository(
     @WorkerThread
     override suspend fun insert(
         goal: Goal,
-        onResult: (Throwable?) -> Unit,
         mode: GoalReadWriteOperation
-    ) {
+    ): Throwable? {
         if (mode == GoalReadWriteOperation.LOCAL_DATABASE) {
-            goalLocalDataSource.insertGoal(goal, null) { error ->
-                onResult(error)
-            }
-            return
+            return goalLocalDataSource.insertGoal(goal, null)
         }
 
-        goalRemoteDataSource.insertGoal(goal, getFirebaseUserId()) { error ->
-            onResult(error)
-        }
+        return goalRemoteDataSource.insertGoal(goal, getFirebaseUserId())
     }
 
     @WorkerThread
@@ -110,19 +103,13 @@ class GoalRepository(
     @CheckResult
     override suspend fun deleteGoal(
         goal: Goal,
-        onResult: (Boolean) -> Unit,
         mode: GoalReadWriteOperation
-    ) {
+    ): Boolean {
         if (mode == GoalReadWriteOperation.LOCAL_DATABASE) {
-            goalLocalDataSource.deleteGoal(goal) {
-                onResult(it)
-            }
-            return
+            return goalLocalDataSource.deleteGoal(goal)
         }
-
-        goalRemoteDataSource.deleteGoal(
+        return goalRemoteDataSource.deleteGoal(
             goal = goal,
-            onResult = onResult,
             userId = getFirebaseUserId()
         )
     }
@@ -132,26 +119,19 @@ class GoalRepository(
     override suspend fun updateGoal(
         goal: Goal,
         operation: GoalReadWriteOperation,
-        onResult: (Boolean) -> Unit
-    ) {
+    ): Boolean =
         if (operation == GoalReadWriteOperation.LOCAL_DATABASE) {
-            return try {
-                goalLocalDataSource.update(goal) {
-                    onResult(true)
-                }
-
+            try {
+                goalLocalDataSource.update(goal)
             } catch (exception: Exception) {
-                onResult(false)
+                false
             }
         } else {
             goalRemoteDataSource.update(
                 goal = goal,
                 userId = getFirebaseUserId()
-            ) { isSuccess ->
-                onResult(isSuccess)
-            }
+            )
         }
-    }
 
     override fun getGoals(operation: GoalReadWriteOperation): Flow<Resource<List<Goal>>> {
         return callbackFlow {

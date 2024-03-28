@@ -9,8 +9,7 @@ import java.time.LocalDateTime
 class DetailUseCase(
     private val repository: IGoalRepository
 ) : IDetailUseCase {
-    override suspend fun insert(goal: Goal, onResult: (Throwable?) -> Unit) =
-        repository.insert(goal, onResult)
+    override suspend fun insert(goal: Goal):Throwable? = repository.insert(goal)
 
     override fun isGoalOverdue(goal: Goal): Boolean = goal.finishDate < LocalDateTime.now()
 

@@ -13,11 +13,10 @@ class GoalLocalDataSource(
 ) : IGoalDataSource {
     override suspend fun deleteGoal(
         goal: Goal,
-        userId: String?,
-        onResult: (Boolean) -> Unit
-    ) {
+        userId: String?
+    ):Boolean {
         goalDao.deleteGoal(goal.toGoalDto())
-        onResult(true)
+        return true
     }
 
     override suspend fun getGoals(userId: String?, onResult: (Throwable?, List<Goal>) -> Unit) {
@@ -29,13 +28,14 @@ class GoalLocalDataSource(
         }
     }
 
-    override suspend fun insertGoal(goal: Goal, userId: String?, onResult: (Throwable?) -> Unit) {
+    override suspend fun insertGoal(goal: Goal, userId: String?):Throwable? {
         goalDao.insert(goal.toGoalDto())
-        onResult(null)
+        return null
     }
 
-    override suspend fun update(goal: Goal, userId: String?, onResult: (Boolean) -> Unit) {
+    override suspend fun update(goal: Goal, userId: String?):Boolean {
         goalDao.update(goal.toGoalDto())
+        return true
     }
 
     override suspend fun deleteAll(userId: String?, onResult: (Boolean) -> Unit) {
