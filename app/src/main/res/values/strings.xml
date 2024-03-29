@@ -73,5 +73,11 @@
     <string name="authentication_sign_up_button_text">Create new account</string>
     <string name="landing_page_error_button_text_I_understand">I understand.</string>
     <string name="detail_goal_description_hint_text">Goal`s description</string>
+    <string name="stocks_diary_detail_stocks_subtitle">Do you have any stocks sold or bought?</string>
+    <string name="stocks_diary_detail_stocks_bought_text">Stocks bought</string>
+    <string name="stocks_diary_detail_name_text">Name</string>
+    <string name="stocks_diary_detail_price_per_stock_text">Price per stock</string>
+    <string name="stocks_diary_detail_stocks_sold_text">Stocks sold</string>
+    <string name="stocks_diary_detail_save_text">Save</string>
 
 </resources>

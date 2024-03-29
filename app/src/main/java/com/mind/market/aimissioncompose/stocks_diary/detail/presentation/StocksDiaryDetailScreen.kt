@@ -30,13 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.presentation.common.Chip
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
-import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksInformation
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.components.ExpandableSection
 
 @Composable
@@ -166,11 +166,13 @@ fun StocksDiaryDetailScreen(
         Spacer(modifier = Modifier.height(8.dp))
         ExpandableSection(title = "Bought / sold any Stocks?") {
             Column(
-                modifier = Modifier.fillMaxHeight().padding(8.dp)
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(8.dp)
             ) {
-                Text(text = "Do you have any stocks sold or bought?", color = Color.Black)
+                Text(text = stringResource(R.string.stocks_diary_detail_stocks_subtitle), color = Color.Black)
                 Spacer(Modifier.height(8.dp))
-                Text(text = "Stocks bought", style = MaterialTheme.typography.h6, color = Color.Black)
+                Text(text = stringResource(R.string.stocks_diary_detail_stocks_bought_text), style = MaterialTheme.typography.h6, color = Color.Black)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = stocksBoughtName,
@@ -178,7 +180,7 @@ fun StocksDiaryDetailScreen(
                         stocksBoughtName = name
                     },
                     colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                    label = { Text(text = "Name") },
+                    label = { Text(text = stringResource(R.string.stocks_diary_detail_name_text)) },
                     textStyle = MaterialTheme.typography.body1,
                     maxLines = 1
                 )
@@ -202,7 +204,7 @@ fun StocksDiaryDetailScreen(
                         modifier = Modifier.weight(1f),
                         value = try {stocksBoughtPricePerStock.toString()} catch(exc:Exception) {""},
                         colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                        label = { Text(text = "Price per stock") },
+                        label = { Text(text = stringResource(R.string.stocks_diary_detail_price_per_stock_text)) },
                         onValueChange = { name ->
                             stocksBoughtPricePerStock = try {name.toDouble()} catch(exc:Exception) {0.0}
                         },
@@ -211,12 +213,12 @@ fun StocksDiaryDetailScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                 }
-                Text(text = "Stocks sold", style = MaterialTheme.typography.h6, color = Color.Black)
+                Text(text = stringResource(R.string.stocks_diary_detail_stocks_sold_text), style = MaterialTheme.typography.h6, color = Color.Black)
                 Spacer(modifier = Modifier.height(4.dp))
                 OutlinedTextField(
                     value = stocksSoldName,
                     colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                    label = { Text(text = "Name") },
+                    label = { Text(text = stringResource(id = R.string.stocks_diary_detail_name_text)) },
                     onValueChange = { name ->
                         stocksSoldName = name
                     },
@@ -242,7 +244,7 @@ fun StocksDiaryDetailScreen(
                 )
             }) {
             if (!state.isLoading) {
-                Text(text = "Save")
+                Text(text = stringResource(R.string.stocks_diary_detail_save_text))
             } else {
                 CircularProgressIndicator()
             }
