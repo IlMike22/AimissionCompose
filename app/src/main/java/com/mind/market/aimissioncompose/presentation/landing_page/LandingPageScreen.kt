@@ -78,7 +78,7 @@ fun LandingPageScreen(
         bottomSheetState = sheetState
     )
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(true) {
         uiEvent.collect { event ->
             when (event) {
                 is LandingPageUiEvent.ShowSnackbar -> {

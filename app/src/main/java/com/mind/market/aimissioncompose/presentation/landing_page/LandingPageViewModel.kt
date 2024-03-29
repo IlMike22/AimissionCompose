@@ -20,6 +20,7 @@ import com.mind.market.aimissioncompose.presentation.common.SnackBarAction
 import com.mind.market.aimissioncompose.presentation.utils.SortingMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,7 @@ class LandingPageViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(LandingPageUiState())
     private val _goals = MutableStateFlow(emptyList<Goal>())
     private val _searchText = MutableStateFlow("")
+    @OptIn(FlowPreview::class)
     private val _searchResult = _searchText
         .debounce(1000L)
         .onEach {
@@ -113,7 +115,8 @@ class LandingPageViewModel @Inject constructor(
 //            }
 //        }
 
-        viewModelScope.launch(context = Dispatchers.IO) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             getGoals().collect {
                 handleGoalsResponse(it)
             }
