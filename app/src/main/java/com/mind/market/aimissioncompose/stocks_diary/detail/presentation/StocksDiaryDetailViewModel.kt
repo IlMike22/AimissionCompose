@@ -28,6 +28,25 @@ class StocksDiaryDetailViewModel @Inject constructor(
                     addDiaryEntryIfNotExistsAlready(event.diary)
                 }
             }
+
+            is StocksDiaryDetailEvent.OnMoodChanged -> {
+                _state.update { it.copy(stocksDiary = it.stocksDiary.copy(mood = event.newMood)) }
+            }
+
+            is StocksDiaryDetailEvent.OnTitleChanged -> {
+                _state.update { it.copy(stocksDiary = it.stocksDiary.copy(title = event.title)) }
+            }
+
+            is StocksDiaryDetailEvent.OnDescriptionChanged -> {
+                _state.update { it.copy(stocksDiary = it.stocksDiary.copy(description = event.description))}}
+
+            is StocksDiaryDetailEvent.OnStockTradingChange -> _state.update {
+                it.copy(
+                    stocksDiary = it.stocksDiary.copy(
+                        stocksTraded = it.stocksDiary.stocksTraded + event.stockTradingDetail
+                    )
+                )
+            }
         }
     }
 

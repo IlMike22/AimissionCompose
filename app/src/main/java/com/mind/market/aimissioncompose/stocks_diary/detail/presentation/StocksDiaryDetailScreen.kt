@@ -17,6 +17,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
@@ -38,6 +39,7 @@ import com.mind.market.aimissioncompose.R
 import com.mind.market.aimissioncompose.presentation.common.Chip
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.components.ExpandableSection
+import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.components.StocksTradingScreen
 
 @Composable
 fun StocksDiaryDetailScreen(
@@ -46,38 +48,6 @@ fun StocksDiaryDetailScreen(
     onEvent: (StocksDiaryDetailEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var title by remember {
-        mutableStateOf("")
-    }
-
-    var description by remember {
-        mutableStateOf("")
-    }
-
-    var moodSelection by remember {
-        mutableStateOf(Mood.GOOD)
-    }
-
-    var stocksBoughtName by remember {
-        mutableStateOf("")
-    }
-    var stocksBoughtAmount by remember {
-        mutableStateOf(0)
-    }
-    var stocksBoughtPricePerStock by remember {
-        mutableStateOf(0.0)
-    }
-
-    var stocksSoldName by remember {
-        mutableStateOf("")
-    }
-    var stocksSoldAmount by remember {
-        mutableStateOf(0)
-    }
-    var stocksSoldPricePerStock by remember {
-        mutableStateOf(0.0)
-    }
-
     LaunchedEffect(key1 = state.isNavigateBack) {
         if (state.isNavigateBack) {
             navController.previousBackStackEntry
@@ -96,9 +66,9 @@ fun StocksDiaryDetailScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            value = title,
+            value = state.stocksDiary.title,
             onValueChange = {
-                title = it
+                onEvent(StocksDiaryDetailEvent.OnTitleChanged(it))
             },
             colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
             textStyle = MaterialTheme.typography.body1,
@@ -121,10 +91,10 @@ fun StocksDiaryDetailScreen(
                 .fillMaxWidth()
                 .height(180.dp)
                 .padding(8.dp),
-            value = description,
+            value = state.stocksDiary.description,
             maxLines = 5,
-            onValueChange = {
-                description = it
+            onValueChange = { description ->
+                onEvent(StocksDiaryDetailEvent.OnDescriptionChanged(description))
             },
             colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
             textStyle = MaterialTheme.typography.body1,
@@ -141,25 +111,25 @@ fun StocksDiaryDetailScreen(
         Row {
             Chip(
                 name = "Good day",
-                isSelected = moodSelection == Mood.GOOD,
-                onSelectionChanged = {
-                    moodSelection = Mood.GOOD
+                isSelected = state.stocksDiary.mood == Mood.GOOD,
+                onSelectionChanged = { newMood ->
+                    onEvent(StocksDiaryDetailEvent.OnMoodChanged(Mood.GOOD))
                 }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Chip(
                 name = "Was okay",
-                isSelected = moodSelection == Mood.OKAY,
+                isSelected = state.stocksDiary.mood == Mood.OKAY,
                 onSelectionChanged = {
-                    moodSelection = Mood.OKAY
+                    onEvent(StocksDiaryDetailEvent.OnMoodChanged(Mood.OKAY))
                 }
             )
             Spacer(modifier = Modifier.width(8.dp))
             Chip(
                 name = "Day to forget",
-                isSelected = moodSelection == Mood.BAD,
+                isSelected = state.stocksDiary.mood == Mood.BAD,
                 onSelectionChanged = {
-                    moodSelection = Mood.BAD
+                    onEvent(StocksDiaryDetailEvent.OnMoodChanged(Mood.BAD))
                 }
             )
         }
@@ -170,61 +140,7 @@ fun StocksDiaryDetailScreen(
                     .fillMaxHeight()
                     .padding(8.dp)
             ) {
-                Text(text = stringResource(R.string.stocks_diary_detail_stocks_subtitle), color = Color.Black)
-                Spacer(Modifier.height(8.dp))
-                Text(text = stringResource(R.string.stocks_diary_detail_stocks_bought_text), style = MaterialTheme.typography.h6, color = Color.Black)
-                Spacer(modifier = Modifier.height(4.dp))
-                OutlinedTextField(
-                    value = stocksBoughtName,
-                    onValueChange = { name ->
-                        stocksBoughtName = name
-                    },
-                    colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                    label = { Text(text = stringResource(R.string.stocks_diary_detail_name_text)) },
-                    textStyle = MaterialTheme.typography.body1,
-                    maxLines = 1
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)) {
-                    OutlinedTextField(
-                        modifier = Modifier.weight(0.3f),
-                        value = if (stocksBoughtAmount == 0) "" else stocksBoughtAmount.toString(),
-                        colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                        onValueChange = { name ->
-                            stocksBoughtAmount = if (name.isBlank()) 0 else name.toInt()
-                        },
-                        textStyle = MaterialTheme.typography.body1,
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    OutlinedTextField(
-                        modifier = Modifier.weight(1f),
-                        value = try {stocksBoughtPricePerStock.toString()} catch(exc:Exception) {""},
-                        colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                        label = { Text(text = stringResource(R.string.stocks_diary_detail_price_per_stock_text)) },
-                        onValueChange = { name ->
-                            stocksBoughtPricePerStock = try {name.toDouble()} catch(exc:Exception) {0.0}
-                        },
-                        textStyle = MaterialTheme.typography.body1,
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
-                Text(text = stringResource(R.string.stocks_diary_detail_stocks_sold_text), style = MaterialTheme.typography.h6, color = Color.Black)
-                Spacer(modifier = Modifier.height(4.dp))
-                OutlinedTextField(
-                    value = stocksSoldName,
-                    colors = TextFieldDefaults.textFieldColors(textColor = Color.Black),
-                    label = { Text(text = stringResource(id = R.string.stocks_diary_detail_name_text)) },
-                    onValueChange = { name ->
-                        stocksSoldName = name
-                    },
-                    textStyle = MaterialTheme.typography.body1,
-                    maxLines = 1
-                )
+                StocksTradingScreen(state = state, onEvent = onEvent)
             }
         }
 
@@ -234,9 +150,9 @@ fun StocksDiaryDetailScreen(
                 onEvent(
                     StocksDiaryDetailEvent.OnSaveButtonClicked(
                         StocksDiaryDomain(
-                            title = title,
-                            description = description,
-                            mood = moodSelection,
+                            title = state.stocksDiary.title,
+                            description = state.stocksDiary.description,
+                            mood = state.stocksDiary.mood,
 //                            stocksSold = StocksInformation(name = stocksSoldName),
 //                            stocksBought = StocksInformation(name = stocksBoughtName)
                         )

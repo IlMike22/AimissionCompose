@@ -12,13 +12,18 @@ data class StocksDiaryDomain(
     val description: String = "",
     val mood: Mood = Mood.GOOD, // TODO MIC Mood is part of presentation..think about it
     val createdDate: LocalDate = LocalDate.now(),
-//    val stocksSold: StocksInformation = StocksInformation(),
-//    val stocksBought: StocksInformation = StocksInformation()
+    val stocksTraded: List<StockTradingDetail> = emptyList(),
 ) : Parcelable
 
-data class StocksInformation(
+@Parcelize
+data class StockTradingDetail(
     val name: String = "",
     val amount: Int = -1,
     val pricePerStock: Double = 0.0,
-    val reason: String = ""
-)
+    val reason: String = "",
+    val tradingState: TradingState = TradingState.BOUGHT
+): Parcelable
+
+enum class TradingState {
+    BOUGHT, SOLD
+}
