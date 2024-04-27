@@ -2,14 +2,17 @@ package com.mind.market.aimissioncompose.stocks_diary.detail.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mind.market.aimissioncompose.presentation.utils.ValidationResult
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper.toStocksDiaryData
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.IStocksDiaryRepository
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
+import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksTradingItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,16 +41,40 @@ class StocksDiaryDetailViewModel @Inject constructor(
             }
 
             is StocksDiaryDetailEvent.OnDescriptionChanged -> {
-                _state.update { it.copy(stocksDiary = it.stocksDiary.copy(description = event.description))}}
+                _state.update { it.copy(stocksDiary = it.stocksDiary.copy(description = event.description)) }
+            }
 
-            is StocksDiaryDetailEvent.OnStockTradingChange -> _state.update {
-                it.copy(
-                    stocksDiary = it.stocksDiary.copy(
-                        stocksTraded = it.stocksDiary.stocksTraded + event.stockTradingDetail
-                    )
+            is StocksDiaryDetailEvent.OnAddNewTradingItem -> {
+                validateStocksTradingItem(
+                    event.name,
+                    event.amount,
+                    event.pricePerStock,
+                    event.reason
                 )
+                _state.update {
+                    it.copy(
+                        stocksDiary = it.stocksDiary.copy(
+                            stocksTraded = it.stocksDiary.stocksTraded + StocksTradingItem(
+                                name = event.name,
+                                amount = event.amount,
+                                pricePerStock = event.pricePerStock,
+                                reason = event.reason
+                            )
+                        )
+                    )
+                }
             }
         }
+    }
+
+    private fun validateStocksTradingItem(
+        name: String,
+        amount: Int,
+        pricePerStock: BigDecimal,
+        reason: String
+    ): ValidationResult {
+        if (name == "" || amount == 0 || pricePerStock == BigDecimal(0)) return ValidationResult.ERROR
+        return ValidationResult.SUCCESS
     }
 
     private suspend fun addDiaryEntryIfNotExistsAlready(

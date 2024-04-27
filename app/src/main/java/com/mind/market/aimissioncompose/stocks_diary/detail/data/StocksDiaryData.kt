@@ -1,5 +1,7 @@
 package com.mind.market.aimissioncompose.stocks_diary.detail.data
 
+import java.math.BigDecimal
+
 data class StocksDiaryData(
     val id: Int = -1,
     val title: String = "",
@@ -13,6 +15,6 @@ data class StocksDiaryData(
 data class StocksInformationData(
     val name: String = "",
     val amount: Int = -1,
-    val pricePerStock: Double = 0.0,
+    val pricePerStock: BigDecimal = BigDecimal(0),
     val reason:String = ""
 )

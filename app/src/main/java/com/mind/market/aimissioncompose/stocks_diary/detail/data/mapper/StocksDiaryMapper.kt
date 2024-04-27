@@ -3,7 +3,7 @@ package com.mind.market.aimissioncompose.stocks_diary.detail.data.mapper
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksDiaryData
 import com.mind.market.aimissioncompose.stocks_diary.detail.data.StocksInformationData
 import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksDiaryDomain
-import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StockTradingDetail
+import com.mind.market.aimissioncompose.stocks_diary.detail.domain.models.StocksTradingItem
 import com.mind.market.aimissioncompose.stocks_diary.detail.presentation.Mood
 import com.mind.market.aimissioncompose.stocks_diary.overview.data.StocksDiaryDto
 import java.time.LocalDate
@@ -50,7 +50,7 @@ private fun addZeroIfNeccessary(day: Int) =
         day.toString()
     }
 
-private fun StockTradingDetail.toData() =
+private fun StocksTradingItem.toData() =
     StocksInformationData(
         name = this.name,
         amount = this.amount,
